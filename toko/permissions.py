@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 class IsAdminOrSelf(permissions.BasePermission):
-    message = 'Allow admin or self'
+    message = 'Only admin or self allowed'
 
     def has_object_permission(self, request, view, obj):
-        return request.user.id == 1 or obj == request.user
+        return request.user.is_superuser or obj == request.user
