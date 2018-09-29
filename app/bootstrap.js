@@ -1,5 +1,5 @@
 
-import { saveToken, loadToken } from './helpers/account'
+import { refreshJwtToken, loadJwtToken } from './helpers/account'
 
 window._ = require('lodash');
 window.Popper = require('popper.js').default;
@@ -24,23 +24,10 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-// auto assign request authorization header from the last response
-
-let authorization = loadToken()
-
 window.axios.interceptors.request.use(config => {
-    if (authorization) {
-        config.headers.authorization = authorization
-    }
+    refreshJwtToken()
+    config.headers.authorization = 'Jwt ' + loadJwtToken()
     return config
-})
-
-window.axios.interceptors.response.use(response => {
-    if (response.headers.authorization) {
-        authorization = response.headers.authorization
-        saveToken(authorization)
-    }
-    return response
 })
 
 /**
@@ -49,10 +36,10 @@ window.axios.interceptors.response.use(response => {
  * a simple convenience so we don't have to attach every token manually.
  */
 
-window.csrf_token = document.head.querySelector('meta[name="csrf-token"]');
+window.csrf_token = document.cookie.match(/csrftoken=(.+)(?:;|$)/)[1];
 
 if (window.csrf_token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = window.csrf_token.content;
+    window.axios.defaults.headers.common['X-CSRFToken'] = window.csrf_token;
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }

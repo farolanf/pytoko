@@ -1,21 +1,35 @@
+import jwtDecode from 'jwt-decode'
 import store from '#/store'
 
 export function loginWithJwt () {
-    if (!loadToken()) return
+    if (!loadJwtToken()) return
     store.dispatch('account/getUser')
         .catch(() => {
-            removeToken()
+            removeJwtToken()
         })
 }
 
-export function removeToken() {
-    localStorage.removeItem('jwt')
+export function refreshJwtToken () {
+    const token = loadJwtToken()
+    if (!token) return
+
+    const decoded = jwtDecode(token)
+    console.log(decoded)
+    if (decoded.exp - Date.now() > 60*15) return
+
+    axios.post('/api-token-refresh', { token }).then(resp => {
+        saveJwtToken(resp.data.token)
+    })
 }
 
-export function saveToken (token) {
-    localStorage.setItem('jwt', token)
+export function removeJwtToken() {
+    localStorage.removeItem('jwtToken')
 }
 
-export function loadToken () {
-    return localStorage.getItem('jwt')
+export function saveJwtToken (token) {
+    localStorage.setItem('jwtToken', token)
+}
+
+export function loadJwtToken () {
+    return localStorage.getItem('jwtToken')
 }

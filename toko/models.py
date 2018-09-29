@@ -1,5 +1,30 @@
+import re
 from django.db import models
+from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
+
+class User(AbstractUser):
+    email = models.EmailField(_('email address'), blank=True, unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    class Meta:
+        db_table = 'auth_user'
+
+    @property
+    def permissions(self):
+        """
+        Return a list of permission names.
+
+        It's a combination of groups and specific user permissions.
+        """
+        group_permissions = [perm.name.lower() for group in self.groups.all()
+            for perm in group.permissions.all()]
+
+        return group_permissions
+
 
 class Taxonomy(MPTTModel):
     name = models.CharField(max_length=50)

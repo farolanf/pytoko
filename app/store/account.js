@@ -1,6 +1,6 @@
 import axios from "axios";
-import { removeToken } from '../helpers/account'
 import { updateFromResponse, updateFromError } from './request'
+import { saveJwtToken, removeJwtToken } from "../helpers/account";
 
 export default {
     namespaced: true,
@@ -19,22 +19,23 @@ export default {
     },
     actions: {
         getUser ({ commit }) {
-            return axios.get('/api/user')
+            return axios.get('/user/')
                 .then(resp => {
                     commit('setUser', { user: resp.data })
                 })
         },
         login ({ commit }, { email, password }) {
-            return axios.post('/api/login', { email, password })
-                .then(updateFromResponse)
-                .catch(updateFromError)
+            return axios.post('/api-token-auth/', { email, password })
+                // .then(updateFromResponse)
+                // .catch(updateFromError)
                 .then(resp => {
-                    commit('setUser', { user: resp.data.user })
+                    console.log(resp)
+                    // saveJwtToken(resp.data.token)
                     return resp
                 })
         },
         logout ({ commit }) {
-            removeToken()
+            removeJwtToken()
             commit('setUser')
         },
         sendResetPasswordEmail ({ commit }, { email }) {
