@@ -12,5 +12,5 @@ class UserSerializer(FilterFieldsMixin, serializers.HyperlinkedModelSerializer):
             {
                 'fields': ['email', 'permissions'],
                 'permission_classes': [IsAdminOrSelf],
-            }
+            },
         ]

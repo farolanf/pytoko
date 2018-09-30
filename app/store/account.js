@@ -26,8 +26,8 @@ export default {
         },
         login ({ commit }, { email, password }) {
             return axios.post('/api-token-auth/', { email, password })
-                // .then(updateFromResponse)
-                // .catch(updateFromError)
+                .then(updateFromResponse)
+                .catch(updateFromError)
                 .then(resp => {
                     console.log(resp)
                     // saveJwtToken(resp.data.token)

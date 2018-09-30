@@ -1,18 +1,28 @@
 
+class ActionPermissionsMixin(object):
+
+    def get_permissions(self):
+        """
+        Return custom permissions for current action/method.
+        """
+        if hasattr(self, 'action_permissions'):
+            action = self.action if hasattr(self, 'action') \
+                    else self.request.method.lower()
+
+            for perm in self.action_permissions:
+                if action in perm['actions']:
+                    return [permission() for permission in perm['permission_classes']]
+
+        return super().get_permissions()
+
 class FilterFieldsMixin(object):
     """
     Allow filtering fields based on permissions. 
     """
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        self.view = kwargs.pop('view', None)
-        super().__init__(*args, **kwargs)
-
     def get_field_names(self, *args, **kwargs):
         fields = super().get_field_names(*args, **kwargs)
 
-        if self.instance is not None and \
-            self.request is not None and self.view is not None:
+        if self.instance is not None and hasattr(self._context, 'view'):
 
             # filter based on permissions
             if hasattr(self, 'Meta') and hasattr(self.Meta, 'field_permissions'):
@@ -28,10 +38,23 @@ class FilterFieldsMixin(object):
         return [field for field in fields if self.field_allowed(field)]
 
     def field_allowed(self, field):
-        for perm in self.Meta.field_permissions:
-            if not field in perm['fields']: continue
-            permissions = [permission() for permission in perm['permission_classes']]
-            for permission in permissions:
-                if not permission.has_object_permission(self.request, self.view, self.instance):
+        return check_permissions(field, 'fields', self.Meta.field_permissions,
+                self._context['request'], self._context['view'], self.instance)
+
+    # def filter_fields(self, fields):
+    #     # do some filters
+    #     # ...
+    #     return fields
+
+def check_permissions(name, field_name, permissions, request, view, obj=None):
+    for perm in permissions:
+        if not name in perm[field_name]: continue
+        permissions = [permission() for permission in perm['permission_classes']]
+        for permission in permissions:
+            if obj is None:
+                if not permission.has_permission(request, view):
                     return False
-        return True
+            else:
+                if not permission.has_object_permission(request, view, obj):
+                    return False
+    return True
