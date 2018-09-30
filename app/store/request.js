@@ -27,7 +27,7 @@ export default {
 
 export function updateFromResponse (response) {
     store.commit('request/setError', {
-        message: response.data.message || response.data.non_field_errors[0],
+        message: response.data.message || response.data.non_field_errors && response.data.non_field_errors[0],
         errors: response.data.errors || response.data.non_field_errors,
         status: response.status
     })

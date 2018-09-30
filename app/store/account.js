@@ -1,6 +1,6 @@
 import axios from "axios";
 import { updateFromResponse, updateFromError } from './request'
-import { saveJwtToken, removeJwtToken } from "../helpers/account";
+import { saveJwtToken, removeJwtToken, getJwtPayload } from "../helpers/account";
 
 export default {
     namespaced: true,
@@ -19,21 +19,23 @@ export default {
     },
     actions: {
         getUser ({ commit }) {
-            return axios.get('/user/')
+            const payload = getJwtPayload()
+            if (!payload) return
+            return axios.get(`/api/users/${payload.user_id}/`)
                 .then(resp => {
                     commit('setUser', { user: resp.data })
                 })
         },
-        login ({ commit }, { email, password }) {
+        login ({ commit, dispatch }, { email, password }) {
             return axios.post('/api-token-auth/', { email, password })
                 .then(updateFromResponse)
-                .catch(updateFromError)
                 .then(resp => {
-                    console.log(resp)
-                    // saveJwtToken(resp.data.token)
+                    saveJwtToken(resp.data.token)
+                    dispatch('getUser')
                     return resp
                 })
-        },
+                .catch(updateFromError)
+            },
         logout ({ commit }) {
             removeJwtToken()
             commit('setUser')

@@ -25,7 +25,9 @@ window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 window.axios.interceptors.request.use(config => {
-    refreshJwtToken()
+    if (!config.refreshTokenRequest) {
+        refreshJwtToken()
+    }
     config.headers.authorization = 'Jwt ' + loadJwtToken()
     return config
 })
@@ -36,13 +38,18 @@ window.axios.interceptors.request.use(config => {
  * a simple convenience so we don't have to attach every token manually.
  */
 
-window.csrf_token = document.cookie.match(/csrftoken=(.+)(?:;|$)/)[1];
+window.axios.defaults.xsrfCookieName = 'csrftoken'
+window.axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-if (window.csrf_token) {
-    window.axios.defaults.headers.common['X-CSRFToken'] = window.csrf_token;
-} else {
-    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
+// window.csrf_token = document.cookie.match(/csrftoken=(.+)(?:;|$)/)[1];
+
+// if (window.csrf_token) {
+//     window.axios.defaults.xsrfCookieName = 'csrftoken'
+//     window.axios.defaults.xsrfHeaderName = 'HTTP_X_CSRFTOKEN'
+//     window.axios.defaults.headers.common['HTTP_X_CSRFTOKEN'] = window.csrf_token;
+// } else {
+//     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+// }
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

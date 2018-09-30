@@ -1,6 +1,6 @@
 <template lang="pug">
     .navbar-item.has-dropdown(:class="{'is-active': profileDropdown}")
-        a.navbar-link(:class="{'is-active': active}" @click.prevent="toggleProfile") Halo {{ user.name }}!
+        a.navbar-link(:class="{'is-active': active}" @click.prevent="toggleProfile") Halo {{ user.username }}!
         .navbar-dropdown
             router-link.navbar-item(:to="{name: 'my-ads'}" @click.native="hideProfile") Iklan saya
             router-link.navbar-item(:to="{name: 'dashboard'}" exact @click.native="hideProfile") Akun
