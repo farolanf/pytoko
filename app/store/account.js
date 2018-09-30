@@ -41,7 +41,7 @@ export default {
             commit('setUser')
         },
         sendResetPasswordEmail ({ commit }, { email }) {
-            return axios.post('/api/password/email', { email })
+            return axios.post('/api/password/email/', { email })
                 .then(updateFromResponse)
                 .catch(updateFromError)
         }

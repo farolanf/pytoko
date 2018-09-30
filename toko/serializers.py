@@ -3,6 +3,9 @@ from rest_framework import serializers
 from .mixins import FilterFieldsMixin
 from .permissions import IsAdminOrSelf
 
+class PasswordEmailRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
 class UserSerializer(FilterFieldsMixin, serializers.HyperlinkedModelSerializer):
     
     class Meta:    

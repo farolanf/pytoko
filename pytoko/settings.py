@@ -121,6 +121,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'password-email': '6/min',
+    },
 }
 
 JWT_AUTH = {
