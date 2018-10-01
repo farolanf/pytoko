@@ -51,8 +51,25 @@ class PasswordResetBrowserTestCase(LiveTestCase):
 
     def test_password_reset(self):
         user = create_user('user@email.com', 'pass')
+
         self.selenium.get('%s%s' % (self.live_server_url, '/lupa-password'))
         email_input = self.selenium.find_element_by_name('email')
         email_input.send_keys(user.email)
         self.selenium.find_element_by_xpath('//button[text()="Kirim email"]').click()
-        self.selenium.find_element_by_xpath('//*[starts-with(text(), "Permintaan sedang diproses")]')        
+        self.selenium.find_element_by_xpath('//*[starts-with(text(), "Permintaan sedang diproses")]')
+
+        password_reset = PasswordReset.objects.get(email=user.email)
+        
+        self.selenium.get('%s%s%s' % (self.live_server_url, 
+                '/reset-password?t=', password_reset.token))
+
+        password_input = self.selenium.find_element_by_xpath('//input[@name="password"]')
+        password_input.send_keys('newpass')
+
+        password_confirm_input = self.selenium.find_element_by_xpath('//input[@name="password_confirm"]')
+        password_confirm_input.send_keys('newpass')
+
+        self.selenium.find_element_by_xpath('//button[text()="Simpan"]').click()
+        self.selenium.find_element_by_xpath('//*[starts-with(text(), "Password telah diubah")]')
+
+
