@@ -3,8 +3,8 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from toko.models import PasswordReset
 from .utils.user import create_user
+from .base import LiveTestCase
 
-# Create your tests here.
 class PasswordResetTestCase(TestCase):
 
     def setUp(self):
@@ -40,3 +40,19 @@ class PasswordResetTestCase(TestCase):
         self.assertTrue(check_password('newpass', user.password))
         self.assertTrue(not PasswordReset.objects.filter(email=user.email).exists())
 
+class PasswordResetBrowserTestCase(LiveTestCase):
+
+    def test_email_not_registered(self):
+        self.selenium.get('%s%s' % (self.live_server_url, '/lupa-password'))
+        email_input = self.selenium.find_element_by_name('email')
+        email_input.send_keys('nouser@email.com')
+        self.selenium.find_element_by_xpath('//button[text()="Kirim email"]').click()
+        self.selenium.find_element_by_xpath('//*[text()="Email tidak terdaftar."]')
+
+    def test_password_reset(self):
+        user = create_user('user@email.com', 'pass')
+        self.selenium.get('%s%s' % (self.live_server_url, '/lupa-password'))
+        email_input = self.selenium.find_element_by_name('email')
+        email_input.send_keys(user.email)
+        self.selenium.find_element_by_xpath('//button[text()="Kirim email"]').click()
+        self.selenium.find_element_by_xpath('//*[starts-with(text(), "Permintaan sedang diproses")]')        

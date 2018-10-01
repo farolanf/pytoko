@@ -9,6 +9,14 @@ export default {
         error: false,
         status: null,
     },
+    getters: {
+        hasError: state => name => state.errors && state.errors.hasOwnProperty(name),
+        getError: state => name => state.errors 
+            ? Array.isArray(state.errors[name])
+                ? state.errors[name][0]
+                : state.errors[name]
+            : ''
+    },
     mutations: {
         setError (state, { message = '', errors = {}, status = 200 } = {}) {
             state.message = message

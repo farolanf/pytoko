@@ -6,7 +6,7 @@
         
         form(@submit.prevent="sendEmail")
 
-            input-field(type="email" name="email" title="Email" required left-icon="fa fa-envelope" placeholder="Alamat email" v-model="email" :error="!!errors.email" :error-msg="errors.email")
+            input-field(type="email" name="email" title="Email" required left-icon="fa fa-envelope" placeholder="Alamat email" v-model="email" :error="hasError('email')" :error-msg="getError('email')")
 
             .field.is-grouped
                 .control
@@ -23,9 +23,11 @@ export default {
             loading: false
         }
     },
-    computed: mapState('request', ['message', 'errors', 'error']),
+    computed: {
+        ...mapState('request', ['message', 'error']),
+        ...mapGetters('request', ['hasError', 'getError'])
+    },
     methods: {
-        ...mapMutations('request', ['resetRequestState']),
         ...mapActions('account', ['sendResetPasswordEmail']),
         sendEmail () {
             const { email } = this
