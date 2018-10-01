@@ -20,11 +20,11 @@ try {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = require('axios');
+const axios = require('axios');
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-window.axios.interceptors.request.use(config => {
+axios.interceptors.request.use(config => {
     if (!config.refreshTokenRequest) {
         refreshJwtToken()
     }
@@ -38,8 +38,8 @@ window.axios.interceptors.request.use(config => {
  * a simple convenience so we don't have to attach every token manually.
  */
 
-window.axios.defaults.xsrfCookieName = 'csrftoken'
-window.axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 // window.csrf_token = document.cookie.match(/csrftoken=(.+)(?:;|$)/)[1];
 

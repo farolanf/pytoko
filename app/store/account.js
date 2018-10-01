@@ -44,6 +44,15 @@ export default {
             return axios.post('/api/password/email/', { email })
                 .then(updateFromResponse)
                 .catch(updateFromError)
+        },
+        resetPassword({ commit }, { token, password, passwordConfirm }) {
+            return axios.post('/api/password/reset/', {
+                token,
+                password,
+                password_confirm: passwordConfirm
+            })
+            .then(updateFromResponse)
+            .catch(updateFromError)
         }
     }
 }

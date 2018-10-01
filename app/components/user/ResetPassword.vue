@@ -24,6 +24,7 @@ export default {
     },
     computed: mapState('request', ['message', 'errors', 'error']),
     methods: {
+        ...mapActions('account', ['resetPassword']),
         validatePassword () {
             const passwordConfirm = this.$el.querySelector('[name="password_confirm"]')
             let error = ''
@@ -35,17 +36,15 @@ export default {
         validate () {
             return this.$refs.form.reportValidity()
         },
-        resetPassword () {
-            axios.post('/api/password/reset/', {
+        submit () {
+            if (!this.validate()) return
+            this.resetPassword({
                 token: this.$route.query.t,
                 password: this.password,
-                password_confirm: this.passwordConfirm
+                passwordConfirm: this.passwordConfirm
+            }).then(() => {
+                this.$router.push({ name: 'request-status' })
             })
-        },
-        submit () {
-            if (this.validate()) {
-                this.resetPassword()
-            }
         }
     }
 }
