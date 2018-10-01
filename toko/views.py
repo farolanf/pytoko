@@ -24,13 +24,13 @@ class PasswordEmailView(AnonPostView):
 
     def post(self, request):
         serializer = PasswordEmailRequestSerializer(data=request.data)
-        validate(serializer, 'Tidak dapat memproses password reset.')
+        validate(serializer, 'Tidak dapat memproses reset password.')
 
         email = serializer.validated_data['email']
         token = create_password_reset(email)
         url = '%sreset-password?t=%s' % (request.build_absolute_uri('/'), token)
 
-        send_mail('Password reset', 'toko/mail/password-reset.html', email, 
+        send_mail('Password reset', 'toko/mail/password_reset.html', email, 
                 context={'url': url})
 
         return Response({
@@ -44,7 +44,9 @@ class PasswordResetView(AnonPostView):
         validate(serializer, 'Tidak dapat mereset password.')
         do_password_reset(serializer.validated_data.get('token'),      
                 serializer.validated_data.get('password'))
-        return Response()
+        return Response({
+            'message': 'Password telah diubah. Silahkan masuk menggunakan password baru anda.'
+        })
 
 class UserViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
