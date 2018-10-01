@@ -79,19 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pytoko.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pytoko',
-        'USER': 'pytoko',
-        'PASSWORD': 'pytoko',
-    }
-}
-
 AUTH_USER_MODEL = 'toko.User'
 
 # Password validation

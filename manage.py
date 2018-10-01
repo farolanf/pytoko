@@ -3,7 +3,13 @@ import os
 import sys
 
 if __name__ == '__main__':
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pytoko.settings')
+    if os.getenv('ENV') == 'production':
+        settings = 'prod'
+    elif 'test' in sys.argv:
+        settings = 'test'
+    else:
+        settings = 'dev'
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pytoko.settings.%s' % settings)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
