@@ -25,6 +25,10 @@ class User(AbstractUser):
 
         return group_permissions
 
+class PasswordReset(models.Model):
+    email = models.EmailField(unique=True)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField()
 
 class Taxonomy(MPTTModel):
     name = models.CharField(max_length=50)

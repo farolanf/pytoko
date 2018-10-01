@@ -6,6 +6,16 @@ from .permissions import IsAdminOrSelf
 class PasswordEmailRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
+class PasswordResetSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=255)
+    password_confirm = serializers.CharField(max_length=255)
+
+    def validate_password_confirm(self, value):
+        if value != self.get_initial().get('password'):
+            raise serializers.ValidationError('Kedua password harus sama')
+        return value
+
 class UserSerializer(FilterFieldsMixin, serializers.HyperlinkedModelSerializer):
     
     class Meta:    

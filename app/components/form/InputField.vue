@@ -4,7 +4,7 @@
         
         .control.has-icons-right(:class="{'has-icons-left': leftIcon}")
             
-            input.input(:class="{'is-danger': error, 'is-success': success}" v-bind="{type, name, placeholder, required}" :value="value" @input="$emit('input', $event.target.value)")
+            input.input(:class="{'is-danger': error, 'is-success': success}" v-bind="{type, name, placeholder, required}" :value="value" @input="$emit('input', $event.target.value)" @change="$emit('change', $event)")
             
             span.icon.is-small.is-left(v-if="leftIcon")
                 i(:class="leftIcon")
@@ -13,8 +13,8 @@
                 i.fa.fa-exclamation-triangle(v-if="error")
                 i.fa.fa-check(v-if="success")
 
-            p.help.is-danger(v-if="error") {{ errorStr }}
-            p.help.is-success(v-else-if="success") {{ successStr }}
+            p.help.is-danger(v-if="error") {{ errorMsg }}
+            p.help.is-success(v-else-if="success") {{ successMsg }}
             p.help(v-else-if="help") {{ help }}
 </template>
 
@@ -46,10 +46,10 @@ export default {
         help: {
             type: String
         },
-        errorStr: {
+        errorMsg: {
             type: String
         },
-        successStr: {
+        successMsg: {
             type: String
         },
         error: {

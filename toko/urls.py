@@ -8,6 +8,7 @@ router.register('users', views.UserViewSet)
 
 api_urlpatterns = [
     path('password/email/', views.PasswordEmailView.as_view()),
+    path('password/reset/', views.PasswordResetView.as_view()),
     path('', include(router.urls)),
 ]
 

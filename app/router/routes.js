@@ -20,6 +20,8 @@ const routes = [
             { path: 'daftar', component: c('user/page/RegisterPage'), name: 'daftar' },
 
             { path: 'lupa-password', component: c('user/page/ForgotPasswordPage'), name: 'forgot-password' },
+
+            { path: 'reset-password', component: c('user/page/ResetPasswordPage'), name: 'reset-password' },
             
             { path: 'akun', component: c('user/page/Dashboard'), name: 'dashboard', meta },
 

@@ -7,12 +7,13 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.status import *
 from .models import User
-from .serializers import UserSerializer, PasswordEmailRequestSerializer
+from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer
 from .permissions import IsAdminOrSelf
 from .mixins import ActionPermissionsMixin
 from .throttling import PasswordEmailThrottle
 from .validation import validate
-from .mail import send_mail
+from .utils.mail import send_mail
+from .utils.user import create_password_reset, do_password_reset
 
 class AnonPostView(views.APIView):
     authentication_classes = ()
@@ -24,11 +25,26 @@ class PasswordEmailView(AnonPostView):
     def post(self, request):
         serializer = PasswordEmailRequestSerializer(data=request.data)
         validate(serializer, 'Tidak dapat memproses password reset.')
-        send_mail('Password reset', 'toko/mail/password-reset.html', 
-                serializer.validated_data['email'])
+
+        email = serializer.validated_data['email']
+        token = create_password_reset(email)
+        url = '%sreset-password?t=%s' % (request.build_absolute_uri('/'), token)
+
+        send_mail('Password reset', 'toko/mail/password-reset.html', email, 
+                context={'url': url})
+
         return Response({
             'message': 'Permintaan sedang diproses. Silahkan periksa email anda beberapa saat lagi.'
         })
+
+class PasswordResetView(AnonPostView):
+
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        validate(serializer, 'Tidak dapat mereset password.')
+        do_password_reset(serializer.validated_data.get('token'),      
+                serializer.validated_data.get('password'))
+        return Response()
 
 class UserViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
