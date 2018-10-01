@@ -25,11 +25,11 @@ export default {
     computed: mapState('request', ['message', 'errors', 'error']),
     methods: {
         validatePassword () {
-            if (!this.passwordConfirm) return
-            const error = this.password !== this.passwordConfirm
-                ? 'kedua password harus sama'
-                : ''
             const passwordConfirm = this.$el.querySelector('[name="password_confirm"]')
+            let error = ''
+            if (this.passwordConfirm && this.passwordConfirm !== this.password) {
+                error = 'Kedua password harus sama'
+            }
             passwordConfirm.setCustomValidity(error)
         },
         validate () {

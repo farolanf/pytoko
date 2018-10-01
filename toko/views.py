@@ -11,9 +11,9 @@ from .serializers import UserSerializer, PasswordEmailRequestSerializer, Passwor
 from .permissions import IsAdminOrSelf
 from .mixins import ActionPermissionsMixin
 from .throttling import PasswordEmailThrottle
-from .validation import validate
+from .utils.validation import validate
 from .utils.mail import send_mail
-from .utils.user import create_password_reset, do_password_reset
+from .utils.password import create_password_reset, do_password_reset
 
 class AnonPostView(views.APIView):
     authentication_classes = ()
