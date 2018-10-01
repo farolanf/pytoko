@@ -4,9 +4,9 @@
         
         form(@submit.prevent="submit" ref="form")
 
-            input-field(type="password" name="password" title="Password" required left-icon="fa fa-lock" v-model="password" :error="!!errors.password" :error-msg="errors.password" @change="validatePassword")
+            input-field(type="password" name="password" title="Password" required left-icon="fa fa-lock" v-model="password" :error="hasError('password')" :error-msg="getError('password')" @change="validatePassword")
 
-            input-field(type="password" name="password_confirm" title="Ulang password" required left-icon="fa fa-lock" v-model="passwordConfirm" :error="!!errors.password_confirm" :error-msg="errors.password_confirm" @change="validatePassword")
+            input-field(type="password" name="password_confirm" title="Ulang password" required left-icon="fa fa-lock" v-model="passwordConfirm" :error="hasError('password_confirm')" :error-msg="getError('password_confirm')" @change="validatePassword")
 
             .field
                 .control
@@ -22,7 +22,10 @@ export default {
             passwordConfirm: ''
         }
     },
-    computed: mapState('request', ['message', 'errors', 'error']),
+    computed: {
+        ...mapState('request', ['message', 'error']),
+        ...mapGetters('request', ['hasError', 'getError']),
+    },
     methods: {
         ...mapActions('account', ['resetPassword']),
         validatePassword () {
