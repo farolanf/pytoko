@@ -1,5 +1,17 @@
+import axios from 'axios'
 import jwtDecode from 'jwt-decode'
 import store from '#/store'
+
+export function loginWithJwt () {
+    const token = loadJwtToken()
+    if (token) {
+        verifyJwtToken(token).then(() => {
+            store.dispatch('account/getUser')
+        }).catch(() => {
+            removeJwtToken()
+        })
+    }
+}
 
 export function getJwtPayload () {
     const token = loadJwtToken()
@@ -21,6 +33,10 @@ export function refreshJwtToken () {
     }).then(resp => {
         saveJwtToken(resp.data.token)
     })
+}
+
+export function verifyJwtToken (token) {
+    return axios.post('/api-token-refresh/', { token })
 }
 
 export function removeJwtToken() {

@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets
 from rest_framework import views
@@ -7,7 +9,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.status import *
 from .models import User
-from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer
+from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
 from .permissions import IsAdminOrSelf
 from .mixins import ActionPermissionsMixin
 from .throttling import PasswordEmailThrottle
@@ -15,9 +17,27 @@ from .utils.validation import validate
 from .utils.mail import send_mail
 from .utils.password import create_password_reset, do_password_reset
 
+User = get_user_model()
+
 class AnonPostView(views.APIView):
     authentication_classes = ()
     permission_classes = ()
+
+class RegisterView(AnonPostView):
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        validate(serializer, 'Pendaftaran akun gagal.')
+
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')
+
+        user = User.objects.create(email=email, password=make_password(password))
+
+        return Response({
+            'message': 'Pendaftaran berhasil. Silahkan periksa email anda dan lakukan konfirmasi.',
+            'user': UserSerializer(user, context={'request': request}).data, 
+        })
 
 class PasswordEmailView(AnonPostView):
     throttle_classes = (PasswordEmailThrottle,)

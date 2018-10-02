@@ -10,6 +10,7 @@ import './bootstrap'
 import Vue from 'vue'
 import router from './router'
 import store from './store'
+import { loginWithJwt } from './helpers/account';
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -34,6 +35,6 @@ const app = new Vue({
     router,
     store,
     created () {
-        store.dispatch('account/getUser')
+        loginWithJwt()
     }
 });

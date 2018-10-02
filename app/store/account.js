@@ -53,6 +53,15 @@ export default {
             })
             .then(updateFromResponse)
             .catch(updateFromError)
+        },
+        register({ commit }, { email, password, passwordConfirm }) {
+            return axios.post('/api/register/', {
+                email,
+                password,
+                password_confirm: passwordConfirm,
+            })
+            .then(updateFromResponse)
+            .catch(updateFromError)
         }
     }
 }

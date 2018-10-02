@@ -1,3 +1,16 @@
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
+
+class ValidatePasswordMixin(object):
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value
+
+    def validate_password_confirm(self, value):
+        if value != self.get_initial().get('password'):
+            raise serializers.ValidationError('Kedua password harus sama')
+        return value
 
 class ActionPermissionsMixin(object):
 

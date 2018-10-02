@@ -35,6 +35,9 @@ class Taxonomy(MPTTModel):
     slug = models.CharField(max_length=50, unique=True)
     parent = TreeForeignKey('self', related_name='children', null=True, blank=True, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name_plural = 'Taxonomies'
+
     class MPTTMeta:
         verbose_name_plural = 'Taxonomies'
 

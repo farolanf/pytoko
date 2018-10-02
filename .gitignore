@@ -7,8 +7,11 @@ env/
 .vscode/
 
 **/__pycache__/
+**/tests/screenshots/
 
 db.sqlite3
 mix-manifest.json
 
+.*
+~*
 *.log

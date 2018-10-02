@@ -41,12 +41,15 @@ export default {
         },
         submit () {
             if (!this.validate()) return
+            this.loading = true
             this.resetPassword({
                 token: this.$route.query.t,
                 password: this.password,
                 passwordConfirm: this.passwordConfirm
             }).then(() => {
                 this.$router.push({ name: 'request-status' })
+            }).finally(() => {
+                this.loading = false
             })
         }
     }
