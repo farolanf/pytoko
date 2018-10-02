@@ -2,9 +2,19 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .mixins import FilterFieldsMixin, ValidatePasswordMixin
 from .permissions import IsAdminOrSelf
-from .models import PasswordReset
+from .models import PasswordReset, Provinsi, Kabupaten
 
 User = get_user_model()
+
+class ProvinsiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Provinsi
+        fields = ('id', 'name')
+
+class KabupatenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Kabupaten
+        fields = ('id', 'name', 'provinsi_id')
 
 class RegisterSerializer(ValidatePasswordMixin, serializers.Serializer):
     email = serializers.EmailField(max_length=255)

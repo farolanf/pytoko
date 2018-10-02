@@ -4,6 +4,13 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+class Provinsi(models.Model):
+    name = models.CharField(max_length=100)
+
+class Kabupaten(models.Model):
+    name = models.CharField(max_length=100)
+    provinsi = models.ForeignKey(Provinsi, on_delete=models.CASCADE)
+
 class User(AbstractUser):
     email = models.EmailField(_('email address'), blank=True, unique=True)
 

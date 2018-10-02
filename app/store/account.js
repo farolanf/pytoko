@@ -1,4 +1,3 @@
-import axios from "axios";
 import { updateFromResponse, updateFromError } from './request'
 import { saveJwtToken, removeJwtToken, getJwtPayload } from "../helpers/account";
 

@@ -5,6 +5,8 @@ from . import views
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet)
+router.register('regions/provinsi', views.ProvinsiViewSet)
+router.register('regions/kabupaten', views.KabupatenViewSet)
 
 api_urlpatterns = [
     path('register/', views.RegisterView.as_view()),

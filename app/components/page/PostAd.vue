@@ -77,16 +77,19 @@ export default {
             })
         },
         onProvinsiChange () {
-            this.selectedProvinsi = this.dataProvinsi[this.provinsi]
+            this.selectedProvinsi = this.dataProvinsi.find(item => item.id === this.provinsi)
             if (this.selectedProvinsi.kabupaten) return
-            axios.get('/api/regions/kabupaten/'+this.provinsi)
-                .then(resp => {
-                    this.$set(this.selectedProvinsi, 'kabupaten', resp.data)
-                })
+            axios.get(`/api/regions/kabupaten/`, {
+                params: {
+                    provinsi_id: this.provinsi
+                }
+            }).then(resp => {
+                this.$set(this.selectedProvinsi, 'kabupaten', resp.data)
+            })
         }
     },
     mounted () {
-        axios.get('/api/regions/provinsi')
+        axios.get('/api/regions/provinsi/')
             .then(resp => {
                 this.dataProvinsi = resp.data
             })

@@ -8,7 +8,8 @@ from rest_framework.decorators import api_view, action, authentication_classes, 
 from rest_framework.permissions import IsAdminUser
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.status import *
-from .models import User
+from .models import User, Provinsi, Kabupaten
+from . import serializers
 from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
 from .permissions import IsAdminOrSelf
 from .mixins import ActionPermissionsMixin
@@ -81,6 +82,15 @@ class UserViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
             'permission_classes': [IsAdminOrSelf]
         },
     )
+
+class ProvinsiViewSet(viewsets.ModelViewSet):
+    queryset = Provinsi.objects.all()
+    serializer_class = serializers.ProvinsiSerializer
+
+class KabupatenViewSet(viewsets.ModelViewSet):
+    queryset = Kabupaten.objects.all()
+    serializer_class = serializers.KabupatenSerializer
+    filter_fields = ('provinsi_id',)
 
 def index(request):
     return render(request, 'toko/index.html')

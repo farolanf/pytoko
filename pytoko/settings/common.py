@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'toko.apps.TokoConfig',
     'mptt',
+    'django_filters',
     'rest_framework',
     'django_extensions',
     'django.contrib.admin',
@@ -108,13 +109,16 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'DEFAULT_THROTTLE_RATES': {
         'password-email': '6/min',
     },
 }
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*14), # TODO: fix this
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_ALLOW_REFRESH': True,
 }
