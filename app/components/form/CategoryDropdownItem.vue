@@ -1,7 +1,7 @@
 <template lang="pug">
     div.category-dropdown-item.relative
         a.dropdown-item(:class="{'is-active': active, 'has-background-light': show}" @click="click")
-            template {{ item.title }}
+            template {{ item.name }}
             span.icon(v-if="hasChildren")
                 i.fa.fa-angle-right
 
@@ -41,7 +41,7 @@ export default {
             return this.item.id === this.selectedId
         },
         hasChildren () {
-            return this.item.children && Object.keys(this.item.children).length
+            return this.item.children && this.item.children.length
         }
     },
     methods: {

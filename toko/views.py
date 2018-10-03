@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.status import *
 from .models import User, Provinsi, Kabupaten
+from . import models
 from . import serializers
 from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
 from .permissions import IsAdminOrSelf
@@ -82,6 +83,11 @@ class UserViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
             'permission_classes': [IsAdminOrSelf]
         },
     )
+
+class TaxonomyViewSet(viewsets.ModelViewSet):
+    queryset = models.Taxonomy.objects.filter(parent=None)
+    serializer_class = serializers.TaxonomySerializer
+    filter_fields = ('slug',)
 
 class ProvinsiViewSet(viewsets.ModelViewSet):
     queryset = Provinsi.objects.all()

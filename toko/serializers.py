@@ -3,15 +3,18 @@ from rest_framework import serializers
 from .mixins import FilterFieldsMixin, ValidatePasswordMixin
 from .permissions import IsAdminOrSelf
 from .models import PasswordReset, Provinsi, Kabupaten
+from . import models
 
 User = get_user_model()
 
 class ProvinsiSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Provinsi
         fields = ('id', 'name')
 
 class KabupatenSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Kabupaten
         fields = ('id', 'name', 'provinsi_id')
@@ -55,3 +58,13 @@ class UserSerializer(FilterFieldsMixin, serializers.HyperlinkedModelSerializer):
                 'permission_classes': [IsAdminOrSelf],
             },
         ]
+
+class TaxonomySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Taxonomy
+        fields = ('id', 'name', 'parent_id', 'children')
+
+    def get_children(self, instance):
+        return [TaxonomySerializer(item).data for item in instance.get_children()]
