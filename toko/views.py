@@ -98,11 +98,13 @@ class KabupatenViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.KabupatenSerializer
     filter_fields = ('provinsi_id',)
 
-class FileViewSet(viewsets.ModelViewSet):
-    queryset = models.File.objects.all()
-    serializer_class = serializers.FileSerializer
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = models.Image.objects.all()
+    serializer_class = serializers.ImageSerializer
 
 class AdViewSet(viewsets.ModelViewSet):
+    authentication_classes = ()
+    permission_classes = ()
     queryset = models.Ad.objects.all()
     serializer_class = serializers.AdSerializer
 

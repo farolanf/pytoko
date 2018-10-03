@@ -51,9 +51,8 @@ class Taxonomy(MPTTModel):
     def __str__(self):
         return self.name
 
-class File(models.Model):
-    name = models.CharField(max_length=255)
-    source = models.CharField(max_length=32)
+class Image(models.Model):
+    image = models.ImageField(upload_to='toko/static/img')
 
 class Ad(models.Model):
     category = models.ForeignKey(Taxonomy, on_delete=models.CASCADE)
@@ -61,4 +60,4 @@ class Ad(models.Model):
     kabupaten = models.ForeignKey(Kabupaten, on_delete=models.CASCADE)
     title = models.CharField(max_length=70)
     desc = models.CharField(max_length=4000)
-    images = models.ManyToManyField(File)
+    images = models.ManyToManyField(Image)

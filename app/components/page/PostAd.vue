@@ -66,13 +66,15 @@ export default {
     methods: {
         submit (e) {
             const fd = new FormData(e.target)
+            fd.append('nama', 'andi')
+            fd.append('nama', 'budi')
             if (this.imageItems && this.imageItems.length) {
-                this.imageItems.forEach(item => {
-                    fd.append('images[]', item.blob, item.file.name)
+                this.imageItems.forEach((item, i) => {
+                    fd.append(`images[${i}]`, item.blob, item.file.name)
                 })
             }
             this.loading = true
-            axios.post('/api/ads', fd).finally(() => {
+            axios.post('/api/ads/', fd).finally(() => {
                 this.loading = false
             })
         },

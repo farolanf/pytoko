@@ -69,14 +69,27 @@ class TaxonomySerializer(serializers.ModelSerializer):
     def get_children(self, instance):
         return [TaxonomySerializer(item).data for item in instance.get_children()]
 
-class FileSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.File
-        fields = ('id', 'name', 'source')
+        model = models.Image
+        fields = ('id', 'image')
+
+    def to_internal_value(self, data):
+        return super().to_internal_value({'image': data})
 
 class AdSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True)
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'title', 'category_id', 'provinsi_id', 'kabupaten_id', 'images')
+        fields = ('id', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images')
+
+    def create(self, validated_data):
+        images = validated_data.pop('images')
+        ad = models.Ad.objects.create(**validated_data)
+        for image in images:
+            img = models.Image.objects.create(**image)
+            img.ad_set.add(ad)
+            img.save()
+        return ad
