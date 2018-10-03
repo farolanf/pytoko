@@ -68,3 +68,15 @@ class TaxonomySerializer(serializers.ModelSerializer):
 
     def get_children(self, instance):
         return [TaxonomySerializer(item).data for item in instance.get_children()]
+
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.File
+        fields = ('id', 'name', 'source')
+
+class AdSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Ad
+        fields = ('id', 'title', 'category_id', 'provinsi_id', 'kabupaten_id', 'images')

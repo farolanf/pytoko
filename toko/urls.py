@@ -8,6 +8,8 @@ router.register('users', views.UserViewSet)
 router.register('regions/provinsi', views.ProvinsiViewSet)
 router.register('regions/kabupaten', views.KabupatenViewSet)
 router.register('taxonomy', views.TaxonomyViewSet)
+router.register('files', views.FileViewSet)
+router.register('ads', views.AdViewSet)
 
 api_urlpatterns = [
     path('register/', views.RegisterView.as_view()),

@@ -12,3 +12,5 @@ DATABASES = {
 REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
     'password-email': '10000/s'
 }
+
+TEST_RUNNER = 'redgreenunittest.django.runner.RedGreenDiscoverRunner'

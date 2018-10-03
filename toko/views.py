@@ -98,5 +98,13 @@ class KabupatenViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.KabupatenSerializer
     filter_fields = ('provinsi_id',)
 
+class FileViewSet(viewsets.ModelViewSet):
+    queryset = models.File.objects.all()
+    serializer_class = serializers.FileSerializer
+
+class AdViewSet(viewsets.ModelViewSet):
+    queryset = models.Ad.objects.all()
+    serializer_class = serializers.AdSerializer
+
 def index(request):
     return render(request, 'toko/index.html')
