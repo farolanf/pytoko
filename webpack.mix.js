@@ -33,9 +33,3 @@ mix.webpackConfig({
 mix.js('app/app.js', 'static/toko/js')
   .sass('app/css/app.scss', 'static/toko/css')
   .disableNotifications();
-
-mix.copy('static/toko', 'toko/static/toko')
-
-if (process.env.NODE_ENV === 'production') {
-  mix.version();
-}

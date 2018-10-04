@@ -8,7 +8,7 @@ router.register('users', views.UserViewSet)
 router.register('regions/provinsi', views.ProvinsiViewSet)
 router.register('regions/kabupaten', views.KabupatenViewSet)
 router.register('taxonomy', views.TaxonomyViewSet)
-router.register('images', views.ImageViewSet)
+router.register('images', views.AdImageViewSet)
 router.register('ads', views.AdViewSet)
 
 api_urlpatterns = [

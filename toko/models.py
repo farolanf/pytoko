@@ -1,8 +1,10 @@
 import re
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
+from .utils.file import get_upload_path
 
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
@@ -51,13 +53,14 @@ class Taxonomy(MPTTModel):
     def __str__(self):
         return self.name
 
-class Image(models.Model):
-    image = models.ImageField(upload_to='toko/static/img')
-
 class Ad(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     category = models.ForeignKey(Taxonomy, on_delete=models.CASCADE)
     provinsi = models.ForeignKey(Provinsi, on_delete=models.CASCADE)
     kabupaten = models.ForeignKey(Kabupaten, on_delete=models.CASCADE)
     title = models.CharField(max_length=70)
     desc = models.CharField(max_length=4000)
-    images = models.ManyToManyField(Image)
+
+class AdImage(models.Model):
+    image = models.ImageField(upload_to='users/img')
+    ad = models.ForeignKey(Ad, related_name='images', on_delete=models.CASCADE)

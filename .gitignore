@@ -9,6 +9,9 @@ env/
 **/__pycache__/
 **/tests/screenshots/
 
+static/
+uploads/
+
 db.sqlite3
 mix-manifest.json
 

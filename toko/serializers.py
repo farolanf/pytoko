@@ -69,27 +69,36 @@ class TaxonomySerializer(serializers.ModelSerializer):
     def get_children(self, instance):
         return [TaxonomySerializer(item).data for item in instance.get_children()]
 
-class ImageSerializer(serializers.ModelSerializer):
+class AdImageSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.Image
-        fields = ('id', 'image')
+        model = models.AdImage
+        fields = ('id', 'image', 'ad')
+        read_only_fields = ('ad',)
 
     def to_internal_value(self, data):
-        return super().to_internal_value({'image': data})
+        """
+        Wrap uploaded file in a dict.
+        If data is not a dict then assume it's a file object and wrap it.
+        """
+        if not isinstance(data, dict):
+            data = {'image': data}
+        return super().to_internal_value(data)
 
 class AdSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True)
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault(),
+    )
+    images = AdImageSerializer(many=True)
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images')
+        fields = ('id', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user')
 
     def create(self, validated_data):
         images = validated_data.pop('images')
         ad = models.Ad.objects.create(**validated_data)
         for image in images:
-            img = models.Image.objects.create(**image)
-            img.ad_set.add(ad)
-            img.save()
+            models.AdImage.objects.create(ad=ad, image=image['image'])
         return ad
