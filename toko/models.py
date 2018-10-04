@@ -62,5 +62,5 @@ class Ad(models.Model):
     desc = models.CharField(max_length=4000)
 
 class AdImage(models.Model):
-    image = models.ImageField(upload_to='users/img')
+    image = models.ImageField(upload_to=get_upload_path('img', 'ad'))
     ad = models.ForeignKey(Ad, related_name='images', on_delete=models.CASCADE)
