@@ -1,0 +1,5 @@
+[
+    {"model": "toko.user", "pk": 1, "fields": {"password": "pbkdf2_sha256$120000$ZTaqFhzaedH4$R5+5vfztelYwQTLWo8HgJHOIrg9KpNfPf9DH5nVQyL4=", "last_login": "2018-10-02T01:09:05.342Z", "is_superuser": false, "username": "owner", "first_name": "", "last_name": "", "is_staff": false, "is_active": true, "date_joined": "2018-10-02T01:09:00.077Z", "email": "owner@foo.com", "groups": [], "user_permissions": []}}, 
+
+    {"model": "toko.user", "pk": 2, "fields": {"password": "pbkdf2_sha256$120000$zYjHhVgDsM70$d02fB7adTZAawJYL43x7WUKM02gy3LkDZZEaE/XY/gY=", "last_login": null, "is_superuser": false, "username": "other", "first_name": "", "last_name": "", "is_staff": false, "is_active": true, "date_joined": "2018-10-04T06:54:47.551Z", "email": "other@foo.com", "groups": [], "user_permissions": []}}
+]
