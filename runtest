@@ -1,1 +1,1 @@
-watch "coverage run --source='.' manage.py test toko.tests && coverage report" pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/
+watch "coverage run --source='.' manage.py test toko.tests && coverage report" app/ pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/

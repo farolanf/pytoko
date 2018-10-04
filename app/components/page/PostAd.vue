@@ -63,6 +63,7 @@ export default {
             loading: false
         }
     },
+    computed: mapState('account', ['loggedId']),
     methods: {
         submit (e) {
             const fd = new FormData(e.target)
@@ -74,7 +75,9 @@ export default {
                 })
             }
             this.loading = true
-            axios.post('/api/ads/', fd).finally(() => {
+            axios.post('/api/ads/', fd).then(() => {
+                this.$router.push({ name: 'my-ads' })
+            }).finally(() => {
                 this.loading = false
             })
         },
@@ -91,6 +94,8 @@ export default {
         }
     },
     mounted () {
+        if (!this.loggedIn) return
+        
         axios.get('/api/regions/provinsi/')
             .then(resp => {
                 this.dataProvinsi = resp.data

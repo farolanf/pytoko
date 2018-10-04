@@ -11,25 +11,25 @@ const store = new Vuex.Store({
         request
     },
     state: {
-        errorType: null,
-        errorMsg: null,
-        errorComp: null
+        msgType: null,
+        msg: null,
+        msgComponent: null
     },
     getters: {
         hasError (state) {
-            return !!state.errorType
+            return state.msgType === 'error'
         }
     },
     mutations: {
-        setError (state, { type = null, msg = '', comp = null } = {}) {
-            state.errorType = type
-            state.errorMsg = msg
-            state.errorComp = comp
+        setMessage (state, { type = null, msg = '', comp = null } = {}) {
+            state.msgType = type
+            state.msg = msg
+            state.msgComponent = comp
         },
-        clearError (state) {
-            state.errorType = null
-            state.errorMsg = null
-            state.errorComp = null
+        clearMessage (state) {
+            state.msgType = null
+            state.msg = null
+            state.msgComponent = null
         }
     }
 })
@@ -37,8 +37,8 @@ const store = new Vuex.Store({
 // handle user change
 store.watch(state => state.account.user, () => {
     
-    // clear page errors (eg. access-denied)
-    store.commit('setError')
+    // clear page messages/errors (eg. access-denied)
+    store.commit('clearMessage')
 })
 
 export default store

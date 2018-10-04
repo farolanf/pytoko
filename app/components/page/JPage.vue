@@ -2,7 +2,7 @@
     .columns
         .column
             h1.title {{ title }}
-            page-error.mb4
+            page-message.mb4
             slot(v-if="!hasError")
 </template>
 
@@ -21,10 +21,11 @@ export default {
     methods: {
         // prevent guest from accessing guarded routes and set errors
         guard () {
+            // check if the route needs auth or a user is logged in
             if (!this.$route.meta.auth || this.loggedIn) return
 
-            this.$store.commit('setError', { 
-                type: 'access-denied', 
+            this.$store.commit('setMessage', { 
+                type: 'error', 
                 comp: 'access-denied'
             })
         }

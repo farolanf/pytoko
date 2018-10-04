@@ -13,8 +13,8 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     
-    // clear page errors when navigating away from a page
-    store.commit('clearError')
+    // clear page messages/errors when navigating away from a page
+    store.commit('clearMessage')
 
     // clear request error when navigating away from a page except to the status page
     if (to.name !== 'request-status') {
