@@ -63,7 +63,7 @@ export default {
             loading: false
         }
     },
-    computed: mapState('account', ['loggedId']),
+    computed: mapGetters('account', ['loggedIn']),
     methods: {
         submit (e) {
             const fd = new FormData(e.target)
@@ -94,8 +94,6 @@ export default {
         }
     },
     mounted () {
-        if (!this.loggedIn) return
-        
         axios.get('/api/regions/provinsi/')
             .then(resp => {
                 this.dataProvinsi = resp.data

@@ -6,7 +6,7 @@
         
             input-field(type="email" name="email" title="Email" required left-icon="fa fa-envelope" placeholder="Alamat email" v-model="email" :error="hasError('email')" :error-msg="getError('email')")
 
-            input-field(type="passowrd" name="password" title="Password" required left-icon="fa fa-lock" placeholder="Password" v-model="password" :error="hasError('password')" :error-msg="getError('password')")
+            input-field(type="password" name="password" title="Password" required left-icon="fa fa-lock" placeholder="Password" v-model="password" :error="hasError('password')" :error-msg="getError('password')")
 
             .field.is-grouped
                 .control

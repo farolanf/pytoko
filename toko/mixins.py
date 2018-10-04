@@ -1,16 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-
-class ValidatePasswordMixin(object):
-
-    def validate_password(self, value):
-        validate_password(value)
-        return value
-
-    def validate_password_confirm(self, value):
-        if value != self.get_initial().get('password'):
-            raise serializers.ValidationError('Kedua password harus sama')
-        return value
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdminOrSelf
 
 class ActionPermissionsMixin(object):
 
@@ -27,6 +18,53 @@ class ActionPermissionsMixin(object):
                     return [permission() for permission in perm['permission_classes']]
 
         return super().get_permissions()
+
+class BrowsePermissionMixin(ActionPermissionsMixin):
+    action_permissions = (
+        {
+            'actions': ['list', 'retrieve'],
+            'permission_classes': [],
+        },
+    )
+
+class UserPermissionMixin(ActionPermissionsMixin):
+    action_permissions = (
+        {
+            'actions': ['retrieve'],
+            'permission_classes': [],
+        },
+        {
+            'actions': ['update', 'partial_update'],
+            'permission_classes': [IsAdminOrSelf],
+        },
+    )
+
+class PostPermissionMixin(ActionPermissionsMixin):
+    action_permissions = (
+        {
+            'actions': ['list', 'retrieve'],
+            'permission_classes': [],
+        },
+        {
+            'actions': ['create'],
+            'permission_classes': [IsAuthenticated],
+        },
+        {
+            'actions': ['update', 'partial_update'],
+            'permission_classes': [IsAdminOrSelf],
+        },
+    )
+
+class ValidatePasswordMixin(object):
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value
+
+    def validate_password_confirm(self, value):
+        if value != self.get_initial().get('password'):
+            raise serializers.ValidationError('Kedua password harus sama')
+        return value
 
 class FilterFieldsMixin(object):
     """
