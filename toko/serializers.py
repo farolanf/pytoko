@@ -47,17 +47,17 @@ class PasswordResetSerializer(ValidatePasswordMixin, serializers.Serializer):
             raise serializers.ValidationError('Token tidak terdaftar.')
         return value
 
-class UserSerializer(FilterFieldsMixin, serializers.HyperlinkedModelSerializer):
+class PublicUserSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:    
+        model = User
+        fields = ('id', 'url', 'username')
+
+class FullUserSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:    
         model = User
         fields = ('id', 'url', 'username', 'email', 'permissions')
-        field_permissions = [
-            {
-                'fields': ['email', 'permissions'],
-                'permission_classes': [IsAdminOrSelf],
-            },
-        ]
 
 class TaxonomySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()

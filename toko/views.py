@@ -1,3 +1,4 @@
+from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
@@ -7,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.status import *
 from .models import User, Provinsi, Kabupaten, Taxonomy, Ad, AdImage
 from . import serializers
-from .serializers import UserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
+from .serializers import PublicUserSerializer, FullUserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
 from .throttling import PasswordEmailThrottle
 from .utils.validation import validate
 from .utils.mail import send_mail
@@ -29,13 +30,15 @@ class RegisterView(AnonView):
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
 
-        user = User.objects.create(email=email, password=make_password(password))
+        username = 'user_%s%s' % (get_random_string(5), User.objects.count())
+
+        user = User.objects.create(username=username, email=email, password=make_password(password))
 
         send_mail('Selamat datang', 'toko/mail/welcome.html', email)
 
         return Response({
             'message': 'Pendaftaran berhasil. Silahkan periksa email anda dan lakukan konfirmasi.',
-            'user': UserSerializer(user, context={'request': request}).data, 
+            'user': FullUserSerializer(user, context={'request': request}).data, 
         })
 
 class PasswordEmailView(AnonView):
@@ -69,7 +72,15 @@ class PasswordResetView(AnonView):
 
 class UserViewSet(UserPermissionMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+
+    def get_serializer_class(self):
+        obj = self.get_object()
+        
+        # show limited data for regular user viewing other than itself
+        if not self.request.user.is_staff and (obj is None or obj != self.request.user):
+            return PublicUserSerializer
+
+        return FullUserSerializer
 
 class TaxonomyViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
     queryset = Taxonomy.objects.filter(parent=None)
