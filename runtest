@@ -1,1 +1,7 @@
-watch "coverage run --source='.' manage.py test toko.tests && coverage report" app/ pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/
+if [ -z $1 ]; then
+    TEST=toko.tests
+else
+    TEST=$1
+fi
+
+watch "coverage run --source='.' manage.py test $TEST && coverage report" app/ pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/

@@ -175,26 +175,10 @@ class AdPublicPermissionTest(PostPublicPermissionTestBase):
     base_url = '/api/ads/'
     fixtures = ['users.json', 'taxonomy.json', 'regions.json', 'ads.json']
 
-from toko.models import Ad
-from pprint import pprint
-
 class AdOwnerPermissionTest(PostOwnerPermissionTestBase):
     base_url = '/api/ads/'
     fixtures = ['users.json', 'taxonomy.json', 'regions.json', 'ads.json']
     role = Role.OWNER
-
-    def test_can_update(self):
-        pprint(User.objects.all())
-        pprint(Ad.objects.all())
-        pprint(Ad.objects.get(pk=1))
-
-        ad = Ad.objects.get(pk=1)
-        user = User.objects.get(pk=1)
-
-        pprint(ad.user == user)
-
-        response = self.client.put(self.detail_url)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
 class AdOtherPermissionTest(PostOtherPermissionTestBase):
     base_url = '/api/ads/'
@@ -209,5 +193,5 @@ inject_test_methods(UserSelfPermissionTest)
 inject_test_methods(UserOtherPermissionTest)
 
 inject_test_methods(AdPublicPermissionTest)
-# inject_test_methods(AdOwnerPermissionTest)
+inject_test_methods(AdOwnerPermissionTest)
 inject_test_methods(AdOtherPermissionTest)
