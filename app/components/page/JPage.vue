@@ -18,6 +18,11 @@ export default {
         ...mapGetters(['hasError']),
         ...mapGetters('account', ['loggedIn'])
     },
+    watch: {
+        loggedIn () {
+            this.guard()
+        }
+    },
     methods: {
         // prevent guest from accessing guarded routes and set errors
         guard () {
