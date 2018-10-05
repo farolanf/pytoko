@@ -28,7 +28,10 @@ window.axios.interceptors.request.use(config => {
     if (!config.refreshTokenRequest) {
         refreshJwtToken()
     }
-    config.headers.authorization = 'Jwt ' + loadJwtToken()
+    const token = loadJwtToken()
+    if (token) {
+        config.headers.authorization = 'Jwt ' + token
+    }
     return config
 })
 
