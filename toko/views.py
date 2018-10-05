@@ -99,7 +99,7 @@ class TaxonomyViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     @action(detail=False)
     def category(self, request):
         category = self.get_queryset().filter(slug='kategori')
-        serializer = self.get_serializer(category, context=self._context)
+        serializer = self.get_serializer(category, context={'request': request})
         return Response(serializer.data)
 
 class ProvinsiViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
@@ -135,8 +135,14 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
 
     @action(detail=False)
     def my(self, request):
-        ads = request.user.ads.all()
-        serializer = self.get_serializer(ads, many=True, context=self._context)
+        if not hasattr(request.user, 'ads'):
+            return Response([])
+        
+        from pprint import pprint
+        pprint(hasattr(self, '_context'))
+
+        ads = request.user.ads.all() 
+        serializer = self.get_serializer(ads, many=True, context={'rquest': request})
         return Response(serializer.data)
 
     def get_serializer_class(self):
