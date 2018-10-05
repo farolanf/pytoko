@@ -99,7 +99,7 @@ class TaxonomyViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     @action(detail=False)
     def category(self, request):
         category = self.get_queryset().filter(slug='kategori')
-        serializer = self.get_serializer(category, context={'request': request})
+        serializer = self.get_serializer(category, many=True, context={'request': request})
         return Response(serializer.data)
 
 class ProvinsiViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
