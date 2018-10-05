@@ -22,8 +22,12 @@ export function refreshJwtToken () {
     const token = loadJwtToken()
     if (!token) return
 
-    const payload = jwtDecode(token)
-    if (!payload) return
+    let payload
+    try {
+        payload = jwtDecode(token)
+    } catch (x) {
+        removeJwtToken()
+    }
 
     if (payload.exp - Date.now()/1000 > 60*15) return
     
@@ -31,6 +35,8 @@ export function refreshJwtToken () {
         refreshTokenRequest: true
     }).then(resp => {
         saveJwtToken(resp.data.token)
+    }).catch(() => {
+        removeJwtToken()
     })
 }
 
