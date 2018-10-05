@@ -8,7 +8,7 @@ class FileTestCase(TestCase):
         obj = Bunch(user=Bunch(
             id=25
         ))
-        path = get_upload_path('img')(obj, 'apple.jpg')
+        path = get_upload_path('img', None, obj, 'apple.jpg')
         self.assertEqual(path, 'user_25/img/apple.jpg')
 
     def test_get_upload_path_with_parent(self):
@@ -17,10 +17,10 @@ class FileTestCase(TestCase):
                 id=25
             )
         ))
-        path = get_upload_path('img', 'parent')(obj, 'apple.jpg')
+        path = get_upload_path('img', 'parent', obj, 'apple.jpg')
         self.assertEqual(path, 'user_25/img/apple.jpg')
 
     def test_get_upload_path_without_user(self):
         obj = Bunch()
-        path = get_upload_path('img')(obj, 'apple.jpg')
+        path = get_upload_path('img', None, obj, 'apple.jpg')
         self.assertEqual(path, 'img/apple.jpg')

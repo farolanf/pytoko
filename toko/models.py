@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
-from .utils.file import get_upload_path
+from .utils.file import get_ad_img_upload_path
 
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
@@ -54,7 +54,7 @@ class Taxonomy(MPTTModel):
         return self.name
 
 class Ad(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), related_name='ads', on_delete=models.CASCADE)
     category = models.ForeignKey(Taxonomy, on_delete=models.CASCADE)
     provinsi = models.ForeignKey(Provinsi, on_delete=models.CASCADE)
     kabupaten = models.ForeignKey(Kabupaten, on_delete=models.CASCADE)
@@ -62,5 +62,5 @@ class Ad(models.Model):
     desc = models.CharField(max_length=4000)
 
 class AdImage(models.Model):
-    image = models.ImageField(upload_to=get_upload_path('img', 'ad'))
+    image = models.ImageField(upload_to=get_ad_img_upload_path)
     ad = models.ForeignKey(Ad, related_name='images', on_delete=models.CASCADE)
