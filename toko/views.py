@@ -2,10 +2,12 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
+from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.status import *
+from rest_framework.permissions import IsAuthenticated
 from .models import User, Provinsi, Kabupaten, Taxonomy, Ad, AdImage
 from . import serializers
 from .serializers import PublicUserSerializer, FullUserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
@@ -13,7 +15,8 @@ from .throttling import PasswordEmailThrottle
 from .utils.validation import validate
 from .utils.mail import send_mail
 from .utils.password import create_password_reset, do_password_reset
-from .mixins import UserPermissionMixin, BrowsePermissionMixin, PostPermissionMixin
+from .mixins import ActionPermissionsMixin, UserPermissionMixin, BrowsePermissionMixin, PostPermissionMixin
+from .permissions import IsAdminOrOwner
 
 User = get_user_model()
 
@@ -74,18 +77,30 @@ class UserViewSet(UserPermissionMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def get_serializer_class(self):
-        obj = self.get_object()
-        
-        # show limited data for regular user viewing other than itself
-        if not self.request.user.is_staff and (obj is None or obj != self.request.user):
-            return PublicUserSerializer
+        obj = self.get_object() if self.detail else None 
 
-        return FullUserSerializer
+        # show full data for admin and self
+        if self.request.user.is_staff or obj == self.request.user:
+            return FullUserSerializer
+    
+        return PublicUserSerializer
 
-class TaxonomyViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
-    queryset = Taxonomy.objects.filter(parent=None)
+class TaxonomyViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
+    queryset = Taxonomy.objects.all()
     serializer_class = serializers.TaxonomySerializer
     filter_fields = ('slug',)
+    action_permissions = (
+        {
+            'actions': ['list', 'retrieve'],
+            'permission_classes': [],
+        },
+    )
+
+    @action(detail=False)
+    def category(self, request):
+        category = self.get_queryset().filter(slug='kategori')
+        serializer = self.get_serializer(category, context=self._context)
+        return Response(serializer.data)
 
 class ProvinsiViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
     queryset = Provinsi.objects.all()
@@ -100,9 +115,34 @@ class AdImageViewSet(viewsets.ModelViewSet):
     queryset = AdImage.objects.all()
     serializer_class = serializers.AdImageSerializer
 
-class AdViewSet(PostPermissionMixin, viewsets.ModelViewSet):
+class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = Ad.objects.all()
-    serializer_class = serializers.AdSerializer
+    serializer_class = serializers.HyperlinkedAdSerializer
+    action_permissions = (
+        {
+            'actions': ['list', 'retrieve'],
+            'permission_classes': [],
+        },
+        {
+            'actions': ['create'],
+            'permission_classes': [IsAuthenticated],
+        },
+        {
+            'actions': ['update', 'partial_update', 'my'],
+            'permission_classes': [IsAdminOrOwner],
+        },
+    )
+
+    @action(detail=False)
+    def my(self, request):
+        ads = request.user.ads.all()
+        serializer = self.get_serializer(ads, many=True, context=self._context)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return serializers.AdSerializer
+        return super().get_serializer_class()
 
 def index(request):
     return render(request, 'toko/index.html')

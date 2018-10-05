@@ -3,7 +3,94 @@ from enum import Enum
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_204_NO_CONTENT
 from .base import TestCase
 from .utils.user import User
-from .utils.permission import inject_test_methods
+
+def can_action(method, detail, expected_status):
+    def test_method(self):
+        response = getattr(self.client, method)(self.detail_url if detail else self.base_url)
+        self.assertEqual(response.status_code, expected_status)
+    return test_method
+
+def cannot_action(method, detail):
+    def test_method(self):
+        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
+        response = getattr(self.client, method)(self.detail_url if detail else self.base_url)
+        self.assertEqual(response.status_code, expected_status)
+    return test_method
+
+def inject_test_methods(cls, actions):
+    """
+    Create test methods on the derived class based on permission config.
+    
+    This is so test error reporting points to the derived class.
+    """
+    for action in cls.can:
+        kwargs = actions['can'][action]
+        setattr(cls, 'test_can_%s' % action, can_action(**kwargs))
+
+    for action in cls.cannot:
+        kwargs = actions['cannot'][action]
+        setattr(cls, 'test_cannot_%s' % action, cannot_action(**kwargs))
+
+actions = {
+    'can': {
+        'list': {
+            'method': 'get',
+            'detail': False,
+            'expected_status': HTTP_200_OK,
+        },
+        'view': {
+            'method': 'get',
+            'detail': True,
+            'expected_status': HTTP_200_OK,
+        },
+        'create': {
+            'method': 'post',
+            'detail': False,
+            'expected_status': HTTP_400_BAD_REQUEST,
+        },
+        'update': {
+            'method': 'put',
+            'detail': True,
+            'expected_status': HTTP_400_BAD_REQUEST,
+        },
+        'delete': {
+            'method': 'delete',
+            'detail': True,
+            'expected_status': HTTP_204_NO_CONTENT,
+        },
+        'my': {
+            'method': 'get',
+            'detail': False,
+            'expected_status': HTTP_200_OK,
+        },
+    },
+    'cannot': {
+        'list': {
+            'method': 'get',
+            'detail': False,
+        },
+        'view': {
+            'method': 'get',
+            'detail': True,
+        },
+        'create': {
+            'method': 'post',
+            'detail': False,
+        },
+        'update': {
+            'method': 'put',
+            'detail': True,
+        },
+        'delete': {
+            'method': 'delete',
+            'detail': True,
+        },
+        'my': {
+            'method': 'get',
+            'detail': False,
+        },
+    }
+}
 
 class PermissionMixin(object):
 
@@ -13,65 +100,6 @@ class PermissionMixin(object):
         self.detail_url = '%s%s/' % (self.base_url, self.detail_pk)
 
         super().__init__(*args, **kwargs)
-
-    """ can """
-
-    def can_list(self):
-        response = self.client.get(self.base_url)
-        self.assertEqual(response.status_code, HTTP_200_OK)
-
-    def can_view(self):
-        response = self.client.get(self.detail_url)
-        self.assertEqual(response.status_code, HTTP_200_OK)
-
-    def can_create(self):
-        """
-        Expect a bad request status when creating with no data.
-
-        If it made it this far then auth and authorization has succeeded.
-        """
-        response = self.client.post(self.base_url)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    def can_update(self):
-        """
-        Expect a not found status when updating with no data.
-
-        If it made it this far then auth and authorization has succeeded.
-        """
-        response = self.client.put(self.detail_url)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    def can_delete(self):
-        response = self.client.delete(self.detail_url)
-        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
-
-    """ cannot """
-
-    def cannot_list(self):
-        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
-        response = self.client.get(self.base_url)
-        self.assertEqual(response.status_code, expected_status)
-
-    def cannot_view(self):
-        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
-        response = self.client.get(self.detail_url)
-        self.assertEqual(response.status_code, expected_status)
-
-    def cannot_create(self):
-        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
-        response = self.client.post(self.base_url)
-        self.assertEqual(response.status_code, expected_status)
-
-    def cannot_update(self):
-        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
-        response = self.client.put(self.detail_url)
-        self.assertEqual(response.status_code, expected_status)
-
-    def cannot_delete(self):
-        expected_status = HTTP_403_FORBIDDEN if self.login else HTTP_401_UNAUTHORIZED
-        response = self.client.delete(self.detail_url)
-        self.assertEqual(response.status_code, expected_status)
 
 class Role(Enum):
     ANON = 1
@@ -133,18 +161,19 @@ class UserSelfPermissionTestBase(PermissionTestBase):
 class UserOtherPermissionTestBase(UserPublicPermissionTestBase):
     pass
 
-# anonymous user access to post resource
-class PostPublicPermissionTestBase(BrowsePublicPermissionTestBase):
-    pass
+# anonymous user access to post ads
+class AdsPublicPermissionTestBase(PermissionTestBase):
+    can = ('list', 'view')
+    cannot = ('create', 'update', 'delete', 'my')
 
-# authenticated user access to own post resource
-class PostOwnerPermissionTestBase(PermissionTestBase):
-    can = ('list', 'view', 'create', 'update')
+# authenticated user access to own post ads
+class AdsOwnerPermissionTestBase(PermissionTestBase):
+    can = ('list', 'view', 'create', 'update', 'my')
     cannot = ('delete',)
 
-# authenticated user access to other's post resource
-class PostOtherPermissionTestBase(PermissionTestBase):
-    can = ('list', 'view', 'create')
+# authenticated user access to other's post ads
+class AdsOtherPermissionTestBase(PermissionTestBase):
+    can = ('list', 'view', 'create', 'my')
     cannot = ('update', 'delete')
 
 """ TESTS """
@@ -171,27 +200,27 @@ class UserOtherPermissionTest(UserOtherPermissionTestBase):
     base_url = '/api/users/'
     role = Role.OTHER
 
-class AdPublicPermissionTest(PostPublicPermissionTestBase):
+class AdPublicPermissionTest(AdsPublicPermissionTestBase):
     base_url = '/api/ads/'
     fixtures = ['users.json', 'taxonomy.json', 'regions.json', 'ads.json']
 
-class AdOwnerPermissionTest(PostOwnerPermissionTestBase):
+class AdOwnerPermissionTest(AdsOwnerPermissionTestBase):
     base_url = '/api/ads/'
     fixtures = ['users.json', 'taxonomy.json', 'regions.json', 'ads.json']
     role = Role.OWNER
 
-class AdOtherPermissionTest(PostOtherPermissionTestBase):
+class AdOtherPermissionTest(AdsOtherPermissionTestBase):
     base_url = '/api/ads/'
     fixtures = ['users.json', 'taxonomy.json', 'regions.json', 'ads.json']
     role = Role.OTHER
 
-inject_test_methods(TaxonomyPublicPermissionTest)
-inject_test_methods(TaxonomyAuthPermissionTest)
+inject_test_methods(TaxonomyPublicPermissionTest, actions)
+inject_test_methods(TaxonomyAuthPermissionTest, actions)
 
-inject_test_methods(UserPublicPermissionTest)
-inject_test_methods(UserSelfPermissionTest)
-inject_test_methods(UserOtherPermissionTest)
+inject_test_methods(UserPublicPermissionTest, actions)
+inject_test_methods(UserSelfPermissionTest, actions)
+inject_test_methods(UserOtherPermissionTest, actions)
 
-inject_test_methods(AdPublicPermissionTest)
-inject_test_methods(AdOwnerPermissionTest)
-inject_test_methods(AdOtherPermissionTest)
+inject_test_methods(AdPublicPermissionTest, actions)
+inject_test_methods(AdOwnerPermissionTest, actions)
+inject_test_methods(AdOtherPermissionTest, actions)

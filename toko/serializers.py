@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .mixins import FilterFieldsMixin, ValidatePasswordMixin
@@ -7,17 +8,17 @@ from . import models
 
 User = get_user_model()
 
-class ProvinsiSerializer(serializers.ModelSerializer):
+class ProvinsiSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Provinsi
-        fields = ('id', 'name')
+        fields = ('id', 'url', 'name')
 
-class KabupatenSerializer(serializers.ModelSerializer):
+class KabupatenSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Kabupaten
-        fields = ('id', 'name', 'provinsi_id')
+        fields = ('id', 'url', 'name', 'provinsi_id')
 
 class RegisterSerializer(ValidatePasswordMixin, serializers.Serializer):
     email = serializers.EmailField(max_length=255)
@@ -59,21 +60,21 @@ class FullUserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'url', 'username', 'email', 'permissions')
 
-class TaxonomySerializer(serializers.ModelSerializer):
+class TaxonomySerializer(serializers.HyperlinkedModelSerializer):
     children = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Taxonomy
-        fields = ('id', 'name', 'parent_id', 'children')
+        fields = ('id', 'url', 'name', 'parent_id', 'children')
 
     def get_children(self, instance):
-        return [TaxonomySerializer(item).data for item in instance.get_children()]
+        return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
 
-class AdImageSerializer(serializers.ModelSerializer):
+class AdImageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.AdImage
-        fields = ('id', 'image', 'ad')
+        fields = ('id', 'url', 'image', 'ad')
         read_only_fields = ('ad',)
 
     def to_internal_value(self, data):
@@ -84,6 +85,18 @@ class AdImageSerializer(serializers.ModelSerializer):
         if not isinstance(data, dict):
             data = {'image': data}
         return super().to_internal_value(data)
+
+class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.HyperlinkedRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault(),
+        view_name='user-detail',
+    )
+    images = AdImageSerializer(many=True)
+
+    class Meta:
+        model = models.Ad
+        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user')
 
 class AdSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
