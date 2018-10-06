@@ -14,7 +14,7 @@
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
                         
                         li
-                            a.pagination-link.is-current {{ pageNum }}
+                            a.pagination-link.is-current {{ data.page_num }}
                         
                         li(v-for="page in nextPageUrls(maxMobile)" :key="page.url")
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
@@ -33,7 +33,7 @@
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
                         
                         li
-                            a.pagination-link.is-current {{ pageNum }}
+                            a.pagination-link.is-current {{ data.page_num }}
                         
                         li(v-for="page in nextPageUrls(max)" :key="page.url")
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
@@ -44,9 +44,9 @@
 
                 .column.is-narrow
                     
-                    a.pagination-previous(:href="pageUrl(pageNum - 1)" title="Halaman sebelumnya" :disabled="prevDisabled" @click.prevent="prev") Sebelum
+                    a.pagination-previous(:href="pageUrl(data.page_num - 1)" title="Halaman sebelumnya" :disabled="prevDisabled" @click.prevent="prev") Sebelum
                     
-                    a.pagination-next(:href="pageUrl(pageNum + 1)" title="Halaman sesudahnya" :disabled="nextDisabled" @click.prevent="next") Sesudah
+                    a.pagination-next(:href="pageUrl(data.page_num + 1)" title="Halaman sesudahnya" :disabled="nextDisabled" @click.prevent="next") Sesudah
 </template>
 
 <script>
@@ -69,47 +69,41 @@ export default {
         }
     },
     computed: {
-        pageSize () {
-            return this.data.results.length
-        },
         lastPageNum () {
-            return Math.ceil(this.data.count / this.pageSize)
-        },
-        pageNum () {
-            return +this.$route.query.page || 1
+            return Math.ceil(this.data.count / this.data.page_size)
         },
         prevDisabled () {
-            return this.loading || this.pageNum === 1
+            return this.loading || this.data.page_num === 1
         },
         nextDisabled () {
-            return this.loading || this.pageNum >= this.lastPageNum
+            return this.loading || this.data.page_num >= this.lastPageNum
         }
     },
     methods: {
         firstVisible (max) {
-            const end = Math.min(this.pageNum + max, this.lastPageNum)
-            const nextCount = end - this.pageNum
-            return (this.pageNum - max - (max - nextCount)) > 1
+            const end = Math.min(this.data.page_num + max, this.lastPageNum)
+            const nextCount = end - this.data.page_num
+            return (this.data.page_num - max - (max - nextCount)) > 1
         },
         lastVisible (max) {
-            const start = Math.max(this.pageNum - max, 1)
-            const prevCount = this.pageNum - start
-            return (this.pageNum + max + (max - prevCount)) < this.lastPageNum
+            const start = Math.max(this.data.page_num - max, 1)
+            const prevCount = this.data.page_num - start
+            return (this.data.page_num + max + (max - prevCount)) < this.lastPageNum
         },
         prevPageUrls (max) {
-            if (this.pageNum <= 1) return
+            if (this.data.page_num <= 1) return
             
             // take invisble next count
-            const end = Math.min(this.pageNum + max, this.lastPageNum)
-            const nextCount = end - this.pageNum
+            const end = Math.min(this.data.page_num + max, this.lastPageNum)
+            const nextCount = end - this.data.page_num
 
-            const start = Math.max(this.pageNum - max - (max - nextCount), 1)
+            const start = Math.max(this.data.page_num - max - (max - nextCount), 1)
             
             // offset if first page visible
             const offset = start > 1 ? 2 : 0 
 
             // subtract 2 for first page nav and dots
-            const count = this.pageNum - start - offset
+            const count = this.data.page_num - start - offset
 
             return Array(count).fill(0).map((n, i) => {
                 const num = start + i + offset
@@ -120,18 +114,18 @@ export default {
             })
         },
         nextPageUrls (max) {
-            if (this.pageNum >= this.lastPageNum) return
+            if (this.data.page_num >= this.lastPageNum) return
             
             // take invisible prev count
-            const start = Math.max(this.pageNum - max, 1)
-            const prevCount = this.pageNum - start
+            const start = Math.max(this.data.page_num - max, 1)
+            const prevCount = this.data.page_num - start
 
-            const end = Math.min(this.pageNum + max + (max - prevCount), this.lastPageNum)
+            const end = Math.min(this.data.page_num + max + (max - prevCount), this.lastPageNum)
             // subtract 2 for last page nav and dots
-            const count = end - this.pageNum - (end < this.lastPageNum ? 2 : 0)
+            const count = end - this.data.page_num - (end < this.lastPageNum ? 2 : 0)
 
             return Array(count).fill(0).map((n, i) => {
-                const num = this.pageNum + i + 1 
+                const num = this.data.page_num + i + 1 
                 return {
                     num,
                     url: this.pageUrl(num)
@@ -140,11 +134,11 @@ export default {
         },
         prev () {
             if (this.prevDisabled) return
-            this.toPage(this.pageNum - 1)
+            this.toPage(this.data.page_num - 1)
         },
         next () {
             if (this.nextDisabled) return
-            this.toPage(this.pageNum + 1)
+            this.toPage(this.data.page_num + 1)
         },
         pageUrl (num) {
             if (num < 1 || num > this.lastPageNum) return
