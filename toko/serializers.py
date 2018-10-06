@@ -65,7 +65,7 @@ class TaxonomySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Taxonomy
-        fields = ('id', 'url', 'name', 'parent_id', 'children')
+        fields = ('id', 'url', 'name', 'slug', 'parent_id', 'children')
 
     def get_children(self, instance):
         return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
