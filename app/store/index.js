@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import account from './account'
 import request from './request'
-import regions from './regions'
+import cache from './cache'
 
 Vue.use(Vuex)
 
@@ -10,7 +10,7 @@ const store = new Vuex.Store({
     modules: {
         account,
         request,
-        regions,
+        cache,
     },
     state: {
         msgType: null,

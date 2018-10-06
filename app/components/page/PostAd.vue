@@ -62,15 +62,15 @@ export default {
         }
     },
     computed: {
-        ...mapState('regions', ['provinsiMap']),
-        ...mapState('regions', { dataProvinsi: 'provinsi' }),
+        ...mapState('cache', ['provinsiMap']),
+        ...mapState('cache', { dataProvinsi: 'provinsi' }),
         ...mapGetters('account', ['loggedIn']),
         selectedProvinsi () {
             return this.provinsi ? this.provinsiMap[this.provinsi] : null
         }
     },
     methods: {
-        ...mapActions('regions', ['getProvinsi', 'getKabupaten']),
+        ...mapActions('cache', ['getProvinsi', 'getKabupaten']),
         submit (e) {
             const fd = new FormData(e.target)
             fd.append('nama', 'andi')

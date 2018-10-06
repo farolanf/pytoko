@@ -20,10 +20,11 @@ export default {
             state.provinsiMap = provinsiMap
         },
         setKabupaten (state, { kabupaten, provinsiId }) {
-            Vue.set(state.provinsiMap[provinsiId], 'kabupaten', kabupaten)
+            state.kabupaten = state.kabupaten.concat(kabupaten)
             kabupaten.forEach(item => {
                 Vue.set(state.kabupatenMap, item.id, item)
             })
+            Vue.set(state.provinsiMap[provinsiId], 'kabupaten', kabupaten)
         },
     },
     actions: {
@@ -48,7 +49,7 @@ export default {
                 })
         },
         getKabupaten ({ commit, state }, { provinsiId }) {
-            if (state.provinsiMap[provinsiId].kabupaten) return
+            if (!state.provinsiMap[provinsiId] || state.provinsiMap[provinsiId].kabupaten) return
             return axios.get('/api/regions/kabupaten/', {
                 params: {
                     provinsi_id: provinsiId

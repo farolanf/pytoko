@@ -33,7 +33,7 @@ export default {
         }
     },
     computed: {
-        ...mapState('regions', ['category', 'categoryMap']),
+        ...mapState('cache', ['category', 'categoryMap']),
         selectedPath () {
             if (!this.value) return
             const id = this.value
@@ -62,7 +62,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions('regions', ['getCategory']),
+        ...mapActions('cache', ['getCategory']),
         select (id) {
             this.show = false
             this.$emit('input', id)
