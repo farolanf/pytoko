@@ -2,23 +2,25 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import account from './account'
 import request from './request'
+import regions from './regions'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     modules: {
         account,
-        request
+        request,
+        regions,
     },
     state: {
         msgType: null,
         msg: null,
-        msgComponent: null
+        msgComponent: null,
     },
     getters: {
         hasError (state) {
             return state.msgType === 'error'
-        }
+        },
     },
     mutations: {
         setMessage (state, { type = null, msg = '', comp = null } = {}) {
@@ -30,8 +32,8 @@ const store = new Vuex.Store({
             state.msgType = null
             state.msg = null
             state.msgComponent = null
-        }
-    }
+        },
+    },
 })
 
 // handle user change

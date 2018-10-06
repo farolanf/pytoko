@@ -8,12 +8,12 @@
                         a(@click="show = !show") Pilih
 
                     li(v-for="(id, i) in selectedPath" v-if="i > 0" :key="id")
-                        a.has-text-grey(v-if="!isLeaf(id)" @click="show = !show") {{ categoryIndex[id].name }} 
-                        a(v-else @click="show = !show") {{ categoryIndex[id].name }}
+                        a.has-text-grey(v-if="!isLeaf(id)" @click="show = !show") {{ categoryMap[id].name }} 
+                        a(v-else @click="show = !show") {{ categoryMap[id].name }}
 
         .dropdown-menu
             .dropdown-content
-                .dropdown-item.has-text-centered(v-if="!category")
+                .dropdown-item.has-text-centered(v-if="!category.length")
                     button.button.is-text.is-loading
                 template(v-else)
                     category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-id.sync="showId" :selected-id="value" :on-select="select")
@@ -28,12 +28,12 @@ export default {
     },
     data () {
         return {
-            category: null,
             showId: 0,
             show: false
         }
     },
     computed: {
+        ...mapState('regions', ['category', 'categoryMap']),
         selectedPath () {
             if (!this.value) return
             const id = this.value
@@ -60,37 +60,19 @@ export default {
             } while (state)
             return stack.map(state => state.item.id)
         },
-        categoryIndex () {
-            const index = {}
-            this.category && this.traverseCategory(this.category[0], item => {
-                index[item.id] = item
-            })
-            return index
-        }
     },
     methods: {
-        traverseCategory (item, cb) {
-            cb(item)
-            item.children && item.children.forEach(item => {
-                this.traverseCategory(item, cb)
-            })
-        },
+        ...mapActions('regions', ['getCategory']),
         select (id) {
             this.show = false
             this.$emit('input', id)
         },
         isLeaf (id) {
-            return !this.categoryIndex[id].children || !this.categoryIndex[id].children.length
+            return !this.categoryMap[id].children || !this.categoryMap[id].children.length
         }
     },
     mounted () {
-        axios.get('/api/taxonomy/', {
-            params: {
-                slug: 'kategori'
-            }
-        }).then(resp => {
-            this.category = resp.data
-        })
+        this.getCategory()
     }
 }
 </script>

@@ -18,7 +18,7 @@ class KabupatenSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Kabupaten
-        fields = ('id', 'url', 'name', 'provinsi_id')
+        fields = ('id', 'url', 'name', 'provinsi')
 
 class RegisterSerializer(ValidatePasswordMixin, serializers.Serializer):
     email = serializers.EmailField(max_length=255)
@@ -96,7 +96,7 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'provinsi_id', 'kabupaten_id', 'images', 'user', 'created_at', 'updated_at')
 
 class AdSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(

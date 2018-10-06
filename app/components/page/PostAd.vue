@@ -57,14 +57,20 @@ export default {
             desc: '',
             provinsi: 0,
             kabupaten: 0,
-            dataProvinsi: null,
-            selectedProvinsi: null,
             imageItems: null,
             loading: false
         }
     },
-    computed: mapGetters('account', ['loggedIn']),
+    computed: {
+        ...mapState('regions', ['provinsiMap']),
+        ...mapState('regions', { dataProvinsi: 'provinsi' }),
+        ...mapGetters('account', ['loggedIn']),
+        selectedProvinsi () {
+            return this.provinsi ? this.provinsiMap[this.provinsi] : null
+        }
+    },
     methods: {
+        ...mapActions('regions', ['getProvinsi', 'getKabupaten']),
         submit (e) {
             const fd = new FormData(e.target)
             fd.append('nama', 'andi')
@@ -82,22 +88,12 @@ export default {
             })
         },
         onProvinsiChange () {
-            this.selectedProvinsi = this.dataProvinsi.find(item => item.id === this.provinsi)
-            if (this.selectedProvinsi.kabupaten) return
-            axios.get(`/api/regions/kabupaten/`, {
-                params: {
-                    provinsi_id: this.provinsi
-                }
-            }).then(resp => {
-                this.$set(this.selectedProvinsi, 'kabupaten', resp.data)
-            })
+            this.kabupaten = 0
+            this.getKabupaten({ provinsiId: this.provinsi })
         }
     },
     mounted () {
-        axios.get('/api/regions/provinsi/')
-            .then(resp => {
-                this.dataProvinsi = resp.data
-            })
+        this.getProvinsi()
     }
 }
 </script>
