@@ -5,6 +5,10 @@ from .base import TestCase
 from .utils.user import User
 
 actions = {
+    """
+    as_param: If True, action will be added to the base url.
+        Eg. /api/ads/{action}/
+    """
     'can': {
         'list': {
             'method': 'get',
