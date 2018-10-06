@@ -14,14 +14,14 @@
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
                         
                         li
-                            a.pagination-link.is-current {{ data.current_page }}
+                            a.pagination-link.is-current {{ pageNum }}
                         
                         li(v-for="page in nextPageUrls(maxMobile)" :key="page.url")
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
 
                         li(v-if="lastVisible(maxMobile)")
                             span.mh2.v-btm ...
-                            a.pagination-link(:href="pageUrl(data.last_page)" @click.prevent="toPage(data.last_page)") {{ data.last_page }}
+                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") {{ lastPageNum }}
 
                     ul.list.flex.justify-end.is-hidden-mobile
 
@@ -33,20 +33,20 @@
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
                         
                         li
-                            a.pagination-link.is-current {{ data.current_page }}
+                            a.pagination-link.is-current {{ pageNum }}
                         
                         li(v-for="page in nextPageUrls(max)" :key="page.url")
                             a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
 
                         li(v-if="lastVisible(max)")
                             span.mh2.v-btm ...
-                            a.pagination-link(:href="pageUrl(data.last_page)" @click.prevent="toPage(data.last_page)") {{ data.last_page }}
+                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") {{ lastPageNum }}
 
                 .column.is-narrow
                     
-                    a.pagination-previous(:href="pageUrl(data.current_page - 1)" title="Halaman sebelumnya" :disabled="prevDisabled" @click.prevent="prev") Sebelum
+                    a.pagination-previous(:href="pageUrl(pageNum - 1)" title="Halaman sebelumnya" :disabled="prevDisabled" @click.prevent="prev") Sebelum
                     
-                    a.pagination-next(:href="pageUrl(data.current_page + 1)" title="Halaman sesudahnya" :disabled="nextDisabled" @click.prevent="next") Sesudah
+                    a.pagination-next(:href="pageUrl(pageNum + 1)" title="Halaman sesudahnya" :disabled="nextDisabled" @click.prevent="next") Sesudah
 </template>
 
 <script>
@@ -69,38 +69,47 @@ export default {
         }
     },
     computed: {
+        pageSize () {
+            return this.data.results.length
+        },
+        lastPageNum () {
+            return Math.ceil(this.data.count / this.pageSize)
+        },
+        pageNum () {
+            return +this.$route.query.page || 1
+        },
         prevDisabled () {
-            return this.loading || this.data.current_page <= 1
+            return this.loading || this.pageNum === 1
         },
         nextDisabled () {
-            return this.loading || this.data.current_page >= this.data.last_page
+            return this.loading || this.pageNum >= this.lastPageNum
         }
     },
     methods: {
         firstVisible (max) {
-            const end = Math.min(this.data.current_page + max, this.data.last_page)
-            const nextCount = end - this.data.current_page
-            return (this.data.current_page - max - (max - nextCount)) > 1
+            const end = Math.min(this.pageNum + max, this.lastPageNum)
+            const nextCount = end - this.pageNum
+            return (this.pageNum - max - (max - nextCount)) > 1
         },
         lastVisible (max) {
-            const start = Math.max(this.data.current_page - max, 1)
-            const prevCount = this.data.current_page - start
-            return (this.data.current_page + max + (max - prevCount)) < this.data.last_page
+            const start = Math.max(this.pageNum - max, 1)
+            const prevCount = this.pageNum - start
+            return (this.pageNum + max + (max - prevCount)) < this.lastPageNum
         },
         prevPageUrls (max) {
-            if (this.data.current_page <= 1) return
+            if (this.pageNum <= 1) return
             
             // take invisble next count
-            const end = Math.min(this.data.current_page + max, this.data.last_page)
-            const nextCount = end - this.data.current_page
+            const end = Math.min(this.pageNum + max, this.lastPageNum)
+            const nextCount = end - this.pageNum
 
-            const start = Math.max(this.data.current_page - max - (max - nextCount), 1)
+            const start = Math.max(this.pageNum - max - (max - nextCount), 1)
             
             // offset if first page visible
             const offset = start > 1 ? 2 : 0 
 
             // subtract 2 for first page nav and dots
-            const count = this.data.current_page - start - offset
+            const count = this.pageNum - start - offset
 
             return Array(count).fill(0).map((n, i) => {
                 const num = start + i + offset
@@ -111,18 +120,18 @@ export default {
             })
         },
         nextPageUrls (max) {
-            if (this.data.current_page >= this.data.last_page) return
+            if (this.pageNum >= this.lastPageNum) return
             
             // take invisible prev count
-            const start = Math.max(this.data.current_page - max, 1)
-            const prevCount = this.data.current_page - start
+            const start = Math.max(this.pageNum - max, 1)
+            const prevCount = this.pageNum - start
 
-            const end = Math.min(this.data.current_page + max + (max - prevCount), this.data.last_page)
+            const end = Math.min(this.pageNum + max + (max - prevCount), this.lastPageNum)
             // subtract 2 for last page nav and dots
-            const count = end - this.data.current_page - (end < this.data.last_page ? 2 : 0)
+            const count = end - this.pageNum - (end < this.lastPageNum ? 2 : 0)
 
             return Array(count).fill(0).map((n, i) => {
-                const num = this.data.current_page + i + 1 
+                const num = this.pageNum + i + 1 
                 return {
                     num,
                     url: this.pageUrl(num)
@@ -131,14 +140,14 @@ export default {
         },
         prev () {
             if (this.prevDisabled) return
-            this.toPage(this.data.current_page - 1)
+            this.toPage(this.pageNum - 1)
         },
         next () {
             if (this.nextDisabled) return
-            this.toPage(this.data.current_page + 1)
+            this.toPage(this.pageNum + 1)
         },
         pageUrl (num) {
-            if (num < 1 || num > this.data.last_page) return
+            if (num < 1 || num > this.lastPageNum) return
             return this.$router.resolve({ query: { page: num } }).href
         },
         toPage (num) {

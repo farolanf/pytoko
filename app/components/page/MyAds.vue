@@ -3,7 +3,7 @@
 
         template(v-if="data")
 
-            router-link.black-80(v-for="ad in data.data" :key="ad.id" :to="editAdUrl(ad.id)")
+            router-link.black-80(v-for="ad in data.results" :key="ad.id" :to="editAdUrl(ad.id)")
                 .flex-column.pa4.w-100.shadow-4.mb4.dim.pointer
                     .f3 {{ ad.title }}
                     .f7.mt2 Diperbarui {{ ad.updated_at }}
@@ -37,7 +37,7 @@ export default {
         },
         fetch () {
             this.loading = true
-            axios.get('/api/ads', { params: { page: this.$route.query.page } })
+            axios.get('/api/ads/', { params: { page: this.$route.query.page } })
                 .then(resp => {
                     this.data = resp.data
                 })

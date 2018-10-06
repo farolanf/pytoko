@@ -17,6 +17,7 @@ from .utils.mail import send_mail
 from .utils.password import create_password_reset, do_password_reset
 from .mixins import ActionPermissionsMixin, UserPermissionMixin, BrowsePermissionMixin, PostPermissionMixin
 from .permissions import IsAdminOrOwner
+from .pagination import StandardPagination
 
 User = get_user_model()
 
@@ -117,6 +118,7 @@ class AdImageViewSet(viewsets.ModelViewSet):
 
 class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = Ad.objects.all()
+    pagination_class = StandardPagination
     serializer_class = serializers.HyperlinkedAdSerializer
     action_permissions = (
         {
