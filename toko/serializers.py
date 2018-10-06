@@ -96,7 +96,7 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'provinsi_id', 'kabupaten_id', 'images', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'category_id', 'provinsi_id', 'kabupaten_id', 'images', 'user', 'created_at', 'updated_at')
 
 class AdSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
