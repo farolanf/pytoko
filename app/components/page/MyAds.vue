@@ -4,10 +4,7 @@
         template(v-if="data")
 
             router-link.black-80(v-for="ad in data.results" :key="ad.id" :to="editAdUrl(ad.id)")
-                .flex-column.pa4.w-100.shadow-4.mb4.dim.pointer
-                    .f3 {{ ad.title }}
-                    .f7.mt2 Diperbarui {{ ad.updated_at }}
-                    p.ml4.mt3 {{ ad.desc }}
+                ad-list-item.mb4(:data="ad")
 
             pagination-nav(:max="8" :max-mobile="3" :data="data" :loading="loading" @change="toPage")
 </template>
