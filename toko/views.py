@@ -1,3 +1,4 @@
+import re
 from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -20,6 +21,9 @@ from .permissions import IsAdminOrOwner
 from .pagination import StandardPagination
 
 User = get_user_model()
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH', None) == 'XMLHttpRequest'
 
 class AnonView(views.APIView):
     authentication_classes = ()
@@ -119,7 +123,7 @@ class AdImageViewSet(viewsets.ModelViewSet):
 class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = Ad.objects.all()
     pagination_class = StandardPagination
-    serializer_class = serializers.HyperlinkedAdSerializer
+    serializer_class = serializers.AdSerializer
     action_permissions = (
         {
             'actions': ['list', 'retrieve'],
@@ -146,8 +150,9 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return serializers.AdSerializer
-        return super().get_serializer_class()
+            return serializers.AdCreateSerializer
+        
+        return super().get_serializer_class() if is_ajax(self.request) else serializers.HyperlinkedAdSerializer
 
 def index(request):
     return render(request, 'toko/index.html')
