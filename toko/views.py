@@ -138,9 +138,6 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         if not hasattr(request.user, 'ads'):
             return Response([])
         
-        from pprint import pprint
-        pprint(hasattr(self, '_context'))
-
         ads = request.user.ads.all() 
         serializer = self.get_serializer(ads, many=True, context={'rquest': request})
         return Response(serializer.data)
