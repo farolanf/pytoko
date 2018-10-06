@@ -9,11 +9,13 @@ export default {
         categoryMap: {},
         provinsiMap: {},
         kabupatenMap: {},
+        categoryPaths: {},
     },
     mutations: {
-        setCategory (state, { category, categoryMap }) {
+        setCategory (state, { category, categoryMap, categoryPaths }) {
             state.category = category
             state.categoryMap = categoryMap
+            state.categoryPaths = categoryPaths
         },
         setProvinsi (state, { provinsi, provinsiMap }) {
             state.provinsi = provinsi
@@ -35,6 +37,7 @@ export default {
                     commit('setCategory', { 
                         category: resp.data,
                         categoryMap: mapFromTree(resp.data),
+                        categoryPaths: paths(resp.data),
                     })
                 })
         },
@@ -84,4 +87,42 @@ function map (data) {
         map[item.id] = item
         return map
     }, {})
+}
+
+/**
+ * Create path for each leaf in the tree.
+ * 
+ * @param {Object} tree 
+ * @returns {Object} map of ID to path (array of IDs)
+ */
+function paths(tree) {
+    let isRoot = !Array.isArray(tree)
+    if (!isRoot) {
+        tree = { children: tree }
+    }
+    const map = {}
+    const stack = []
+    let state = {
+        item: tree,
+        i: 0,
+    }
+    do {
+        if (state.item.children && state.item.children.length 
+                && state.i < state.item.children.length) {
+            stack.push(state)
+            state = {
+                item: state.item.children[state.i++],
+                i: 0,
+            }
+            if (!state.item.children || !state.item.children.length) {
+                stack.push(state)
+                map[state.item.id] = stack.map(state => state.item)
+                !isRoot && map[state.item.id].shift()
+                stack.pop()
+            }
+        } else {
+            state = stack.pop()
+        }
+    } while (state)
+    return map
 }

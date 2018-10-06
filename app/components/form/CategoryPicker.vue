@@ -7,9 +7,9 @@
                     li(v-if="!value") 
                         a(@click="show = !show") Pilih
 
-                    li(v-for="(id, i) in selectedPath" v-if="i > 0" :key="id")
-                        a.has-text-grey(v-if="!isLeaf(id)" @click="show = !show") {{ categoryMap[id].name }} 
-                        a(v-else @click="show = !show") {{ categoryMap[id].name }}
+                    li(v-for="(item, i) in selectedPath" v-if="i > 0" :key="item.id")
+                        a.has-text-grey(v-if="!isLeaf(item)" @click="show = !show") {{ item.name }} 
+                        a(v-else @click="show = !show") {{ item.name }}
 
         .dropdown-menu
             .dropdown-content
@@ -33,32 +33,10 @@ export default {
         }
     },
     computed: {
-        ...mapState('cache', ['category', 'categoryMap']),
+        ...mapState('cache', ['category', 'categoryMap', 'categoryPaths']),
         selectedPath () {
             if (!this.value) return
-            const id = this.value
-            const stack = []
-            let state = {
-                item: this.category[0],
-                i: 0,
-            }
-            do {
-                if (state.item.children && state.item.children.length 
-                        && state.i < state.item.children.length) {
-                    stack.push(state)
-                    state = {
-                        item: state.item.children[state.i++],
-                        i: 0,
-                    }
-                    if (state.item.id === id) {
-                        stack.push(state)
-                        break;
-                    }
-                } else {
-                    state = stack.pop()
-                }
-            } while (state)
-            return stack.map(state => state.item.id)
+            return this.categoryPaths[this.value]
         },
     },
     methods: {
@@ -67,8 +45,8 @@ export default {
             this.show = false
             this.$emit('input', id)
         },
-        isLeaf (id) {
-            return !this.categoryMap[id].children || !this.categoryMap[id].children.length
+        isLeaf (item) {
+            return !item.children || !item.children.length
         }
     },
     mounted () {
