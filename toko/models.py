@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 from .utils.file import get_ad_img_upload_path
-from .mixins import TimestampsMixin
 
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
@@ -54,13 +53,15 @@ class Taxonomy(MPTTModel):
     def __str__(self):
         return self.name
 
-class Ad(TimestampsMixin, models.Model):
+class Ad(models.Model):
     user = models.ForeignKey(get_user_model(), related_name='ads', on_delete=models.CASCADE)
     category = models.ForeignKey(Taxonomy, on_delete=models.CASCADE)
     provinsi = models.ForeignKey(Provinsi, on_delete=models.CASCADE)
     kabupaten = models.ForeignKey(Kabupaten, on_delete=models.CASCADE)
     title = models.CharField(max_length=70)
     desc = models.CharField(max_length=4000)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class AdImage(models.Model):
     image = models.ImageField(upload_to=get_ad_img_upload_path)

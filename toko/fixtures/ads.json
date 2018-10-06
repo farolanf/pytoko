@@ -1,1 +1,1 @@
-[{"model": "toko.ad", "pk": 1, "fields": {"user": 1, "category": 17, "provinsi": 11, "kabupaten": 1172, "title": "aaaa", "desc": "vvvvvvvv"}}]
+[{"model": "toko.ad", "pk": 1, "fields": {"user": 1, "category": 17, "provinsi": 11, "kabupaten": 1172, "title": "aaaa", "desc": "vvvvvvvv", "created_at": "2018-10-06T02:32:56.510Z", "updated_at": "2018-10-06T02:32:56.616Z"}}]

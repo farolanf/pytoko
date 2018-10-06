@@ -110,7 +110,3 @@ def check_permissions(name, field_name, permissions, request, view, obj=None):
                 if not permission.has_object_permission(request, view, obj):
                     return False
     return True
-
-class TimestampsMixin(object):
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
