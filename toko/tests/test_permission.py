@@ -4,11 +4,11 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UN
 from .base import TestCase
 from .utils.user import User
 
+"""
+as_param: If True, action will be added to the base url.
+    Eg. /api/taxonomy/action_name/
+"""
 actions = {
-    """
-    as_param: If True, action will be added to the base url.
-        Eg. /api/ads/{action}/
-    """
     'can': {
         'list': {
             'method': 'get',
