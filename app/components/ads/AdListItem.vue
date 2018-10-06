@@ -27,22 +27,22 @@ export default {
             return this.data.images && this.data.images.length
         },
         categoryPath () {
-            return this.categoryPaths[this.data.category_id] 
-                ? this.categoryPaths[this.data.category_id]
+            return this.categoryPaths[this.data.category] 
+                ? this.categoryPaths[this.data.category]
                     .slice(1)
                     .map(item => item.name)
                     .join(' / ')
                 : ''
         },
         provinsi () {
-            return this.provinsiMap[this.data.provinsi_id] ? this.provinsiMap[this.data.provinsi_id].name : ''
+            return this.provinsiMap[this.data.provinsi] ? this.provinsiMap[this.data.provinsi].name : ''
         },
         kabupaten () {
-            if (!this.kabupatenMap[this.data.kabupaten_id]) {
-                this.getKabupaten({ provinsiId: this.data.provinsi_id })
+            if (!this.kabupatenMap[this.data.kabupaten]) {
+                this.getKabupaten({ provinsiId: this.data.provinsi })
                 return
             }
-            return this.kabupatenMap[this.data.kabupaten_id] ? this.kabupatenMap[this.data.kabupaten_id].name : ''
+            return this.kabupatenMap[this.data.kabupaten] ? this.kabupatenMap[this.data.kabupaten].name : ''
         }
     },
     methods: mapActions('cache', ['getCategory', 'getProvinsi', 'getKabupaten']),
