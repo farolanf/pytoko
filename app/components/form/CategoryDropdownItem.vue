@@ -1,15 +1,15 @@
 <template lang="pug">
-    div.category-dropdown-item.relative(:class="{'is-hoverable': hoverable}")
-        a.dropdown-item(:class="{'is-active': active, 'has-background-light': show}" @click="click")
+    div.category-dropdown-item.relative
+        a.dropdown-item(:class="{'is-active': active, 'has-background-light': show && !active}" @click="$emit('select', { item, depth })")
             template {{ item.name }}
             span.icon(v-if="hasChildren")
                 i.fa.fa-angle-right
 
-        .dropdown(v-if="(show || hoverable) && hasChildren" :class="{'is-active': show}")
+        .dropdown(v-if="hasChildren" :class="{'is-active': show}")
             
             .dropdown-menu
                 .dropdown-content
-                    category-dropdown-item(v-for="child in item.children" :key="child.id" :item="child" :show-id.sync="childShowId" :selected-id="selectedId" :hoverable="hoverable" @select="$emit('select', $event)")
+                    category-dropdown-item(v-for="child in item.children" :key="child.id" :item="child" :depth="depth + 1" :show-ids="showIds" @select="$emit('select', $event)")
 </template>
 
 <script>
@@ -18,40 +18,28 @@ export default {
         item: {
             type: Object
         },
-        showId: {
-            type: Number
+        showIds: {
+            type: Array,
+            default () {
+                return []
+            }
         },
-        selectedId: {
-            type: Number
-        },
-        hoverable: {
-            type: Boolean,
-        }
-    },
-    data () {
-        return {
-            childShowId: 0
+        depth: {
+            type: Number,
+            default: 0
         }
     },
     computed: {
         show () {
-            return this.showId === this.item.id
+            return this.showIds.includes(this.item.id)
         },
         active () {
-            return this.item.id === this.selectedId
+            return this.show && !this.hasChildren
         },
         hasChildren () {
             return this.item.children && this.item.children.length
         }
     },
-    methods: {
-        click () {
-            if (this.hasChildren) {
-                this.$emit('update:showId', this.showId === this.item.id ? 0 : this.item.id)
-            } 
-            this.$emit('select', this.item)
-        }
-    }
 }
 </script>
 
@@ -64,8 +52,8 @@ export default {
         align-items center
     & > .dropdown
         position absolute
-    &.is-hoverable:hover > .dropdown > .dropdown-menu
-        display block
+    & > .dropdown:not(.is-active) > .dropdown-menu
+        display none
 </style>
 
 <style lang="scss">
@@ -81,6 +69,9 @@ export default {
                 width: 100%;
             }
         }
+        .dropdown.is-active > .dropdown-menu {
+            display: block;
+        }
     }
 }
 
@@ -89,6 +80,12 @@ export default {
         & > .dropdown {
             top: 0;
             left: 100%;
+        }
+        &:hover > .dropdown > .dropdown-menu {
+            display: block;
+        }
+        & .dropdown, & .dropdown-menu {
+            width: 100%;
         }
     }
 }

@@ -4,7 +4,7 @@
             .columns
                 .column
 
-                    ul.list.flex.justify-center.is-hidden-tablet
+                    ul.list.flex.justify-center.is-hidden-tablet(v-if="mobile")
 
                         li(v-if="firstVisible(maxMobile)")
                             a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 1
@@ -23,7 +23,7 @@
                             span.mh2.v-btm ...
                             a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") {{ lastPageNum }}
 
-                    ul.list.flex.justify-end.is-hidden-mobile
+                    ul.list.flex.justify-end.is-hidden-mobile(v-if="tablet")
 
                         li(v-if="firstVisible(max)")
                             a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 1
@@ -69,6 +69,7 @@ export default {
         }
     },
     computed: {
+        ...mapState(['mobile', 'tablet']),
         lastPageNum () {
             return Math.ceil(this.data.count / this.data.page_size)
         },

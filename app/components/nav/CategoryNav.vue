@@ -1,30 +1,54 @@
 <template lang="pug">
-    .navbar-item.has-dropdown.is-hoverable
-        a.navbar-link(@click="show = !show") Kategori
+    .navbar-item.has-dropdown(:class="{'is-hoverable': show}")
+        a.navbar-link(@click="show = show ? hide() : true") Kategori
         .navbar-dropdown(v-if="category.length")
-            category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" hoverable @select="select")
+            category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-ids="showIds" @select="select")
 </template>
 
 <script>
 export default {
     data () {
         return {
-            show: false,
-            showId: null,
+            show: true,
+            showIds: [],
         }
     },
-    computed: mapState('cache', ['category']),
+    computed: mapState('cache', ['category', 'categoryPaths']),
     methods: {
-        select (item) {
-            console.log(item)
+        ...mapActions('cache', ['getCategory']),
+        select (e) {
+            if (e.item.isLeaf) {
+                this.showIds = []
+            } else {
+                this.showIds = this.showIds.slice(0, e.depth + 1)
+                this.$set(this.showIds, e.depth, 
+                    this.showIds[e.depth] === e.item.id ? false : e.item.id)
+            }
+            this.hide()
+        },
+        hide () {
+            this.show = false
+            setTimeout(() => { this.show = true }, 100)
         }
+    },
+    created () {
+        this.getCategory()
     }
 }
 </script>
 
-<style lang="stylus">
-.navbar-dropdown
-    width 200px
-    & .dropdown, & .dropdown-menu
-        width 100%
+<style lang="scss">
+@import '~bulma/bulma';
+
+@include until($tablet) {
+    .navbar-dropdown {
+        width: 100%;
+    }
+}
+
+@include from($tablet) {
+    .navbar-dropdown {
+        width: 200px;
+    }
+}
 </style>

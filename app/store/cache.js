@@ -11,6 +11,11 @@ export default {
         kabupatenMap: {},
         categoryPaths: {},
     },
+    getters: {
+        // get category path excluding the root
+        getCategoryPathIds: state => id => 
+            state.categoryPaths[id].map(item => item.id).slice(1)
+    },
     mutations: {
         setCategory (state, { category, categoryMap, categoryPaths }) {
             state.category = category
@@ -67,19 +72,22 @@ export default {
     }
 }
 
+function walkTree (item, cb) {
+    if (Array.isArray(item)) {
+        item.forEach(item => walkTree(item, cb))
+    } else {
+        cb(item)
+        Array.isArray(item.children) && walkTree(item.children, cb)
+    }
+}
+
 function mapFromTree (data) {
     const map = {}
-    data.length && traverseCategory(data[0], item => {
+    walkTree(data, item => {
+        item.isLeaf = !item.children || !item.children.length
         map[item.id] = item
     })
     return map
-    
-    function traverseCategory (item, cb) {
-        cb(item)
-        item.children && item.children.forEach(item => {
-            traverseCategory(item, cb)
-        })
-    }
 }
 
 function map (data) {

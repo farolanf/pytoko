@@ -12,7 +12,7 @@ export default {
             const mobile = getComputedStyle(this.$refs.mobile).display === 'block'
             const tablet = getComputedStyle(this.$refs.tablet).display === 'block'
             this.setMedia({ mobile, tablet })
-            this.timeout = setTimeout(this.detect, 150)
+            this.timeout = setTimeout(this.detect, 1000)
         }
     },
     mounted () {

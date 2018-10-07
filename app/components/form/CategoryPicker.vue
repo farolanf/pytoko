@@ -16,7 +16,7 @@
                 .dropdown-item.has-text-centered(v-if="!category.length")
                     button.button.is-text.is-loading
                 template(v-else)
-                    category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-id.sync="showId" :selected-id="value" @select="select")
+                    category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-ids="showIds" @select="select")
 </template>
 
 <script>
@@ -28,12 +28,13 @@ export default {
     },
     data () {
         return {
-            showId: 0,
-            show: false
+            show: false,
+            showIds: [],
         }
     },
     computed: {
         ...mapState('cache', ['category', 'categoryMap', 'categoryPaths']),
+        ...mapGetters('cache', ['getCategoryPathIds']),
         selectedPath () {
             if (!this.value) return
             return this.categoryPaths[this.value]
@@ -41,10 +42,15 @@ export default {
     },
     methods: {
         ...mapActions('cache', ['getCategory']),
-        select (item) {
-            if (this.isLeaf(item)) {
+        select (e) {
+            if (this.isLeaf(e.item)) {
                 this.show = false
-                this.$emit('input', item.id)
+                this.showIds = this.getCategoryPathIds(e.item.id)
+                this.$emit('input', e.item.id)
+            } else {
+                this.showIds = this.showIds.slice(0, e.depth + 1)
+                this.$set(this.showIds, e.depth, 
+                    this.showIds[e.depth] === e.item.id ? false : e.item.id)
             }
         },
         isLeaf (item) {
