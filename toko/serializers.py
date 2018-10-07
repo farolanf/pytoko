@@ -131,13 +131,16 @@ class AdCreateSerializer(serializers.ModelSerializer):
         images = validated_data.pop('images')
 
         for key, val in validated_data.items():
-            print('%s: %s' % (key, val))
             setattr(instance, key, val)
         
-        # TODO: delete the files from filesystem
+        # delete the files from filesystem
+        for img in instance.images.all():
+            img.image.delete()
+
         instance.images.all().delete()
 
         for image in images:
+            print(image['image'])
             models.AdImage.objects.create(ad=instance, image=image['image'])
 
         instance.save()

@@ -60,7 +60,7 @@ export default {
             imageItems.forEach((item, i) => {
                 if (!item.url) return
                 this.items[i].name = item.url.match(/.*\/(.+)$/)[1]
-                this.image(i, item.url)
+                this.image(i, item.url, false)
             })
         }
     },
@@ -96,12 +96,12 @@ export default {
                 })
             })
         },
-        async image (id, img) {
+        async image (id, img, sort = true) {
             const item = this.getItem(id)
             item.blob = await fetch(img).then(r => r.blob()) 
             item.originalImg = img
             this.$set(item, 'img', img)
-            this.sort()
+            sort && this.sort()
             this.emitChange()
         },
         file (id, file) {

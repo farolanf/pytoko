@@ -3,7 +3,7 @@
 
         .overflow-hidden.w-100.h-100(v-if="img")
     
-            img(:src="img")
+            img.w-100(:src="img")
     
         .flex.justify-center.items-center.bg-washed-blue.bw1.b--dotted.b--light-silver.w4.h4.mr2.mb2(v-else @click="browse")
             span.icon
