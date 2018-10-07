@@ -7,7 +7,7 @@ export function loginWithJwt () {
         verifyJwtToken(token).then(() => {
             store.dispatch('account/getUser')
         }).catch(() => {
-            removeJwtToken()
+            store.commit('account/logout')
         })
     }
 }
@@ -26,7 +26,7 @@ export function refreshJwtToken () {
     try {
         payload = jwtDecode(token)
     } catch (x) {
-        removeJwtToken()
+        store.commit('account/logout')
     }
 
     if (payload.exp - Date.now()/1000 > 60*15) return
@@ -36,7 +36,7 @@ export function refreshJwtToken () {
     }).then(resp => {
         saveJwtToken(resp.data.token)
     }).catch(() => {
-        removeJwtToken()
+        store.commit('account/logout')
     })
 }
 
