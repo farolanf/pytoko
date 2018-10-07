@@ -138,6 +138,7 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
             'permission_classes': [IsAdminOrOwner],
         },
     )
+    filter_fields = ('category',)
 
     @action(detail=False)
     def my(self, request):
@@ -147,6 +148,13 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         ads = request.user.ads.all() 
         serializer = self.get_serializer(ads, many=True, context={'rquest': request})
         return Response(serializer.data)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        order = self.request.query_params.get('order', None)
+        if order:
+            queryset = queryset.order_by(order)
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ('create', 'update'):

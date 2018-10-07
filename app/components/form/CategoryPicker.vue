@@ -16,7 +16,7 @@
                 .dropdown-item.has-text-centered(v-if="!category.length")
                     button.button.is-text.is-loading
                 template(v-else)
-                    category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-id.sync="showId" :selected-id="value" :on-select="select")
+                    category-dropdown-item(v-for="item in category[0].children" :key="item.id" :item="item" :show-id.sync="showId" :selected-id="value" @select="select")
 </template>
 
 <script>
@@ -41,9 +41,11 @@ export default {
     },
     methods: {
         ...mapActions('cache', ['getCategory']),
-        select (id) {
-            this.show = false
-            this.$emit('input', id)
+        select (item) {
+            if (this.isLeaf(item)) {
+                this.show = false
+                this.$emit('input', item.id)
+            }
         },
         isLeaf (item) {
             return !item.children || !item.children.length

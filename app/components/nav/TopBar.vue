@@ -12,6 +12,7 @@
                 .navbar-start
                     router-link.navbar-item(:to="{name: 'front'}" exact) Depan
                     router-link.navbar-item(:to="{name: 'about'}") Tentang kami
+                    category-nav
                 
                 .navbar-end
                     router-link.navbar-item(:to="{name: 'post-ad'}") Pasang iklan
