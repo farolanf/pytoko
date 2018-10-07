@@ -121,7 +121,7 @@ class AdImageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AdImageSerializer
 
 class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
-    queryset = Ad.objects.all()
+    queryset = Ad.objects.order_by('-updated_at').all()
     pagination_class = StandardPagination
     serializer_class = serializers.AdSerializer
     action_permissions = (
@@ -149,7 +149,7 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action in ('create', 'update'):
             return serializers.AdCreateSerializer
         
         return super().get_serializer_class() if is_ajax(self.request) else serializers.HyperlinkedAdSerializer

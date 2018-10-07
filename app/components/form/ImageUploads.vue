@@ -36,6 +36,9 @@ export default {
         max: {
             type: Number,
             default: 5
+        },
+        value: {
+            type: Array
         }
     },
     data () {
@@ -51,6 +54,14 @@ export default {
             if (!val) {
                 this.cropperItem = null
             }
+        },
+        value (imageItems) {
+            // load from url
+            imageItems.forEach((item, i) => {
+                if (!item.url) return
+                this.items[i].name = item.url.match(/.*\/(.+)$/)[1]
+                this.image(i, item.url)
+            })
         }
     },
     methods: {
@@ -107,12 +118,19 @@ export default {
         emitChange () {
             const items = this.items.filter(item => item.blob)
                 .map(item => ({
+                    name: item.name,
                     file: item.file,
                     blob: item.blob
                 }))
             this.$emit('input', items)
         },
         initDrag () {
+            const dropOnImage = (el, sibling) => {
+                let replaceEl = sibling ? (sibling.previousSibling || sibling)
+                    : el.parentNode.children.item(el.parentNode.children.length - 1)
+                const id = +replaceEl.getAttribute('data-id')
+                return !!this.getItem(id).img
+            }
             this.drake = dragula([this.$el.querySelector('.image-uploads-container')], {
                 direction: 'horizontal',
                 moves (el, src, handle, sibling) {
@@ -133,11 +151,6 @@ export default {
                 this.items = items
                 this.emitChange()
             })
-            function dropOnImage (el, sibling) {
-                let replaceEl = sibling ? (sibling.previousSibling || sibling)
-                    : el.parentNode.children.item(el.parentNode.children.length - 1)
-                return replaceEl.querySelector('input[type="file"]').value
-            }
         }
     },
     mounted () {
