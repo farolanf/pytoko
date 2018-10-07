@@ -12,6 +12,7 @@
                         a.is-link Kontak
                     .column
                         span.has-text-grey Hak cipta (C) 2018 juwal.com
+        media-detector
 </template>
 
 <script>

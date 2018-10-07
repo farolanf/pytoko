@@ -13,6 +13,8 @@ const store = new Vuex.Store({
         cache,
     },
     state: {
+        mobile: true,
+        tablet: false,
         msgType: null,
         msg: null,
         msgComponent: null,
@@ -23,6 +25,10 @@ const store = new Vuex.Store({
         },
     },
     mutations: {
+        setMedia (state, { mobile, tablet }) {
+            state.mobile = mobile
+            state.tablet = tablet
+        },
         setMessage (state, { type = null, msg = '', comp = null } = {}) {
             state.msgType = type
             state.msg = msg
