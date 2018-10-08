@@ -1,5 +1,5 @@
 <template lang="pug">
-    .nav.pagination
+    .nav.pagination(v-if="hasContent")
         .container
             .columns
                 .column
@@ -8,39 +8,47 @@
 
                         li(v-if="firstVisible(maxMobile)")
                             a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 1
+                                or-loading(:loading="loading && loadingPageNum === 1") 1
                             span.mh2.v-btm ...
 
                         li(v-for="page in prevPageUrls(maxMobile)" :key="page.url")
-                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
+                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") 
+                                or-loading(:loading="loading && loadingPageNum === page.num") {{ page.num }}
                         
                         li
                             a.pagination-link.is-current {{ data.page_num }}
                         
                         li(v-for="page in nextPageUrls(maxMobile)" :key="page.url")
-                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
+                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)")
+                                or-loading(:loading="loading && loadingPageNum === page.num") {{ page.num }}
 
                         li(v-if="lastVisible(maxMobile)")
                             span.mh2.v-btm ...
-                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") {{ lastPageNum }}
+                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)")
+                                or-loading(:loading="loading && loadingPageNum === lastPageNum") {{ lastPageNum }}
 
                     ul.list.flex.justify-end.is-hidden-mobile(v-if="tablet")
 
                         li(v-if="firstVisible(max)")
-                            a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 1
+                            a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 
+                                or-loading(:loading="loading && loadingPageNum === 1") 1
                             span.mh2.v-btm ...
 
                         li(v-for="page in prevPageUrls(max)" :key="page.url")
-                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
+                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") 
+                                or-loading(:loading="loading && loadingPageNum === page.num") {{ page.num }}
                         
                         li
                             a.pagination-link.is-current {{ data.page_num }}
                         
                         li(v-for="page in nextPageUrls(max)" :key="page.url")
-                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)") {{ page.num }}
+                            a.pagination-link(:href="page.url" @click.prevent="toPage(page.num)")
+                                or-loading(:loading="loading && loadingPageNum === page.num") {{ page.num }}
 
                         li(v-if="lastVisible(max)")
                             span.mh2.v-btm ...
-                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") {{ lastPageNum }}
+                            a.pagination-link(:href="pageUrl(lastPageNum)" @click.prevent="toPage(lastPageNum)") 
+                                or-loading(:loading="loading && loadingPageNum === lastPageNum") {{ lastPageNum }}
 
                 .column.is-narrow
                     
@@ -66,6 +74,11 @@ export default {
         maxMobile: {
             type: Number,
             default: 3
+        },
+    },
+    data () {
+        return {
+            loadingPageNum: null,
         }
     },
     computed: {
@@ -78,6 +91,9 @@ export default {
         },
         nextDisabled () {
             return this.loading || this.data.page_num >= this.lastPageNum
+        },
+        hasContent () {
+            return this.data.results && this.data.results.length
         }
     },
     methods: {
@@ -146,8 +162,14 @@ export default {
             return this.$router.resolve({ query: { page: num } }).href
         },
         toPage (num) {
-            this.$emit('change', num)
-        }
+            this.loadingPageNum = num
+            this.$router.push({ 
+                query: {
+                    ...this.$route.query, 
+                    page: num,
+                }
+            })
+        },
     }
 }
 </script>
