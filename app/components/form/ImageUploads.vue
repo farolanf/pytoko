@@ -98,7 +98,7 @@ export default {
         },
         async image (id, img, sort = true) {
             const item = this.getItem(id)
-            item.blob = await fetch(img).then(r => r.blob()) 
+            item.blob = img ? await fetch(img).then(r => r.blob()) : null
             item.originalImg = img
             this.$set(item, 'img', img)
             sort && this.sort()

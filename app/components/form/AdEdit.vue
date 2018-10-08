@@ -85,8 +85,10 @@ export default {
             const fd = new FormData(e.target)
             if (this.imageItems && this.imageItems.length) {
                 this.imageItems.forEach((item, i) => {
-                    const name = item.file ? item.file.name : item.name
-                    fd.append(`images[${i}]`, item.blob, name)
+                    if (item.blob) {
+                        const name = item.file ? item.file.name : item.name
+                        fd.append(`images[${i}]`, item.blob, name)
+                    }
                 })
             }
             this.loading = true

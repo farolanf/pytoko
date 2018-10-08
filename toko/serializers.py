@@ -5,6 +5,7 @@ from .mixins import FilterFieldsMixin, ValidatePasswordMixin
 from .permissions import IsAdminOrSelf
 from .models import PasswordReset, Provinsi, Kabupaten
 from . import models
+from .utils.file import inc_filename
 
 User = get_user_model()
 
@@ -133,14 +134,10 @@ class AdCreateSerializer(serializers.ModelSerializer):
         for key, val in validated_data.items():
             setattr(instance, key, val)
         
-        # delete the files from filesystem
-        for img in instance.images.all():
-            img.image.delete()
-
         instance.images.all().delete()
 
         for image in images:
-            print(image['image'])
+            image['image'].name = inc_filename(image['image'].name)
             models.AdImage.objects.create(ad=instance, image=image['image'])
 
         instance.save()

@@ -1,4 +1,11 @@
+import re
 
+def inc_filename(filename):
+    match = re.match(r'.*?(\d+)\.\w+$', filename)
+    num = int(match.group(1)) if match else 0
+    num += 1
+    return re.sub(r'\d*(\.\w+)$', r'%s\1' % num, filename)
+    
 def get_upload_path(subdir, parent_attr, obj, filename):
     """
     Get upload path in the form of user_{id}/{subdir}/{filename}
