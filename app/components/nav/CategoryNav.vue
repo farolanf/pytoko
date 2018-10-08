@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bulma/bulma';
+@import '~bulma/sass/utilities/all';
 
 @include until($tablet) {
     .navbar-dropdown {

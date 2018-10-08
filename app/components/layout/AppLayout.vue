@@ -21,19 +21,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bulma/bulma';
+@import '~bulma/sass/utilities/all';
 
 #app-layout {
     padding-bottom: calc(168px + 4rem);
 }
 @include until($tablet) {
     #app-layout > .main-content {
-        padding: 3rem .5rem 0 .5rem;
+        padding: 1.5rem .5rem 0 .5rem;
     }
 }
 @include from($tablet) {
     #app-layout > .main-content {
-        padding: 3rem 0;
+        padding: 2rem 0;
     }
 }
 </style>

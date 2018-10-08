@@ -57,7 +57,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '~bulma/bulma';
+@import '~bulma/sass/utilities/all';
 
 @include until($tablet) {
     .category-dropdown-item {
