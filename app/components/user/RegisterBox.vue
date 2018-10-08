@@ -1,6 +1,6 @@
 <template lang="pug">
     div
-        .notification.is-danger(v-if="message") {{ message }}
+        .notification.is-danger(v-if="hasError('non_field_errors')") {{ getError('non_field_errors') }}
         
         form(@submit.prevent="submit")
         
@@ -27,10 +27,7 @@ export default {
             loading: false
         }
     },
-    computed: {
-        ...mapState('request', ['message']),
-        ...mapGetters('request', ['hasError', 'getError']),
-    },
+    computed: mapGetters('request', ['hasError', 'getError']),
     methods: {
         ...mapActions(['account/register', 'account/login']),
         submit () {

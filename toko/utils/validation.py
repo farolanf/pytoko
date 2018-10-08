@@ -7,8 +7,10 @@ def validate(serializer, message=''):
     This is to maintain consistent response structure.
     """
     if not serializer.is_valid():
+        non_field_errors = serializer.errors.get('non_field_errors', [])
+        non_field_errors.append(message)
         raise ValidationError({
-            'message': message,
-            'errors': serializer.errors
+            **serializer.errors,
+            'non_field_errors': non_field_errors,
         })
     return True

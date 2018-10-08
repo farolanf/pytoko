@@ -21,8 +21,8 @@ class RegisterTestCase(TestCase):
             'password_confirm': PASSWORD,
         })
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json()['message'], 'Pendaftaran akun gagal.')
-        self.assertEqual(response.json()['errors']['email'][0], 'Email sudah terdaftar.')
+        self.assertEqual(response.json()['non_field_errors'][0], 'Pendaftaran akun gagal.')
+        self.assertEqual(response.json()['email'][0], 'Email sudah terdaftar.')
 
 class RegisterLiveTestCase(LiveTestCase):
 

@@ -1,6 +1,8 @@
 <template lang="pug">
     div
-        .notification(v-if="message" :class="{'is-danger': error, 'is-success': !error}") {{ message }}
+        .notification.is-danger(v-if="hasError('non_field_errors')")
+            p {{ getError('non_field_errors') }}
+            p {{ getError('token') }}
         
         form(@submit.prevent="submit" ref="form")
 
@@ -22,10 +24,7 @@ export default {
             passwordConfirm: ''
         }
     },
-    computed: {
-        ...mapState('request', ['message', 'error']),
-        ...mapGetters('request', ['hasError', 'getError']),
-    },
+    computed: mapGetters('request', ['hasError', 'getError']),
     methods: {
         ...mapActions('account', ['resetPassword']),
         validatePassword () {

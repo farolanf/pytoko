@@ -33,9 +33,17 @@ export default {
 }
 
 export function updateFromResponse (response) {
+    let message = ''
+    let errors = {}
+    const error = response.status < 200 || response.status >= 300
+    if (error) {
+        errors = response.data
+    } else if (response.data.message) {
+        message = response.data.message
+    }
     store.commit('request/setError', {
-        message: response.data.message || response.data.non_field_errors && response.data.non_field_errors[0],
-        errors: response.data.errors || response.data.non_field_errors,
+        message,
+        errors,
         status: response.status
     })
     return response

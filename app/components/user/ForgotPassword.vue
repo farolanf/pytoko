@@ -2,7 +2,7 @@
     div
         .notification.is-info Masukkan email anda untuk menerima link ke halaman reset password
 
-        .notification(v-if="message" :class="{'is-danger': error, 'is-success': !error}") {{ message }}
+        .notification.is-danger(v-if="hasError('non_field_errors')") {{ getError('non_field_errors') }}
         
         form(@submit.prevent="sendEmail")
 
@@ -23,10 +23,7 @@ export default {
             loading: false
         }
     },
-    computed: {
-        ...mapState('request', ['message', 'error']),
-        ...mapGetters('request', ['hasError', 'getError'])
-    },
+    computed: mapGetters('request', ['hasError', 'getError']),
     methods: {
         ...mapActions('account', ['sendResetPasswordEmail']),
         sendEmail () {
