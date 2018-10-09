@@ -1,21 +1,6 @@
 <template lang="pug">
-    .field
-        .label {{ title }}
-        
-        .control.has-icons-right(:class="{'has-icons-left': leftIcon}")
-            
-            input.input(:class="{'is-danger': error, 'is-success': success}" v-bind="{type, name, placeholder, required}" :value="value" @input="$emit('input', $event.target.value)" @change="$emit('change', $event)")
-            
-            span.icon.is-small.is-left(v-if="leftIcon")
-                i(:class="leftIcon")
-            
-            span.icon.is-small.is-right(v-if="error || success")
-                i.fa.fa-exclamation-triangle(v-if="error")
-                i.fa.fa-check(v-if="success")
-
-            p.help.is-danger(v-if="error") {{ errorMsg }}
-            p.help.is-success(v-else-if="success") {{ successMsg }}
-            p.help(v-else-if="help") {{ help }}
+    form-field(errorIcon v-bind="{title, name, leftIcon, help, errorMsg, successMsg, error, success}")
+        field-input(v-bind="{type, value, name, placeholder, required, error, success}" @input="$emit('input', $event)" @change="$emit('change', $event)")
 </template>
 
 <script>
@@ -61,4 +46,3 @@ export default {
     }
 }
 </script>
-

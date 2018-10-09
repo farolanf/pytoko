@@ -6,6 +6,7 @@
  */
 
 import './bootstrap'
+import './directives'
 
 import Vue from 'vue'
 import router from './router'
