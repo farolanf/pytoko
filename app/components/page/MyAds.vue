@@ -6,7 +6,7 @@
             router-link.black-80(v-for="ad in data.results" :key="ad.id" :to="editAdUrl(ad.id)")
                 ad-list-item.mb4(:data="ad")
 
-            pagination-nav(:max="8" :max-mobile="3" :data="data" :loading="loading" @change="toPage")
+            pagination-nav.mt1(:max="8" :max-mobile="3" :data="data" :loading="loading")
 </template>
 
 <script>
@@ -14,7 +14,6 @@ export default {
     data () {
         return {
             data: null,
-            loading: false
         }
     },
     watch: {
@@ -23,9 +22,6 @@ export default {
         }
     },
     methods: {
-        toPage (num) {
-            this.$router.push({ query: { page: num } })
-        },
         editAdUrl (id) {
             return this.$router.resolve({
                 name: 'edit-ad', 
@@ -51,7 +47,7 @@ export default {
 
 
 <style lang="scss">
-@import '~bulma/bulma';
+@import '~bulma/sass/utilities/all';
 
 .my-ads-page {
     @include from($tablet) {

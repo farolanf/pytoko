@@ -147,6 +147,6 @@ class AdCreateSerializer(serializers.ModelSerializer):
         return instance
 
     def validate_images(self, value):
-        if len(value) > 1:
+        if len(value) > 8:
             raise serializers.ValidationError('Jumlah foto melebihi batas (maksimal 8 foto).')
         return value

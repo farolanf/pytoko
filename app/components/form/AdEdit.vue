@@ -1,28 +1,17 @@
 <template lang="pug">
     form(@submit.prevent="submit")
 
-        .field
-            .label Kategori
-            .control.relative
-                category-picker(v-model="category")
-                input(type="hidden" name="category" :value="category")
-            field-error(name='category')
+        form-field.relative(title="Kategori" name="category")
+            category-picker(v-model="category")
+            input(type="hidden" name="category" :value="category")
 
-        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" v-model="title" :error="hasError('title')" :error-msg="getError('title')")
+        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" v-model="title")
 
-        .field
-            .label Deskripsi iklan
-            .control
-                textarea.textarea(rows="10" cols="50" name="desc" v-model="desc")
-            field-error(name='desc')
-            p.help Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.
+        form-field(title="Deskripsi iklan" name="desc" help="Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.")
+            textarea.textarea(v-error="" rows="10" cols="50" name="desc" v-model="desc")
 
-        .field
-            .label Foto Produk
-            .control
-                image-uploads(:max="8" v-model="imageItems")
-            field-error(name="images")
-            p.help Sertakan minimal 3 foto untuk menarik pembeli
+        form-field(title="Foto Produk" name="images" help="Sertakan minimal 3 foto untuk menarik pembeli")
+            image-uploads(v-error="images" :max="8" v-model="imageItems")
 
         .field
             .label Provinsi
@@ -41,7 +30,7 @@
                 template(v-else)
                     button.button.is-text.is-loading
                 p.help Lokasi produk/jasa
-
+        
         .field.is-grouped
             .control
                 button.button.is-link(type="submit" :class="{'is-loading': loading}") Simpan
@@ -49,6 +38,7 @@
 
 <script>
 import { updateFromResponse, updateFromError } from '#/store/request'
+import { scrollToError } from '#/utils/dom'
 
 export default {
     props: ['id'],
@@ -68,7 +58,6 @@ export default {
         ...mapState('cache', ['provinsiMap']),
         ...mapState('cache', { dataProvinsi: 'provinsi' }),
         ...mapGetters('account', ['loggedIn']),
-        ...mapGetters('request', ['hasError', 'getError']),
         selectedProvinsi () {
             return this.provinsi ? this.provinsiMap[this.provinsi] : null
         },
@@ -103,6 +92,7 @@ export default {
                 this.$router.push({ name: 'my-ads' })
             }).then(updateFromResponse)
                 .catch(updateFromError)
+                .catch(scrollToError)
                 .finally(() => {
                     this.loading = false
                 })

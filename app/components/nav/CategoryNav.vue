@@ -17,6 +17,7 @@ export default {
     methods: {
         ...mapActions('cache', ['getCategory']),
         select (e) {
+            // TODO: fix dropdown expand state
             if (e.item.isLeaf) {
                 this.showIds = []
             } else {
@@ -25,6 +26,10 @@ export default {
                     this.showIds[e.depth] === e.item.id ? false : e.item.id)
             }
             this.hide()
+            this.$router.push({
+                name: 'search',
+                query: { category: e.item.id }
+            })
         },
         hide () {
             this.show = false

@@ -7,7 +7,7 @@
                     ul.list.flex.justify-center.is-hidden-tablet(v-if="mobile")
 
                         li(v-if="firstVisible(maxMobile)")
-                            a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 1
+                            a.pagination-link(:href="pageUrl(1)" @click.prevent="toPage(1)") 
                                 or-loading(:loading="loading && loadingPageNum === 1") 1
                             span.mh2.v-btm ...
 
@@ -96,6 +96,11 @@ export default {
             return this.data.results && this.data.results.length
         }
     },
+    watch: {
+        '$route' () {
+            this.loadingPageNum = this.$route.query.page
+        }
+    },
     methods: {
         firstVisible (max) {
             const end = Math.min(this.data.page_num + max, this.lastPageNum)
@@ -162,7 +167,6 @@ export default {
             return this.$router.resolve({ query: { page: num } }).href
         },
         toPage (num) {
-            this.loadingPageNum = num
             this.$router.push({ 
                 query: {
                     ...this.$route.query, 

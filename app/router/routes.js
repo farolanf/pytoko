@@ -15,6 +15,10 @@ const routes = [
 
             { path: 'tentang-kami', component: c('page/AboutPage'), name: 'about' },
 
+            { path: 'cari', component: c('page/SearchPage'), name: 'search' },
+
+            { path: 'iklan/:id', component: c('page/AdDetail'), name: 'ad-detail' },
+
             { path: 'masuk', component: c('user/page/LoginPage'), name: 'login' },
 
             { path: 'daftar', component: c('user/page/RegisterPage'), name: 'daftar' },
@@ -27,7 +31,7 @@ const routes = [
 
             { path: 'akun/iklan-saya', component: c('page/MyAds'), name: 'my-ads', meta },
 
-            { path: 'iklan/:id', component: c('page/EditAd'), name: 'edit-ad', meta },
+            { path: 'akun/iklan-saya/:id', component: c('page/EditAd'), name: 'edit-ad', meta },
 
             { path: 'pasang-iklan', component: c('page/PostAd'), name: 'post-ad', meta },
 
