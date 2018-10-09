@@ -125,6 +125,7 @@ class AdCreateSerializer(serializers.ModelSerializer):
         images = validated_data.pop('images')
         ad = models.Ad.objects.create(**validated_data)
         for image in images:
+            image['image'].name = inc_filename(image['image'].name)
             models.AdImage.objects.create(ad=ad, image=image['image'])
         return ad
 
@@ -142,3 +143,8 @@ class AdCreateSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+    def validate_images(self, value):
+        if len(value) > 8:
+            raise serializers.ValidationError('Jumlah foto melebihi batas (maksimal 8 foto).')
+        return value
