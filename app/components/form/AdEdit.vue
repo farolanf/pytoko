@@ -6,19 +6,22 @@
             .control.relative
                 category-picker(v-model="category")
                 input(type="hidden" name="category" :value="category")
+            field-error(name='category')
 
-        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" v-model="title")
+        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" v-model="title" :error="hasError('title')" :error-msg="getError('title')")
 
         .field
             .label Deskripsi iklan
             .control
                 textarea.textarea(rows="10" cols="50" name="desc" v-model="desc")
+            field-error(name='desc')
             p.help Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.
 
         .field
             .label Foto Produk
             .control
                 image-uploads(:max="8" v-model="imageItems")
+            field-error(name="images")
             p.help Sertakan minimal 3 foto untuk menarik pembeli
 
         .field
@@ -45,6 +48,8 @@
 </template>
 
 <script>
+import { updateFromResponse, updateFromError } from '#/store/request'
+
 export default {
     props: ['id'],
     data () {
@@ -63,6 +68,7 @@ export default {
         ...mapState('cache', ['provinsiMap']),
         ...mapState('cache', { dataProvinsi: 'provinsi' }),
         ...mapGetters('account', ['loggedIn']),
+        ...mapGetters('request', ['hasError', 'getError']),
         selectedProvinsi () {
             return this.provinsi ? this.provinsiMap[this.provinsi] : null
         },
@@ -95,9 +101,11 @@ export default {
             const method = this.exists ? 'put' : 'post'
             axios[method](this.url, fd).then(() => {
                 this.$router.push({ name: 'my-ads' })
-            }).finally(() => {
-                this.loading = false
-            })
+            }).then(updateFromResponse)
+                .catch(updateFromError)
+                .finally(() => {
+                    this.loading = false
+                })
         },
         kabupatenChange (e) {
             this.$emit('update:kabupaten', e.target.value)            

@@ -9,12 +9,13 @@ export default {
         status: null,
     },
     getters: {
-        hasError: state => name => state.errors && state.errors.hasOwnProperty(name),
-        getError: state => name => state.errors 
-            ? Array.isArray(state.errors[name])
-                ? state.errors[name][0]
-                : state.errors[name]
-            : ''
+        hasError: state => name => state.errors.hasOwnProperty(name),
+        getError: state => (name, all = false) => {
+            if (state.errors.hasOwnProperty(name)) {
+                return all ? state.errors[name] : state.errors[name][0]
+            }
+            return all ? [] : ''
+        }
     },
     mutations: {
         setError (state, { message = '', errors = {}, status = 200 } = {}) {

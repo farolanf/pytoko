@@ -1,8 +1,6 @@
 <template lang="pug">
     div
-        .notification.is-danger(v-if="hasError('non_field_errors')")
-            p {{ getError('non_field_errors') }}
-            p {{ getError('token') }}
+        error-messages(name="token" with-default)
         
         form(@submit.prevent="submit" ref="form")
 

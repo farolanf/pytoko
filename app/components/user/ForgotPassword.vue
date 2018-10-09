@@ -2,7 +2,7 @@
     div
         .notification.is-info Masukkan email anda untuk menerima link ke halaman reset password
 
-        .notification.is-danger(v-if="hasError('non_field_errors')") {{ getError('non_field_errors') }}
+        error-messages
         
         form(@submit.prevent="sendEmail")
 

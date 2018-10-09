@@ -115,6 +115,8 @@ class AdCreateSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault(),
     )
+    title = serializers.CharField(min_length=10, max_length=70)
+    desc = serializers.CharField(min_length=20, max_length=4000)
     images = AdImageSerializer(many=True)
 
     class Meta:
@@ -145,6 +147,6 @@ class AdCreateSerializer(serializers.ModelSerializer):
         return instance
 
     def validate_images(self, value):
-        if len(value) > 8:
+        if len(value) > 1:
             raise serializers.ValidationError('Jumlah foto melebihi batas (maksimal 8 foto).')
         return value
