@@ -1,5 +1,5 @@
 import { updateFromResponse, updateFromError } from './request'
-import { saveJwtToken, removeJwtToken, getJwtPayload } from "../helpers/account";
+import { saveJwtToken, removeJwtToken, getJwtPayload } from "../utils/account";
 
 export default {
     namespaced: true,

@@ -1,5 +1,5 @@
 
-import { refreshJwtToken, loadJwtToken } from './helpers/account'
+import { refreshJwtToken, loadJwtToken } from './utils/account'
 
 window._ = require('lodash');
 window.Popper = require('popper.js').default;

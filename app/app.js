@@ -11,7 +11,7 @@ import './directives'
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import { loginWithJwt } from './helpers/account';
+import { loginWithJwt } from './utils/account';
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
