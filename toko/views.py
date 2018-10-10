@@ -96,7 +96,7 @@ class TaxonomyViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     filter_fields = ('slug',)
     action_permissions = (
         {
-            'actions': ['list', 'retrieve'],
+            'actions': ['list', 'retrieve', 'category'],
             'permission_classes': [],
         },
     )
