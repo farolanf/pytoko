@@ -3,17 +3,19 @@
         .columns.is-multiline
             
             .column.is-12(v-if="premium")
-                router-link(:to="adDetail(premium.id)")
+                router-link.link.dim.near-black(:to="adDetail(premium.id)")
                     ad-search-item-bar(:item="premium" type="premium")
 
             .column.is-3(v-for="(item, i) in data.results" :key="item.id")
                 router-link(:to="adDetail(item.id)")
                     ad-search-item(:item="item")
 
-        pagination-nav.mt4(:max="8" :max-mobile="3" :data="data" :loading="loading")
+        pagination-nav.mt4(:max="6" :max-mobile="3" :data="data" :loading="loading")
 </template>
 
 <script>
+import { scrollTo } from '#/utils/dom'
+
 export default {
     data () {
         return {
@@ -40,7 +42,7 @@ export default {
 
             const query = { params: this.$route.query }
 
-            Promise.all([
+            return Promise.all([
                 axios.get('/api/ads/premium/', query).then(resp => {
                     this.premium = resp.data
                 }),

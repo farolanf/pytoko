@@ -14,7 +14,10 @@
 </template>
 
 <script>
+import info from '@/mixins/info'
+
 export default {
+    mixins: [info],
     props: {
         data: {
             type: Object,
@@ -22,34 +25,19 @@ export default {
         }
     },
     computed: {
-        ...mapState('cache', ['categoryPaths', 'provinsiMap', 'kabupatenMap']),
         hasImage () {
             return this.data.images && this.data.images.length
         },
         categoryPath () {
-            return this.categoryPaths[this.data.category] 
-                ? this.categoryPaths[this.data.category]
-                    .slice(1)
-                    .map(item => item.name)
-                    .join(' / ')
-                : ''
+            return this.categoryPathStr(this.data.category)
         },
         provinsi () {
-            return this.provinsiMap[this.data.provinsi] ? this.provinsiMap[this.data.provinsi].name : ''
+            return this.provinsiStr(this.data.provinsi)
         },
         kabupaten () {
-            if (!this.kabupatenMap[this.data.kabupaten]) {
-                this.getKabupaten({ provinsiId: this.data.provinsi })
-                return
-            }
-            return this.kabupatenMap[this.data.kabupaten] ? this.kabupatenMap[this.data.kabupaten].name : ''
+            return this.kabupatenStr(this.data.provinsi, this.data.kabupaten)
         }
     },
-    methods: mapActions('cache', ['getCategory', 'getProvinsi', 'getKabupaten']),
-    mounted () {
-        this.getCategory()
-        this.getProvinsi()
-    }
 }
 </script>
 

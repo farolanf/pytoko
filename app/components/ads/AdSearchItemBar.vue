@@ -1,20 +1,45 @@
 <template lang="pug">
-    article.media(:class="{[theme.cls]: true}")
-        figure.media-left.overflow-hidden
-            p.image.is-square.w-50
-                img.of-cover(v-if="item.images[0]" :src="item.images[0].image")
-        .media-content
-            p.f3 {{ item.title }}
-            .level
-                .level-left
-                .level-right
-                    .level-item 
-                        div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
+    .card.is-hidden-tablet(v-if="mobile" :class="{[theme.cls]: true}")
+        .card-image.image
+            img.of-cover(v-if="item.images[0]" :src="item.images[0].image")
+        .card-content
+            p.heading {{ item.updated_at }}
+            p.heading {{ categoryPath }}
+            strong.f4 {{ item.title }}
+            p.heading {{ kabupaten }} - {{ provinsi }}
+            p.ad-search-item-bar__desc {{ item.desc }}
+
+    .is-hidden-mobile(v-else-if="tablet")
+        article.ad-search-item-bar.media.pa2.pr4.overflow-hidden(:class="{[theme.cls]: true}")
+            .media-left.w-30
+                .flex.w-100
+                    p.image
+                        img.of-cover(v-if="item.images[0]" :src="item.images[0].image")
+                    p.image
+                        img.of-cover(v-if="item.images[1]" :src="item.images[1].image")
+                .flex
+                    p.image
+                        img.of-cover(v-if="item.images[2]" :src="item.images[2].image")
+                    p.image
+                        img.of-cover(v-if="item.images[3]" :src="item.images[3].image")
+            .media-content.h-100
+                p.heading {{ item.updated_at }}
+                p.heading {{ categoryPath }}
+                strong.f3 {{ item.title }}
+                p.heading {{ kabupaten }} - {{ provinsi }}
+                p.ad-search-item-bar__desc {{ item.desc }}
+                .level.pt2
+                    .level-left
+                    .level-right
+                        .level-item 
+                            div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
 </template>
 
 <script>
+import info from '@/mixins/info'
 
 export default {
+    mixins: [info],
     props: {
         item: {
             type: Object,
@@ -52,16 +77,29 @@ export default {
         },
         theme () {
             return this.types[this.type]
+        },
+        categoryPath () {
+            return this.categoryPathStr(this.item.category)
+        },
+        provinsi () {
+            return this.provinsiStr(this.item.provinsi)
+        },
+        kabupaten () {
+            return this.kabupatenStr(this.item.provinsi, this.item.kabupaten)
         }
     }
 }
 </script>
 
 <style lang="stylus">
+.ad-search-item-bar
+    height 320px
+.ad-search-item-bar__desc
+    max-height 100px
+    overflow hidden
 .ad-search-item-bar--premium
     outline 4px solid #00d1b2
     box-shadow 2px 2px 15px 2px rgba(0, 0, 0, 0.3)
-
 .ad-search-item-bar--plus
     outline 2px solid #209cee
     box-shadow 2px 2px 5px 2px rgba(0, 0, 0, 0.3)

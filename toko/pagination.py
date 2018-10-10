@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 class StandardPagination(PageNumberPagination):
-    page_size = 4
+    page_size = 20
 
     def get_paginated_response(self, data):
         return Response(OrderedDict([

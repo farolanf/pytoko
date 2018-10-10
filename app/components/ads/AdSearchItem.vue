@@ -1,7 +1,7 @@
 <template lang="pug">
     .card(:class="{[theme.cardCls]: true}")
         .card-image
-            figure.image.is-square.w-100.overflow-hidden
+            figure.image.w-100.overflow-hidden
                 img.of-cover(v-if="firstImage" :src="firstImage.image")
         .card-content.pa2.bt.b--light-gray
             p.f6 {{ item.title }}
@@ -61,7 +61,6 @@ export default {
 .ad-search-item--premium
     outline 4px solid #00d1b2
     box-shadow 2px 2px 15px 2px rgba(0, 0, 0, 0.3)
-
 .ad-search-item--plus
     outline 2px solid #209cee
     box-shadow 2px 2px 5px 2px rgba(0, 0, 0, 0.3)
