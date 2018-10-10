@@ -9,5 +9,6 @@ DATABASES = {
         'NAME': 'pytoko',
         'USER': 'pytoko',
         'PASSWORD': 'pytoko',
+        'COLLATION': 'utf8_general_ci',
     },
 }
