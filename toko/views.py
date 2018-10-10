@@ -126,7 +126,7 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     serializer_class = serializers.AdSerializer
     action_permissions = (
         {
-            'actions': ['list', 'retrieve'],
+            'actions': ['list', 'retrieve', 'premium'],
             'permission_classes': [],
         },
         {
@@ -145,7 +145,17 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
             return Response([])
         
         ads = request.user.ads.all() 
-        serializer = self.get_serializer(ads, many=True, context={'rquest': request})
+        serializer = self.get_serializer(ads, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(detail=False)
+    def premium(self, request):
+        """
+        Get premium ads.
+        """
+        # TODO: decide which ads to show
+        ad = self.get_queryset().order_by('-updated_at').first()
+        serializer = self.get_serializer(ad, context={'request': request})
         return Response(serializer.data)
 
     def get_queryset(self):

@@ -2,7 +2,7 @@
     .card(:class="{[theme.cardCls]: true}")
         .card-image
             figure.image.is-square.w-100.overflow-hidden
-                img.ad-search-item__img(v-if="firstImage" :src="firstImage.image")
+                img.of-cover(v-if="firstImage" :src="firstImage.image")
         .card-content.pa2.bt.b--light-gray
             p.f6 {{ item.title }}
             .level
@@ -58,9 +58,6 @@ export default {
 </script>
 
 <style lang="stylus">
-.ad-search-item__img
-    object-fit cover
-
 .ad-search-item--premium
     outline 4px solid #00d1b2
     box-shadow 2px 2px 15px 2px rgba(0, 0, 0, 0.3)

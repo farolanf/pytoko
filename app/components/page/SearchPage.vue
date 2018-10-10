@@ -2,9 +2,9 @@
     j-page(title="Cari")
         .columns.is-multiline
             
-            .column.is-12(v-for="(item, i) in data.results" :key="item.id * 10")
-                router-link(:to="adDetail(item.id)")
-                    ad-search-item-bar(:item="item" type="premium")
+            .column.is-12(v-if="premium")
+                router-link(:to="adDetail(premium.id)")
+                    ad-search-item-bar(:item="premium" type="premium")
 
             .column.is-3(v-for="(item, i) in data.results" :key="item.id")
                 router-link(:to="adDetail(item.id)")
@@ -18,6 +18,7 @@ export default {
     data () {
         return {
             data: {},
+            premium: null,
             loading: false,
         }
     },
@@ -36,11 +37,17 @@ export default {
         },
         refresh () {
             this.loading = true
-            axios.get('/api/ads/', {
-                params: this.$route.query
-            }).then(resp => {
-                this.data = resp.data
-            }).finally(() => {
+
+            const query = { params: this.$route.query }
+
+            Promise.all([
+                axios.get('/api/ads/premium/', query).then(resp => {
+                    this.premium = resp.data
+                }),
+                axios.get('/api/ads/', query).then(resp => {
+                    this.data = resp.data
+                })
+            ]).finally(() => {
                 this.loading = false
             })
         }

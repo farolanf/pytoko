@@ -1,20 +1,9 @@
 <template lang="pug">
-    .card(:class="{[theme.cardCls]: true}")
-        .card-image
-            .columns.is-gapless.is-centered
-                .column
-                    figure.image.is-square.overflow-hidden
-                        img.ad-search-item__img(v-if="item.images[0]" :src="item.images[0].image")
-                .column
-                    figure.image.is-square.overflow-hidden
-                        img.ad-search-item__img(v-if="item.images[1]" :src="item.images[1].image")
-                .column
-                    figure.image.is-square.overflow-hidden
-                        img.ad-search-item__img(v-if="item.images[2]" :src="item.images[2].image")
-                .column
-                    figure.image.is-square.overflow-hidden
-                        img.ad-search-item__img(v-if="item.images[3]" :src="item.images[3].image")
-        .card-content.pa2.bt.b--light-gray
+    article.media(:class="{[theme.cls]: true}")
+        figure.media-left.overflow-hidden
+            p.image.is-square.w-50
+                img.of-cover(v-if="item.images[0]" :src="item.images[0].image")
+        .media-content
             p.f3 {{ item.title }}
             .level
                 .level-left
@@ -40,17 +29,17 @@ export default {
         return {
             types: {
                 premium: {
-                    cardCls: 'ad-search-item--premium',
+                    cls: 'ad-search-item-bar--premium',
                     tag: 'strong',
                     tagCls: 'is-primary',
                 },
                 plus: {
-                    cardCls: 'ad-search-item--plus',
+                    cls: 'ad-search-item-bar--plus',
                     tag: 'strong',
                     tagCls: 'is-info',
                 },
                 default: {
-                    cardCls: '',
+                    cls: '',
                     tag: 'span',
                     tagCls: 'is-light',
                 }
@@ -69,14 +58,11 @@ export default {
 </script>
 
 <style lang="stylus">
-.ad-search-item__img
-    object-fit cover
-
-.ad-search-item--premium
+.ad-search-item-bar--premium
     outline 4px solid #00d1b2
     box-shadow 2px 2px 15px 2px rgba(0, 0, 0, 0.3)
 
-.ad-search-item--plus
+.ad-search-item-bar--plus
     outline 2px solid #209cee
     box-shadow 2px 2px 5px 2px rgba(0, 0, 0, 0.3)
 </style>
