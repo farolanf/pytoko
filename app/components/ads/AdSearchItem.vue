@@ -1,20 +1,19 @@
 <template lang="pug">
-    .card(:class="{[theme.cardCls]: true}")
+    .ad-search-item.card.flex.flex-column(:class="{[theme.cardCls]: true}")
         .card-image
-            figure.image.w-100.overflow-hidden
-                img.of-cover(v-if="firstImage" :src="firstImage.image")
-        .card-content.pa2.bt.b--light-gray
-            p.f6 {{ item.title }}
-            .level
-                .level-left
-                .level-right
-                    .level-item 
-                        div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
+            figure.ad-search-item__figure.image.w-100.overflow-hidden
+                img.h-100.of-cover(v-if="firstImage" :src="firstImage.image")
+        .card-content.pa2.bt.b--light-gray.flex.flex-column.flex-grow-1
+            p {{ item.title }}
+            div.flex-grow-1.flex.justify-end.items-end
+                div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
 </template>
 
 <script>
+import info from '@/mixins/info'
 
 export default {
+    mixins: [info],
     props: {
         item: {
             type: Object,
@@ -52,12 +51,29 @@ export default {
         },
         theme () {
             return this.types[this.type]
+        },
+        categoryPath () {
+            return this.categoryPathStr(this.item.category)
+        },
+        provinsi () {
+            return this.provinsiStr(this.item.provinsi)
+        },
+        kabupaten () {
+            return this.kabupatenStr(this.item.provinsi, this.item.kabupaten)
         }
     }
 }
 </script>
 
 <style lang="stylus">
+.ad-search-item
+    height 316px
+.ad-search-item__small
+    font-size .6rem
+.ad-search-item__figure
+    height 200px
+    img
+        height 100%
 .ad-search-item--premium
     outline 4px solid #00d1b2
     box-shadow 2px 2px 15px 2px rgba(0, 0, 0, 0.3)

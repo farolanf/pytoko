@@ -1,19 +1,23 @@
 <template lang="pug">
     j-page(title="Cari")
-        .columns.is-multiline
+        search-box
+        .tile.is-ancestor.is-vertical
             
-            .column.is-12(v-if="premium")
-                router-link.link.dim.near-black(:to="adDetail(premium.id)")
-                    ad-search-item-bar(:item="premium" type="premium")
+            .tile.is-12.is-parent(v-if="premium")
+                .tile.is-child
+                    router-link.link.dim.near-black(:to="adDetail(premium.id)")
+                        ad-search-item-bar(:item="premium" type="premium")
 
-            .column.is-3(v-for="(item, i) in data.results" :key="item.id")
-                router-link(:to="adDetail(item.id)")
-                    ad-search-item(:item="item")
+            .tile.is-12.is-parent(v-for="(row, i) in rows" :key="i")
+                .tile.is-3.is-child.pa2(v-for="item in row" :key="item.id")
+                    router-link(:to="adDetail(item.id)")
+                        ad-search-item.h-100(:item="item")
 
         pagination-nav.mt4(:max="6" :max-mobile="3" :data="data" :loading="loading")
 </template>
 
 <script>
+import { prepareAd } from '#/utils/data'
 import { scrollTo } from '#/utils/dom'
 
 export default {
@@ -22,6 +26,15 @@ export default {
             data: {},
             premium: null,
             loading: false,
+        }
+    },
+    computed: {
+        rows () {
+            let count = 0
+            const map = _.groupBy(this.data.results, item => {
+                return Math.floor(count++ / 4) 
+            })
+            return Object.values(map)
         }
     },
     watch: {
@@ -44,10 +57,11 @@ export default {
 
             return Promise.all([
                 axios.get('/api/ads/premium/', query).then(resp => {
-                    this.premium = resp.data
+                    this.premium = prepareAd(resp.data)
                 }),
                 axios.get('/api/ads/', query).then(resp => {
                     this.data = resp.data
+                    this.data.results = this.data.results.map(prepareAd)
                 })
             ]).finally(() => {
                 this.loading = false
@@ -60,3 +74,19 @@ export default {
 }
 </script>
 
+<style lang="scss">
+@import '~bulma/sass/utilities/all';
+
+@include until($tablet) {
+    .search-page__tile {
+        flex: none;
+        width: 100%;
+    }
+}
+@include from($tablet) {
+    .search-page__tile {
+        flex: none;
+        width: 20%;
+    }
+}
+</style>
