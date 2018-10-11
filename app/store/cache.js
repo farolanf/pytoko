@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Semaphore from '#/utils/semaphore'
 
 export default {
     namespaced: true,
@@ -37,35 +38,41 @@ export default {
     actions: {
         getCategory ({ commit, state }) {
             if (state.category.length) return
-            return axios.get('/api/taxonomy/category/')
-                .then(resp => {
-                    commit('setCategory', { 
-                        category: resp.data,
-                        categoryMap: mapFromTree(resp.data),
-                        categoryPaths: paths(resp.data),
+            return Semaphore('cache:getCategory', () => {
+                return axios.get('/api/taxonomy/category/')
+                    .then(resp => {
+                        commit('setCategory', { 
+                            category: resp.data,
+                            categoryMap: mapFromTree(resp.data),
+                            categoryPaths: paths(resp.data),
+                        })
                     })
-                })
+            })
         },
         getProvinsi ({ commit, state }) {
             if (state.provinsi.length) return
-            return axios.get('/api/regions/provinsi/')
-                .then(resp => {
-                    commit('setProvinsi', { 
-                        provinsi: resp.data,
-                        provinsiMap: map(resp.data),
+            return Semaphore('cache:getProvinsi', () => {
+                return axios.get('/api/regions/provinsi/')
+                    .then(resp => {
+                        commit('setProvinsi', { 
+                            provinsi: resp.data,
+                            provinsiMap: map(resp.data),
+                        })
                     })
-                })
+            })
         },
         getKabupaten ({ commit, state }, { provinsiId }) {
             if (!state.provinsiMap[provinsiId] || state.provinsiMap[provinsiId].kabupaten) return
-            return axios.get('/api/regions/kabupaten/', {
-                params: {
-                    provinsi_id: provinsiId
-                }
-            }).then(resp => {
-                commit('setKabupaten', {
-                    kabupaten: resp.data,
-                    provinsiId,
+            return Semaphore(`cache:getKabupaten/${provinsiId}`, () => {
+                return axios.get('/api/regions/kabupaten/', {
+                    params: {
+                        provinsi_id: provinsiId
+                    }
+                }).then(resp => {
+                    commit('setKabupaten', {
+                        kabupaten: resp.data,
+                        provinsiId,
+                    })
                 })
             })
         }
