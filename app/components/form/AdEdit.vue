@@ -7,6 +7,18 @@
 
         input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" maxlength="70" :help="(70 - title.length) + ' karakter tersisa.'" v-model="title")
 
+        .field
+            .label Harga
+            .control.flex.items-center
+
+                input.input.w-50.tr(v-if="mobile" name="price" type="number" required placeholder="123456" max="999999999999" v-model="price")
+
+                input.input.w-20.tr(v-if="tablet" name="price" type="number" required placeholder="123456" max="999999999999" v-model="price")
+
+                label.checkbox.ml2
+                    input(name="nego" type="checkbox" v-model="nego")
+                    template &nbsp;Bisa nego
+
         form-field(title="Deskripsi iklan" name="desc" :help="'Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.<br>' + (4000 - desc.length) + ' karakter tersisa.'")
             textarea.textarea(v-error="" rows="10" cols="50" name="desc" maxlength="4000" v-model="desc")
 
@@ -39,8 +51,10 @@
 <script>
 import { updateFromResponse, updateFromError } from '#/store/request'
 import { scrollToError } from '#/utils/dom'
+import info from '@/mixins/info'
 
 export default {
+    mixins: [info],
     props: ['id'],
     data () {
         return {
@@ -49,6 +63,8 @@ export default {
             kabupaten: null,
             title: '',
             desc: '',
+            price: null,
+            nego: true,
             images: null,
             imageItems: null,
             loading: false
@@ -103,7 +119,7 @@ export default {
         load (id) {
             this.loading = true
             axios.get(`/api/ads/${id}/`).then(resp => {
-                Object.assign(this, _.pick(resp.data, ['category', 'provinsi', 'kabupaten', 'title', 'desc', 'images']))
+                Object.assign(this, _.pick(resp.data, ['category', 'provinsi', 'kabupaten', 'title', 'desc', 'price', 'images']))
                 
                 // load images
                 if (this.images) {

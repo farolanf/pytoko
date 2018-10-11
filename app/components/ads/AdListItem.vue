@@ -11,6 +11,8 @@
                         span.heading {{ data.updated_at }}
                         span.heading {{ kabupaten }} - {{ provinsi }}
                     p {{ data.desc }}
+                    .flex.flex.justify-end
+                        .tag {{ money(data.price) }}
 </template>
 
 <script>

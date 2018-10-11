@@ -8,7 +8,7 @@
             strong.f4 {{ item.title }}
             p.heading {{ kabupaten }} - {{ provinsi }}
             p.ad-search-item-bar__desc {{ item.desc }}
-            div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
+            div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") {{ money(item.price) }}
 
     .is-hidden-mobile(v-else-if="tablet")
         article.ad-search-item-bar.media.pa2.pr4.overflow-hidden(:class="{[theme.cls]: true}")
@@ -34,7 +34,7 @@
                     .level-left
                     .level-right
                         .level-item 
-                            div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
+                            div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") {{ money(item.price) }}
 </template>
 
 <script>

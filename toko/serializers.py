@@ -96,7 +96,7 @@ class AdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'url', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
 
 class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HyperlinkedRelatedField(
@@ -108,7 +108,7 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'url', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
 
 class AdCreateSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
@@ -121,7 +121,7 @@ class AdCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'title', 'desc', 'category', 'provinsi', 'kabupaten', 'images', 'user')
+        fields = ('id', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user')
 
     def create(self, validated_data):
         images = validated_data.pop('images')

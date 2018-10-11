@@ -14,3 +14,11 @@ export function prepareAd (ad) {
         .replace(/\.\s*(.)/g, (all, m1) => '. ' + m1.toUpperCase())
     return ad
 }
+
+export function money (val, currency = 'IDR') {
+    return new Intl.NumberFormat('id', { 
+        style: 'currency', 
+        currency, 
+        minimumFractionDigits: 0 
+    }).format(val).replace(/\s+/g, '')
+}

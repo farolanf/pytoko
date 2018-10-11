@@ -6,7 +6,7 @@
         .card-content.pa2.bt.b--light-gray.flex.flex-column.flex-grow-1
             p {{ item.title }}
             div.flex-grow-1.flex.justify-end.items-end
-                div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") Rp30.000
+                div(:is="theme.tag").tag.is-rounded(:class="{[theme.tagCls]: true}") {{ money(item.price) }}
 </template>
 
 <script>

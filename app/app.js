@@ -7,6 +7,7 @@
 
 import './bootstrap'
 import './directives'
+import './mixins'
 
 import Vue from 'vue'
 import router from './router'
