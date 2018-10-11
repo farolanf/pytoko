@@ -126,7 +126,7 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     serializer_class = serializers.AdSerializer
     action_permissions = (
         {
-            'actions': ['list', 'retrieve', 'premium'],
+            'actions': ['list', 'retrieve', 'premium', 'info'],
             'permission_classes': [],
         },
         {
@@ -157,6 +157,16 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         ad = self.get_queryset().order_by('-updated_at').first()
         serializer = self.get_serializer(ad, context={'request': request})
         return Response(serializer.data)
+
+    @action(detail=False)
+    def info(self, request):
+
+        categories = self.get_queryset().order_by().values_list('category', flat=True).distinct()
+
+        return Response({
+            'count': self.get_queryset().count(),
+            'categories': categories,
+        })
 
     def get_queryset(self):
         queryset = super().get_queryset()
