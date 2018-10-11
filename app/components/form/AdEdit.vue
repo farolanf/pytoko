@@ -5,10 +5,10 @@
             category-picker(v-model="category")
             input(type="hidden" name="category" :value="category")
 
-        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" v-model="title")
+        input-field(name="title" title="Judul iklan" required placeholder="Judul iklan" maxlength="70" :help="(70 - title.length) + ' karakter tersisa.'" v-model="title")
 
-        form-field(title="Deskripsi iklan" name="desc" help="Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.")
-            textarea.textarea(v-error="" rows="10" cols="50" name="desc" v-model="desc")
+        form-field(title="Deskripsi iklan" name="desc" :help="'Terangkan produk/jasa dengan singkat dan jelas. Terangkan juga kekurangannya jika ada.<br>' + (4000 - desc.length) + ' karakter tersisa.'")
+            textarea.textarea(v-error="" rows="10" cols="50" name="desc" maxlength="4000" v-model="desc")
 
         form-field(title="Foto Produk" name="images" help="Sertakan minimal 3 foto untuk menarik pembeli")
             image-uploads(v-error="images" :max="8" v-model="imageItems")

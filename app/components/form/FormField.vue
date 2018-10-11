@@ -15,7 +15,7 @@
 
             p.help.is-danger(v-if="_error") {{ _errorMsg }}
             p.help.is-success(v-else-if="success") {{ successMsg }}
-            p.help(v-if="help") {{ help }}
+            p.help(v-html="help") {{ help }}
 </template>
 
 <script>

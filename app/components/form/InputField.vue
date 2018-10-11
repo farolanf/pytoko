@@ -1,6 +1,6 @@
 <template lang="pug">
     form-field(errorIcon v-bind="{title, name, leftIcon, help, errorMsg, successMsg, error, success}")
-        field-input(v-bind="{type, value, name, placeholder, required, error, success}" @input="$emit('input', $event)" @change="$emit('change', $event)")
+        field-input(v-bind="attrs" @input="$emit('input', $event)" @change="$emit('change', $event)")
 </template>
 
 <script>
@@ -43,6 +43,15 @@ export default {
         success: {
             type: Boolean
         }
+    },
+    computed: {
+        attrs () {
+            return { 
+                ..._.pick(this, ['type', 'value', 'name', 'placeholder', 'required', 'error', 'sucess']),
+                ...this.$attrs 
+            }            
+        }
+
     }
 }
 </script>

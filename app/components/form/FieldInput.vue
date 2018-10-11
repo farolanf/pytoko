@@ -1,5 +1,5 @@
 <template lang="pug">
-    input.input(:class="{'is-danger': _error, 'is-success': success}" v-bind="{type, name, placeholder, required}" :value="value" @input="$emit('input', $event.target.value)" @change="$emit('change', $event)")
+    input.input(:class="{'is-danger': _error, 'is-success': success}" v-bind="attrs" :value="value" @input="$emit('input', $event.target.value)" @change="$emit('change', $event)")
 </template>
 
 <script>
@@ -32,6 +32,12 @@ export default {
         ...mapGetters('request', ['hasError']),
         _error () {
             return this.error || this.hasError(this.name)
+        },
+        attrs () {
+            return { 
+                ..._.pick(this, ['type', 'name', 'placeholder', 'required']),
+                ...this.$attrs 
+            }            
         }
     }
 }
