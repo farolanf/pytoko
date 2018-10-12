@@ -1,8 +1,11 @@
 import re
+from django import forms
+from django.urls import reverse_lazy
 from django.utils.crypto import get_random_string
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.views.generic.edit import FormView
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import views
@@ -19,8 +22,39 @@ from .utils.password import create_password_reset, do_password_reset
 from .mixins import ActionPermissionsMixin, UserPermissionMixin, BrowsePermissionMixin, PostPermissionMixin
 from .permissions import IsAdminOrOwner
 from .pagination import StandardPagination
+from .forms import RegisterForm, LoginForm
 
 User = get_user_model()
+
+class RegisterView(FormView):
+    template_name = 'toko/register.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('toko:front')
+
+    def form_valid(self, form):
+        username = 'user%s%s' % (get_random_string(3), User.objects.count())
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password')
+        User.objects.create_user(username=username, email=email, password=password)
+        return super().form_valid(form)
+
+class LoginView(FormView):
+    template_name = 'toko/login.html'
+    form_class = LoginForm
+    success_url = reverse_lazy('toko:front')
+
+    def form_valid(self, form):
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=email, password=password)
+        login(self.request, user)
+        return super().form_valid(form)
+
+def logout_view(request):
+    logout(request)
+    return redirect('toko:front')
+
+#=======================================
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH', None) == 'XMLHttpRequest'
@@ -28,26 +62,6 @@ def is_ajax(request):
 class AnonView(views.APIView):
     authentication_classes = ()
     permission_classes = ()
-
-class RegisterView(AnonView):
-
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        validate(serializer, 'Pendaftaran akun gagal.')
-
-        email = serializer.validated_data.get('email')
-        password = serializer.validated_data.get('password')
-
-        username = 'user_%s%s' % (get_random_string(5), User.objects.count())
-
-        user = User.objects.create(username=username, email=email, password=make_password(password))
-
-        send_mail('Selamat datang', 'toko/mail/welcome.html', email)
-
-        return Response({
-            'message': 'Pendaftaran berhasil. Silahkan periksa email anda dan lakukan konfirmasi.',
-            'user': FullUserSerializer(user, context={'request': request}).data, 
-        })
 
 class PasswordEmailView(AnonView):
     throttle_classes = (PasswordEmailThrottle,)

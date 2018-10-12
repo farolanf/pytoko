@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <title>Juwal - {% block title %}{% endblock %}</title>
+
+        <link href="/assets/favicon.ico" rel="shortcut icon">
+        <link href="/assets/lib/font-awesome.min.css" rel="stylesheet">
+        <link href="/assets/lib/bulma.min.css" rel="stylesheet">
+        <link href="/assets/lib/tachyons.min.css" rel="stylesheet">
+        <link href="/assets/toko/css/app.css" rel="stylesheet">
+        
+        <script src="/assets/lib/jquery.min.js"></script>
+    </head>
+    <body>
+        {% include 'toko/topbar.html' %}
+        
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+
+        <script src="/assets/toko/js/app.js"></script>
+    </body>
+</html>

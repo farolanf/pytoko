@@ -1,0 +1,31 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Masuk
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column is-narrow">
+        <h1>Masuk</h1>
+        {% if form.non_field_errors %}
+        <div class="notification is-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <form action="/accounts/login/" method="post">
+            {% csrf_token %}
+            {% include 'toko/fields/input.html' with field=form.email %}
+            {% include 'toko/fields/input.html' with field=form.password %}
+            {% include 'toko/fields/input.html' with field=form.password_confirm %}
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link">Masuk</button>
+                    <a href="#" class="button is-text">Lupa password</a>
+                    <a href="{% url 'toko:register' %}" class="button is-text">Daftar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
