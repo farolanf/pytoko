@@ -1,10 +1,12 @@
 import re
 from django import forms
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
+from django.views import generic 
 from django.views.generic.edit import FormView
 from rest_framework.decorators import action
 from rest_framework import viewsets
@@ -22,7 +24,7 @@ from .utils.password import create_password_reset, do_password_reset
 from .mixins import ActionPermissionsMixin, UserPermissionMixin, BrowsePermissionMixin, PostPermissionMixin
 from .permissions import IsAdminOrOwner
 from .pagination import StandardPagination
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, AdForm
 
 User = get_user_model()
 
@@ -42,7 +44,6 @@ class RegisterView(FormView):
 class LoginView(FormView):
     template_name = 'toko/account/login.html'
     form_class = LoginForm
-    success_url = reverse_lazy('toko:front')
 
     def form_valid(self, form):
         email = form.cleaned_data.get('email')
@@ -51,9 +52,23 @@ class LoginView(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return self.request.GET.get('next', reverse('toko:front'))
+
 def logout_view(request):
     logout(request)
     return redirect('toko:front')
+
+class MyAds(LoginRequiredMixin, generic.ListView):
+    model = Ad
+    template_name = 'toko/ads/my-ads.html'
+    paginate_by = 5
+
+class AdEdit(generic.UpdateView):
+    model = Ad
+    template_name = 'toko/ads/ad-form.html'
+    form_class = AdForm
+    success_url = reverse_lazy('toko:my-ads')
 
 #=======================================
 

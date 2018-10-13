@@ -15,7 +15,7 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-guard 'livereload' do
+guard 'livereload', :grace_period => 1 do
   watch(%r{(?:pytoko|toko)/.+\.(?:py|html|css|js)})
   watch(%r{static/.+\.(?:css|js)})
   watch(%r{\.env})

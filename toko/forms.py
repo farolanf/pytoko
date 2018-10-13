@@ -1,5 +1,8 @@
 from django import forms
+from django.utils.safestring import mark_safe
+from django.template.loader import get_template
 from django.contrib.auth import get_user_model, authenticate
+from . import models
 
 User = get_user_model()
 
@@ -21,23 +24,34 @@ def validate_unique(model, field, message=None):
             raise forms.ValidationError(message)
     return validate
 
-class InputMixin(object):
+class AttrsMixin(object):
+    attrs = {}
 
     def __init__(self, attrs={}):
-        if hasattr(attrs, 'class'):
-            attrs['class'] += ' input'
-        else:
-            attrs['class'] = 'input'
-        super().__init__(attrs)
+        final_attrs = dict(list(attrs.items()) + list(self.attrs.items()))
+        super().__init__(attrs=final_attrs)
 
-class TextInput(InputMixin, forms.TextInput):
-    pass
+class InputMixin(AttrsMixin):
+    attrs = {
+        'class': 'input'
+    }
+
+class TextInput(forms.TextInput):
+    template_name = 'toko/widgets/input.html'
+
+class Textarea(AttrsMixin, forms.Textarea):
+    attrs = {
+        'class': 'textarea'
+    }
 
 class EmailInput(InputMixin, forms.EmailInput):
     pass
 
 class PasswordInput(InputMixin, forms.PasswordInput):
     pass
+
+class Select(forms.Select):
+    template_name = 'toko/widgets/select.html'
 
 class EmailField(forms.EmailField):
     widget = EmailInput
@@ -49,6 +63,21 @@ class PasswordField(forms.CharField):
     widget = PasswordInput
 
 email_unique = validate_unique(User, 'email', message='Email sudah terdaftar')
+
+class FormOutputMixin:
+
+    def __str__(self):
+        output = []
+        
+        field_template = get_template('toko/form/field.html')
+
+        for field in self:
+            output.append(field_template.render({'field': field}))
+
+        return mark_safe('\n'.join(output))
+
+class ModelFormBase(FormOutputMixin, forms.ModelForm):
+    pass
 
 class LoginForm(forms.Form):
     email = EmailField(max_length=100)
@@ -75,3 +104,19 @@ class RegisterForm(forms.Form):
         if password != password_confirm:
             self.add_error('password_confirm', 'Password tidak sama')
         return cleaned_data
+
+class AdModelFormBase(ModelFormBase):
+    title = CharField(min_length=10, max_length=70)
+    desc = CharField(min_length=20, max_length=4000, widget=Textarea, help_text='Terangkan produk/jasa dengan singkat dan jelas, beserta kekurangannya jika ada.')
+
+AdForm = forms.modelform_factory(
+    models.Ad,
+    form=AdModelFormBase,
+    fields=('category', 'title', 'desc', 'price', 'nego', 'provinsi', 'kabupaten'),
+    widgets={
+        'category': Select,
+        'price': TextInput,
+        'provinsi': Select,
+        'kabupaten': Select,
+    },    
+)

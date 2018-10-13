@@ -1,0 +1,22 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Ubah Iklan
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column is-narrow">
+        <h1>Ubah Iklan</h1>
+        <form action="{% url 'toko:ad-edit' object.id %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <div class="field">
+                <div class="control">
+                    <button class="button is-link">Simpan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

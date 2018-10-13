@@ -27,11 +27,14 @@ api_urlpatterns = [
 urlpatterns = [
     path('api/', include(api_urlpatterns)),
     url(r'^$', template('toko/front.html'), name='front'),
-    path('accounts/register/', views.RegisterView.as_view(), name='register'),
+
     path('accounts/login/', views.LoginView.as_view(), name='login'),
     path('accounts/logout/', views.logout_view, name='logout'),
-    path('accounts/ads/', template('toko/my-ads.html'), name='my-ads'),
-    path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success')
+    path('accounts/register/', views.RegisterView.as_view(), name='register'),
+    path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success'),
+
+    path('accounts/ads/', views.MyAds.as_view(), name='my-ads'),
+    path('accounts/ads/<int:pk>/', views.AdEdit.as_view(), name='ad-edit'),
 ]
 
 app_name = 'toko'

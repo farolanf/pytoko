@@ -13,7 +13,7 @@ Masuk
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-        <form action="/accounts/login/" method="post">
+        <form action="{% url 'toko:login' %}?{{ request.GET.urlencode }}" method="post">
             {% csrf_token %}
             {% include 'toko/fields/input.html' with field=form.email %}
             {% include 'toko/fields/input.html' with field=form.password %}
