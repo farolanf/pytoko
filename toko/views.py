@@ -27,19 +27,20 @@ from .forms import RegisterForm, LoginForm
 User = get_user_model()
 
 class RegisterView(FormView):
-    template_name = 'toko/register.html'
+    template_name = 'toko/account/register.html'
     form_class = RegisterForm
-    success_url = reverse_lazy('toko:front')
+    success_url = reverse_lazy('toko:register-success')
 
     def form_valid(self, form):
         username = 'user%s%s' % (get_random_string(3), User.objects.count())
         email = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password')
         User.objects.create_user(username=username, email=email, password=password)
+        send_mail('Selamat datang', 'toko/mail/welcome.html', email)
         return super().form_valid(form)
 
 class LoginView(FormView):
-    template_name = 'toko/login.html'
+    template_name = 'toko/account/login.html'
     form_class = LoginForm
     success_url = reverse_lazy('toko:front')
 

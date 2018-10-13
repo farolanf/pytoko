@@ -31,6 +31,7 @@ urlpatterns = [
     path('accounts/login/', views.LoginView.as_view(), name='login'),
     path('accounts/logout/', views.logout_view, name='logout'),
     path('accounts/ads/', template('toko/my-ads.html'), name='my-ads'),
+    path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success')
 ]
 
 app_name = 'toko'

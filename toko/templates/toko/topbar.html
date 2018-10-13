@@ -15,12 +15,12 @@
                 <a href="tentang-kami" class="navbar-item">Tentang kami</a>
             </div>
             <div class="navbar-end">
-            {% if request.user.is_authenticated %}
-                {% include 'toko/nav/profile.html' %}
-            {% else %}
-                <a href="{% url 'toko:login' %}" class="navbar-item {% if_url 'toko:login' 'is-active' %}">Masuk</a>
-                <a href="{% url 'toko:register' %}" class="navbar-item {% if_url 'toko:register' 'is-active' %}">Daftar</a>
-            {% endif %}
+                {% if request.user.is_authenticated %}
+                    {% include 'toko/nav/profile.html' %}
+                {% else %}
+                    <a href="{% url 'toko:login' %}" class="navbar-item {% if_url 'toko:login' 'is-active' %}">Masuk</a>
+                    <a href="{% url 'toko:register' %}" class="navbar-item {% if_url 'toko:register' 'is-active' %}">Daftar</a>
+                {% endif %}
             </div>
         </div>
     </div>
