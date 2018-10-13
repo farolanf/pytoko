@@ -9,6 +9,8 @@ def template(name, context=None):
         return render(request, name, context=context)
     return _render
 
+app_name = 'toko'
+
 router = DefaultRouter()
 router.register('users', views.UserViewSet)
 router.register('regions/provinsi', views.ProvinsiViewSet)
@@ -36,5 +38,3 @@ urlpatterns = [
     path('accounts/ads/', views.MyAds.as_view(), name='my-ads'),
     path('accounts/ads/<int:pk>/', views.AdEdit.as_view(), name='ad-edit'),
 ]
-
-app_name = 'toko'

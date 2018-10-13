@@ -77,6 +77,10 @@ class AdImageSerializer(serializers.HyperlinkedModelSerializer):
         model = models.AdImage
         fields = ('id', 'url', 'image', 'ad')
         read_only_fields = ('ad',)
+        extra_kwargs = {
+            'url': {'view_name': 'toko:adimage-detail'},
+            'ad': {'view_name': 'toko:ad-detail'},
+        }
 
     def to_internal_value(self, data):
         """
@@ -102,13 +106,19 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HyperlinkedRelatedField(
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault(),
-        view_name='user-detail',
+        view_name='toko:user-detail',
     )
     images = AdImageSerializer(many=True)
 
     class Meta:
         model = models.Ad
         fields = ('id', 'url', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:ad-detail'},
+            'category': {'view_name': 'toko:taxonomy-detail'},
+            'provinsi': {'view_name': 'toko:provinsi-detail'},
+            'kabupaten': {'view_name': 'toko:kabupaten-detail'},
+        }
 
 class AdCreateSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
