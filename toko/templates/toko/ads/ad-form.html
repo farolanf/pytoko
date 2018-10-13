@@ -6,7 +6,7 @@ Ubah Iklan
 
 {% block content %}
 <div class="columns">
-    <div class="column is-narrow">
+    <div class="column is-6">
         <h1>Ubah Iklan</h1>
         <form action="{% url 'toko:ad-edit' object.id %}" method="post">
             {% csrf_token %}
