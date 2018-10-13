@@ -36,6 +36,8 @@ class InputMixin(AttrsMixin):
         'class': 'input'
     }
 
+# Widgets ####################################################################
+
 class TextInput(forms.TextInput):
     template_name = 'toko/widgets/input.html'
 
@@ -50,19 +52,32 @@ class EmailInput(InputMixin, forms.EmailInput):
 class PasswordInput(InputMixin, forms.PasswordInput):
     pass
 
-class Select(forms.Select):
-    template_name = 'toko/widgets/select.html'
-
-class EmailField(forms.EmailField):
-    widget = EmailInput
+# Fields #####################################################################
 
 class CharField(forms.CharField):
     widget = TextInput
 
+class EmailField(forms.EmailField):
+    widget = EmailInput
+
 class PasswordField(forms.CharField):
     widget = PasswordInput
 
+class Select(forms.Select):
+    template_name = 'toko/widgets/select.html'
+
+class TreeChoiceField(forms.ModelChoiceField):
+    widget = Select
+
+    def label_from_instance(self, obj):
+        ancestors = obj.get_ancestors(include_self=True).values_list('name', flat=True)
+        return ' / '.join(ancestors[1:]) 
+
+# Validators #################################################################
+
 email_unique = validate_unique(User, 'email', message='Email sudah terdaftar')
+
+# Forms ######################################################################
 
 class FormOutputMixin:
 
@@ -106,6 +121,9 @@ class RegisterForm(forms.Form):
         return cleaned_data
 
 class AdModelFormBase(ModelFormBase):
+    category = TreeChoiceField(
+        models.Taxonomy.objects.get(slug='kategori').get_descendants(),
+    )
     title = CharField(min_length=10, max_length=70)
     desc = CharField(min_length=20, max_length=4000, widget=Textarea, help_text='Terangkan produk/jasa dengan singkat dan jelas, beserta kekurangannya jika ada.')
 
@@ -114,7 +132,6 @@ AdForm = forms.modelform_factory(
     form=AdModelFormBase,
     fields=('category', 'title', 'desc', 'price', 'nego', 'provinsi', 'kabupaten'),
     widgets={
-        'category': Select,
         'price': TextInput,
         'provinsi': Select,
         'kabupaten': Select,
