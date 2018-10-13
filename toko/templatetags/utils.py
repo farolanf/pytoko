@@ -1,6 +1,9 @@
+import locale
 from django import template
 from django.urls import resolve
 from django.forms import BoundField
+
+locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
 register = template.Library()
 
@@ -21,3 +24,7 @@ def field_error(bound_field):
         else:
             bound_field.field.widget.attrs['class'] = 'is-danger'
     return bound_field
+
+@register.filter
+def money(val):
+    return locale.currency(val, grouping=True)
