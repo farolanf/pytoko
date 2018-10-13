@@ -1,3 +1,6 @@
+{% if field.field.widget.input_type == 'hidden' %}
+{{ field }}
+{% else %}
 <div class="field">
     {% if field.field.widget.input_type != 'checkbox' %}
         <label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
@@ -19,3 +22,4 @@
         <p class="help">{{ field.help_text }}</p>
     {% endif %}
 </div>
+{% endif %}
