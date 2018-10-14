@@ -148,6 +148,7 @@ class KabupatenViewSet(BrowsePermissionMixin, viewsets.ModelViewSet):
 
 class AdImageViewSet(viewsets.ModelViewSet):
     queryset = AdImage.objects.all()
+    pagination_class = StandardPagination
     serializer_class = serializers.AdImageSerializer
 
 class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
