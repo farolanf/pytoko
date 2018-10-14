@@ -127,8 +127,8 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
 
 class AdSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
         default=serializers.CurrentUserDefault(),
+        read_only=True,
     )
     title = serializers.CharField(min_length=10, max_length=70)
     desc = serializers.CharField(min_length=20, max_length=4000,
