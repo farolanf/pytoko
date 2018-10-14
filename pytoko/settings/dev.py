@@ -12,3 +12,5 @@ DATABASES = {
         'COLLATION': 'utf8_general_ci',
     },
 }
+
+COMPRESS_ENABLED = True

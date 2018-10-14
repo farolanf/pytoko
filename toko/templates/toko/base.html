@@ -1,3 +1,4 @@
+{% load compress %}
 {% load utils %}
 
 {% define '[]' as scripts %}
@@ -11,10 +12,12 @@
         <title>Juwal - {% block title %}{% endblock %}</title>
 
         <link href="/assets/favicon.ico" rel="shortcut icon">
-        <link href="/assets/lib/font-awesome.min.css" rel="stylesheet">
-        <link href="/assets/lib/bulma.min.css" rel="stylesheet">
-        <link href="/assets/lib/tachyons.min.css" rel="stylesheet">
-        <link href="/assets/toko/css/app.css" rel="stylesheet">
+        {% compress css %}
+        <link href="/static/lib/font-awesome.min.css" rel="stylesheet">
+        <link href="/static/lib/bulma.min.css" rel="stylesheet">
+        <link href="/static/lib/tachyons.min.css" rel="stylesheet">
+        <link href="/static/toko/css/app.css" rel="stylesheet">
+        {% endcompress %}
     </head>
     <body>
         {% include 'toko/topbar.html' %}
@@ -31,10 +34,12 @@
             </div>
         </footer>
 
-        <script src="/assets/lib/jquery.min.js"></script>
-        <script src="/assets/toko/js/app.js"></script>
+        {% compress js %}
+        <script src="/static/lib/jquery.min.js"></script>
+        <script src="/static/toko/js/app.js"></script>
         {% for src in scripts|unique %}
         <script src="{{ src }}"></script>
         {% endfor %}
+        {% endcompress %}
     </body>
 </html>

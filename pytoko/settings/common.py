@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'toko.apps.TokoConfig',
     'mptt',
+    'compressor',
     'django_filters',
     'rest_framework',
     'django_extensions',
@@ -122,6 +123,13 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_ALLOW_REFRESH': True,
 }
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
