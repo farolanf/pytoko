@@ -77,8 +77,8 @@ class AdEdit(generic.UpdateView):
 
 #=======================================
 
-def is_ajax(request):
-    return request.META.get('HTTP_X_REQUESTED_WITH', None) == 'XMLHttpRequest'
+def is_admin(request):
+    return request.path.startswith('/api/')
 
 class AnonView(views.APIView):
     authentication_classes = ()
@@ -175,23 +175,24 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         },
     )
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    # TODO: move to filter backend
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
 
-        category_id = self.request.query_params.get('category', None)
-        if category_id:
-            category = Taxonomy.objects.get(pk=category_id)
-            categories = category.get_descendants(include_self=True).values_list('id', flat=True)
-            queryset = queryset.filter(category__in=list(categories))
+    #     category_id = self.request.query_params.get('category', None)
+    #     if category_id:
+    #         category = Taxonomy.objects.get(pk=category_id)
+    #         categories = category.get_descendants(include_self=True).values_list('id', flat=True)
+    #         queryset = queryset.filter(category__in=list(categories))
 
-        order = self.request.query_params.get('order', None)
-        if order:
-            queryset = queryset.order_by(order)
+    #     order = self.request.query_params.get('order', None)
+    #     if order:
+    #         queryset = queryset.order_by(order)
         
-        return queryset
+    #     return queryset
 
     def get_serializer_class(self):
-        return super().get_serializer_class() if is_ajax(self.request) else serializers.HyperlinkedAdSerializer
+        return serializers.HyperlinkedAdSerializer if is_admin(self.request) else super().get_serializer_class()
 
 class UserAdViewSet(AdViewSet):
     renderer_classes = [TemplateHTMLRenderer]
@@ -200,16 +201,18 @@ class UserAdViewSet(AdViewSet):
         """
         Show the list page with objects owned by the user.
         """
-        if hasattr(request.user, 'ads'):
-            ads = request.user.ads.all() 
-            serializer = self.get_serializer(ads, many=True, context={'request': request})
-        else:
-            serializer = None
+        response = super().list(request)
+        return Response({'data': response.data}, template_name='toko/ad/list.html')
 
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Show edit form for the object.
+        """
+        serializer = self.get_serializer(self.get_object())
         return Response({
-            **self.get_renderer_context(),
+            'obj': serializer.data,
             'serializer': serializer,
-        }, template_name='toko/ads/list.html')
+        }, template_name='toko/ad/detail.html')
 
     @action(detail=False)
     def premium(self, request):
@@ -231,12 +234,21 @@ class UserAdViewSet(AdViewSet):
             'categories': categories,
         })
 
+    def filter_queryset(self, queryset):
+        
+        if self.action == 'list':
+            queryset = self.request.user.ads.all()
+
+        return super().filter_queryset(queryset)
 
 def index(request):
     return render(request, 'toko/index.html')
 
 def exception_handler(exc, context):
     response = _exception_handler(exc, context)
+
+    if not response:
+        return
     
     if response.status_code == 401:
         return render(context['request'], 'toko/401.html')

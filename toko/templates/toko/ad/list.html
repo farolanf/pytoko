@@ -1,0 +1,16 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Iklan Saya
+{% endblock %}
+
+{% block content %}
+<h1>Iklan Saya</h1>
+
+{% for item in data.results %}
+    <a href="{% url 'toko:ad-detail' item.id %}" class="db mb3">
+        {% include 'toko/ad/item.html' %}
+    </a>
+{% endfor %}
+
+{% endblock %}

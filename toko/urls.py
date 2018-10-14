@@ -17,7 +17,7 @@ api_router.register('provinsi', views.ProvinsiViewSet)
 api_router.register('kabupaten', views.KabupatenViewSet)
 api_router.register('taxonomy', views.TaxonomyViewSet)
 api_router.register('images', views.AdImageViewSet)
-api_router.register('ads', views.AdViewSet, base_name='api-ads')
+api_router.register('ads', views.AdViewSet, base_name='api-ad')
 
 api_urlpatterns = [
     path('register/', views.RegisterView.as_view()),

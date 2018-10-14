@@ -6,10 +6,12 @@ Ubah Iklan
 {% endblock %}
 
 {% block content %}
+<pre>{{ serializer }}</pre>
+<pre>{{ obj }}</pre>
 <div class="columns">
     <div class="column is-7">
         <h1>Ubah Iklan</h1>
-        <form action="{% url 'toko:ad-edit' object.id %}" method="post">
+        <form action="{% url 'toko:ad-detail' obj.id %}" method="post">
             {% csrf_token %}
             {{ form }}
             <div class="field">

@@ -5,7 +5,7 @@
         <div class="media-left">
             {% if item.images %}
                 <figure class="image is-128x128">
-                    <img src="{{ item.images.all.0.image.url }}" alt="" class="of-cover">
+                    <img src="{{ item.images.0.image }}" alt="" class="of-cover">
                 </figure>
             {% endif %}
         </div>
