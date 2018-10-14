@@ -214,6 +214,10 @@ class UserAdViewSet(AdViewSet):
             'serializer': serializer,
         }, template_name='toko/ad/detail.html')
 
+    def update(self, *args, **kwargs):
+        print(self.request.method)
+        super().update(*args, **kwargs)
+
     @action(detail=False)
     def premium(self, request):
         """
@@ -245,6 +249,7 @@ def index(request):
     return render(request, 'toko/index.html')
 
 def exception_handler(exc, context):
+
     response = _exception_handler(exc, context)
 
     if not response:

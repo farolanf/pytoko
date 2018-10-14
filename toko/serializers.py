@@ -117,7 +117,7 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'url', 'title', 'desc', 'price', 'nego', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
         extra_kwargs = {
             'url': {'view_name': 'toko:ad-detail'},
             'category': {'view_name': 'toko:taxonomy-detail'},
@@ -131,12 +131,17 @@ class AdSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault(),
     )
     title = serializers.CharField(min_length=10, max_length=70)
-    desc = serializers.CharField(min_length=20, max_length=4000)
+    desc = serializers.CharField(min_length=20, max_length=4000,
+        help_text='Terangkan produk/jasa dengan singkat dan jelas, beserta kekurangannya jika ada.',
+        style={
+        'base_template': 'textarea.html',
+        'rows': 15,
+    })
     images = AdImageSerializer(many=True)
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user')
+        fields = ('id', 'title', 'desc', 'price', 'nego', 'category', 'provinsi', 'kabupaten', 'images', 'user')
 
     def create(self, validated_data):
         images = validated_data.pop('images')
