@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf.urls import url
 from django.shortcuts import render
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
 from . import views
 
 def template(name, context=None):
@@ -11,23 +11,25 @@ def template(name, context=None):
 
 app_name = 'toko'
 
-router = DefaultRouter()
-router.register('users', views.UserViewSet)
-router.register('provinsi', views.ProvinsiViewSet)
-router.register('kabupaten', views.KabupatenViewSet)
-router.register('taxonomy', views.TaxonomyViewSet)
-router.register('images', views.AdImageViewSet)
-router.register('ads', views.AdViewSet)
+api_router = DefaultRouter()
+api_router.register('users', views.UserViewSet)
+api_router.register('provinsi', views.ProvinsiViewSet)
+api_router.register('kabupaten', views.KabupatenViewSet)
+api_router.register('taxonomy', views.TaxonomyViewSet)
+api_router.register('images', views.AdImageViewSet)
+api_router.register('ads', views.AdViewSet, base_name='api-ads')
 
 api_urlpatterns = [
     path('register/', views.RegisterView.as_view()),
     path('password/email/', views.PasswordEmailView.as_view()),
     path('password/reset/', views.PasswordResetView.as_view()),
-    path('', include(router.urls)),
+    path('', include(api_router.urls)),
 ]
 
+router = SimpleRouter()
+router.register('ads', views.UserAdViewSet)
+
 urlpatterns = [
-    path('api/', include(api_urlpatterns)),
     url(r'^$', template('toko/front.html'), name='front'),
 
     path('accounts/login/', views.LoginView.as_view(), name='login'),
@@ -37,4 +39,7 @@ urlpatterns = [
 
     path('accounts/ads/', views.MyAds.as_view(), name='my-ads'),
     path('accounts/ads/<int:pk>/', views.AdEdit.as_view(), name='ad-edit'),
+
+    path('api/', include(api_urlpatterns)),
+    path('', include(router.urls)),
 ]

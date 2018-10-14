@@ -107,17 +107,6 @@ class AdImageSerializer(serializers.HyperlinkedModelSerializer):
             data = {'image': data}
         return super().to_internal_value(data)
 
-class AdSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault(),
-    )
-    images = AdImageSerializer(many=True)
-
-    class Meta:
-        model = models.Ad
-        fields = ('id', 'url', 'title', 'desc', 'price', 'category', 'provinsi', 'kabupaten', 'images', 'user', 'created_at', 'updated_at')
-
 class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HyperlinkedRelatedField(
         queryset=User.objects.all(),
@@ -136,7 +125,7 @@ class HyperlinkedAdSerializer(serializers.HyperlinkedModelSerializer):
             'kabupaten': {'view_name': 'toko:kabupaten-detail'},
         }
 
-class AdCreateSerializer(serializers.ModelSerializer):
+class AdSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault(),
