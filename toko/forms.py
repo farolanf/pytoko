@@ -52,6 +52,9 @@ class EmailInput(InputMixin, forms.EmailInput):
 class PasswordInput(InputMixin, forms.PasswordInput):
     pass
 
+class Select(forms.Select):
+    template_name = 'toko/widgets/select.html'
+
 # Fields #####################################################################
 
 class CharField(forms.CharField):
@@ -62,9 +65,6 @@ class EmailField(forms.EmailField):
 
 class PasswordField(forms.CharField):
     widget = PasswordInput
-
-class Select(forms.Select):
-    template_name = 'toko/widgets/select.html'
 
 class TreeChoiceField(forms.ModelChoiceField):
     widget = Select
@@ -92,7 +92,11 @@ class FormOutputMixin:
         return mark_safe('\n'.join(output))
 
 class ModelFormBase(FormOutputMixin, forms.ModelForm):
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if hasattr(self, 'init') and callable(self.init):
+            self.init()
 
 class LoginForm(forms.Form):
     email = EmailField(max_length=100)
@@ -126,6 +130,10 @@ class AdModelFormBase(ModelFormBase):
     )
     title = CharField(min_length=10, max_length=70)
     desc = CharField(min_length=20, max_length=4000, widget=Textarea, help_text='Terangkan produk/jasa dengan singkat dan jelas, beserta kekurangannya jika ada.')
+
+    def init(self):
+        provinsi = models.Provinsi.objects.get(pk=self['provinsi'].value())
+        self['kabupaten'].queryset = provinsi.kabupaten_set.all()
 
 AdForm = forms.modelform_factory(
     models.Ad,

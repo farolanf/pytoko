@@ -2,6 +2,7 @@
 {% load utils %}
 
 {% define '[]' as scripts %}
+{% define '{}' as js_vars %}
 
 <!DOCTYPE html>
 <html>
@@ -35,6 +36,9 @@
         </footer>
 
         {% compress js %}
+        <script>
+            const DATA = {{ js_vars|json }}
+        </script>
         <script src="/static/lib/jquery.min.js"></script>
         <script src="/static/toko/js/app.js"></script>
         {% for src in scripts|unique %}

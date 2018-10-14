@@ -13,8 +13,8 @@ app_name = 'toko'
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet)
-router.register('regions/provinsi', views.ProvinsiViewSet)
-router.register('regions/kabupaten', views.KabupatenViewSet)
+router.register('provinsi', views.ProvinsiViewSet)
+router.register('kabupaten', views.KabupatenViewSet)
 router.register('taxonomy', views.TaxonomyViewSet)
 router.register('images', views.AdImageViewSet)
 router.register('ads', views.AdViewSet)

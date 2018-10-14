@@ -1,3 +1,4 @@
+import json as jsonlib
 import locale
 from django import template
 from django.conf import settings
@@ -19,6 +20,11 @@ def js(context, src):
     return ''
 
 @register.simple_tag(takes_context=True)
+def jsvar(context, **kwargs):
+    context['js_vars'].update(kwargs)
+    return ''
+
+@register.simple_tag(takes_context=True)
 def if_url(context, name, true_val, false_val=''):
     m = resolve(context['request'].path)
     is_url = m.url_name == name or '%s:%s' % (m.app_name, m.url_name) == name
@@ -27,8 +33,16 @@ def if_url(context, name, true_val, false_val=''):
 # Filters ===================================================================
 
 @register.filter
+def json(val):
+    return mark_safe(jsonlib.dumps(val))
+
+@register.filter
 def unique(val):
-    return set(val)
+    result = []
+    for item in val:
+        if not item in result:
+            result.append(item)
+    return result
 
 @register.filter
 def field_error(bound_field):

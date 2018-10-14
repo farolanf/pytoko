@@ -20,5 +20,7 @@ Ubah Iklan
         </form>
     </div>
 </div>
+{% jsvar kabupaten_id=form.kabupaten.value %}
+{% js '/static/lib/vue.min.js' %}
 {% js '/static/toko/js/provinsi.js' %}
 {% endblock %}
