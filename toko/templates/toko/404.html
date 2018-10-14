@@ -1,14 +1,13 @@
 {% extends 'toko/base.html' %}
 
 {% block title %}
-Akses Terbatas
+Halaman Tidak Ditemukan
 {% endblock %}
 
 {% block content %}
 <div class="notification is-danger mt4">
-    <h1 class="title">403 - Akses Terbatas</h1>
+    <h1 class="title">404 - Halaman Tidak Ditemukan</h1>
     <div class="content">
-        <p>Anda tidak dapat mengakses halaman ini.</p>
         <p>{{ request.build_absolute_uri }}</p>
     </div>
 </div>

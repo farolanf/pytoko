@@ -242,3 +242,5 @@ def exception_handler(exc, context):
         return render(context['request'], 'toko/401.html')
     elif response.status_code == 403 or isinstance(exc, exceptions.PermissionDenied):
         return render(context['request'], 'toko/403.html')
+    elif response.status_code == 404:
+        return render(context['request'], 'toko/404.html')

@@ -37,9 +37,6 @@ urlpatterns = [
     path('accounts/register/', views.RegisterView.as_view(), name='register'),
     path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success'),
 
-    path('accounts/ads/', views.MyAds.as_view(), name='my-ads'),
-    path('accounts/ads/<int:pk>/', views.AdEdit.as_view(), name='ad-edit'),
-
     path('api/', include(api_urlpatterns)),
     path('', include(router.urls)),
 ]
