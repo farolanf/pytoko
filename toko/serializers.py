@@ -137,11 +137,13 @@ class AdSerializer(serializers.ModelSerializer):
         'base_template': 'textarea.html',
         'rows': 15,
     })
-    images = AdImageSerializer(many=True)
+    images = AdImageSerializer(many=True, style={
+        'base_template': 'images.html',
+    })
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'title', 'desc', 'price', 'nego', 'category', 'provinsi', 'kabupaten', 'images', 'user')
+        fields = ('id', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user')
 
     def create(self, validated_data):
         images = validated_data.pop('images')
