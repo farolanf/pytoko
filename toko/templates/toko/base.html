@@ -1,3 +1,7 @@
+{% load utils %}
+
+{% define '[]' as scripts %}
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,8 +15,6 @@
         <link href="/assets/lib/bulma.min.css" rel="stylesheet">
         <link href="/assets/lib/tachyons.min.css" rel="stylesheet">
         <link href="/assets/toko/css/app.css" rel="stylesheet">
-        
-        <script src="/assets/lib/jquery.min.js"></script>
     </head>
     <body>
         {% include 'toko/topbar.html' %}
@@ -29,6 +31,10 @@
             </div>
         </footer>
 
+        <script src="/assets/lib/jquery.min.js"></script>
         <script src="/assets/toko/js/app.js"></script>
+        {% for src in scripts|unique %}
+        <script src="{{ src }}"></script>
+        {% endfor %}
     </body>
 </html>
