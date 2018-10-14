@@ -14,12 +14,19 @@ class ProvinsiSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Provinsi
         fields = ('id', 'url', 'name')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:provinsi-detail'},
+        }
 
 class KabupatenSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Kabupaten
         fields = ('id', 'url', 'name', 'provinsi')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:kabupaten-detail'},
+            'provinsi': {'view_name': 'toko:provinsi-detail'},
+        }
 
 class RegisterSerializer(ValidatePasswordMixin, serializers.Serializer):
     email = serializers.EmailField(max_length=255)
@@ -54,12 +61,18 @@ class PublicUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:    
         model = User
         fields = ('id', 'url', 'username')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:user-detail'},
+        }
 
 class FullUserSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:    
         model = User
         fields = ('id', 'url', 'username', 'email', 'permissions')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:user-detail'},
+        }
 
 class TaxonomySerializer(serializers.HyperlinkedModelSerializer):
     children = serializers.SerializerMethodField()
@@ -67,6 +80,9 @@ class TaxonomySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Taxonomy
         fields = ('id', 'url', 'name', 'slug', 'parent_id', 'children')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:taxonomy-detail'},
+        }
 
     def get_children(self, instance):
         return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
