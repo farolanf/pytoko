@@ -8,12 +8,17 @@ from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
 from django.views import generic 
 from django.views.generic.edit import FormView
+from django.core import exceptions
+
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.views import exception_handler as _exception_handler
+
 from .models import User, Provinsi, Kabupaten, Taxonomy, Ad, AdImage
 from . import serializers
 from .serializers import PublicUserSerializer, FullUserSerializer, PasswordEmailRequestSerializer, PasswordResetSerializer, RegisterSerializer
@@ -157,27 +162,54 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
     serializer_class = serializers.AdSerializer
     action_permissions = (
         {
-            'actions': ['list', 'retrieve', 'premium', 'info'],
+            'actions': ['premium', 'info'],
             'permission_classes': [],
         },
         {
-            'actions': ['create'],
+            'actions': ['list', 'create'],
             'permission_classes': [IsAuthenticated],
         },
         {
-            'actions': ['update', 'partial_update', 'my'],
+            'actions': ['retrieve', 'update', 'partial_update'],
             'permission_classes': [IsAdminOrOwner],
         },
     )
 
-    @action(detail=False)
-    def my(self, request):
-        if not hasattr(request.user, 'ads'):
-            return Response([])
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        category_id = self.request.query_params.get('category', None)
+        if category_id:
+            category = Taxonomy.objects.get(pk=category_id)
+            categories = category.get_descendants(include_self=True).values_list('id', flat=True)
+            queryset = queryset.filter(category__in=list(categories))
+
+        order = self.request.query_params.get('order', None)
+        if order:
+            queryset = queryset.order_by(order)
         
-        ads = request.user.ads.all() 
-        serializer = self.get_serializer(ads, many=True, context={'request': request})
-        return Response(serializer.data)
+        return queryset
+
+    def get_serializer_class(self):
+        return super().get_serializer_class() if is_ajax(self.request) else serializers.HyperlinkedAdSerializer
+
+class UserAdViewSet(AdViewSet):
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def list(self, request):
+        """
+        Show the list page with objects owned by the user.
+        """
+        if hasattr(request.user, 'ads'):
+            ads = request.user.ads.all() 
+            serializer = self.get_serializer(ads, many=True, context={'request': request})
+        else:
+            serializer = None
+
+        return Response({
+            **self.get_renderer_context(),
+            'serializer': serializer,
+        }, template_name='toko/ads/list.html')
 
     @action(detail=False)
     def premium(self, request):
@@ -199,26 +231,14 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
             'categories': categories,
         })
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        category_id = self.request.query_params.get('category', None)
-        if category_id:
-            category = Taxonomy.objects.get(pk=category_id)
-            categories = category.get_descendants(include_self=True).values_list('id', flat=True)
-            queryset = queryset.filter(category__in=list(categories))
-
-        order = self.request.query_params.get('order', None)
-        if order:
-            queryset = queryset.order_by(order)
-        
-        return queryset
-
-    def get_serializer_class(self):
-        if self.action in ('create', 'update'):
-            return serializers.AdCreateSerializer
-        
-        return super().get_serializer_class() if is_ajax(self.request) else serializers.HyperlinkedAdSerializer
 
 def index(request):
     return render(request, 'toko/index.html')
+
+def exception_handler(exc, context):
+    response = _exception_handler(exc, context)
+    
+    if response.status_code == 401:
+        return render(context['request'], 'toko/401.html')
+    elif response.status_code == 403 or isinstance(exc, exceptions.PermissionDenied):
+        return render(context['request'], 'toko/403.html')

@@ -1,0 +1,12 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Akses Ditolak
+{% endblock %}
+
+{% block content %}
+<h1>Akses Ditolak</h1>
+<div class="notification is-danger">
+    Silahkan <a href="{% url 'toko:login' %}?next={{ request.get_full_path }}">masuk</a> untuk mengakses halaman ini.
+</div>
+{% endblock %}

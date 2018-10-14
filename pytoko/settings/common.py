@@ -116,6 +116,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'password-email': '6/min',
     },
+    'EXCEPTION_HANDLER': 'toko.views.exception_handler',
 }
 
 JWT_AUTH = {
