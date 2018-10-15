@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import serializers
 
-from toko.serializers import LoginSerializer
+from toko.serializers import LoginSerializer, RegisterSerializer
 from toko.utils.mail import send_mail
 from toko.utils.password import create_password_reset, do_password_reset
 
@@ -48,6 +48,9 @@ class FormView(APIView):
     def fail(self, msg, code=None):
         raise serializers.ValidationError(msg, code)
 
+    def form_valid(self, data):
+        pass
+
 class AnonFormView(FormView):
     authentication_classes = ()
     permission_classes = ()
@@ -59,41 +62,19 @@ class LoginView(AnonFormView):
 
     def form_valid(self, data):
         user = authenticate(username=data['email'], password=data['password'])
-        
         if not user:
             self.fail('Email/password tidak terdaftar')
-
         login(self.request, user)
 
-class RegisterView(FormView):
-    pass
+class RegisterView(AnonFormView):
+    serializer_class = RegisterSerializer
+    template = 'toko/account/register.html'
+    success_url = 'toko:register-success'
 
-# class XRegisterView(FormView):
-#     template_name = 'toko/account/register.html'
-#     form_class = forms.RegisterForm
-#     success_url = reverse_lazy('toko:register-success')
-
-#     def form_valid(self, form):
-#         username = 'user%s%s' % (get_random_string(3), User.objects.count())
-#         email = form.cleaned_data.get('email')
-#         password = form.cleaned_data.get('password')
-#         User.objects.create_user(username=username, email=email, password=password)
-#         send_mail('Selamat datang', 'toko/mail/welcome.html', email)
-#         return super().form_valid(form)
-
-# class XLoginView(FormView):
-#     template_name = 'toko/account/login.html'
-#     form_class = forms.LoginForm
-
-#     def form_valid(self, form):
-#         email = form.cleaned_data.get('email')
-#         password = form.cleaned_data.get('password')
-#         user = authenticate(username=email, password=password)
-#         login(self.request, user)
-#         return super().form_valid(form)
-
-#     def get_success_url(self):
-#         return self.request.GET.get('next', reverse('toko:front'))
+    def form_valid(self, data):
+        username = 'user%s%s' % (get_random_string(3), User.objects.count())
+        User.objects.create_user(username=username, email=data['email'], password=data['password'])
+        send_mail('Selamat datang', 'toko/mail/welcome.html', email)
 
 def logout_view(request):
     logout(request)
