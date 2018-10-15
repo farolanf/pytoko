@@ -25,10 +25,20 @@ router.register('ads', views.AdViewSet)
 urlpatterns = [
     url(r'^$', template('toko/front.html'), name='front'),
 
+    path('accounts/', template('toko/account/home.html'), name='home'),
+
     path('accounts/login/', views.LoginView.as_view(), name='login'),
     path('accounts/logout/', views.logout_view, name='logout'),
     path('accounts/register/', views.RegisterView.as_view(), name='register'),
+
     path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success'),
+
+    path('accounts/forgot-password/', views.ForgotPasswordView.as_view(), name='forgot-password'),
+
+    path('accounts/forgot-password-success/', template('toko/account/forgot-password-success.html'), name='forgot-password-success'),
+
+    path('accounts/reset-password/', views.ResetPasswordView.as_view(), name='reset-password'),
+    path('accounts/reset-password/<token>/', views.ResetPasswordView.as_view(), name='reset-password'),
 
     path('api/', include(api_router.urls)),
     path('', include(router.urls)),

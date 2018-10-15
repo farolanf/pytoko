@@ -11,18 +11,19 @@ class FormView(APIView):
     template = None
     success_url = '/'
 
-    def get(self, request):
+    def get(self, request, **kwargs):
         serializer = self.serializer_class()
 
         return Response({
-            'serializer': serializer
+            'serializer': serializer,
+            'params': kwargs,
         }, template_name=self.template)
 
     def post(self, request):
         errors = None
 
         self.serializer = self.serializer_class(data=request.data)
-                
+
         if self.serializer.is_valid():
             try:
                 self.form_valid(self.serializer.data)

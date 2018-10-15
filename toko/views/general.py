@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core import exceptions
 from rest_framework.views import exception_handler as _exception_handler
+from rest_framework.exceptions import Throttled
 
 def index(request):
     return render(request, 'toko/index.html')
@@ -12,6 +13,9 @@ def exception_handler(exc, context):
 
     if request.path.startswith('/api/'):
         return response
+
+    if isinstance(exc, Throttled):
+        return render(request, 'toko/throttled.html')
 
     if not response:
         return

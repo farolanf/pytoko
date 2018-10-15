@@ -1,0 +1,16 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Permintaan Dibatasi
+{% endblock %}
+
+{% block content %}
+<div class="notification is-danger mt4">
+    <h1 class="title">Permintaan Dibatasi</h1>
+    <div class="content">
+        <p>Permintaan pada halaman <a href="{{ request.META.HTTP_REFERER }}">{{ request.META.HTTP_REFERER }}</a> telah dibatasi.</p>
+        <p>Hal ini disebabkan permintaan yang terlalu sering pada halaman tersebut.</p>
+        <p>Silahkan tunggu beberapa saat lagi sebelum mengulangnya kembali.</p>
+    </div>
+</div>
+{% endblock %}

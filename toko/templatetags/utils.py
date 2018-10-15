@@ -38,6 +38,10 @@ def pagination(paginator):
 def errors(errors):
     return {'errors': errors}
 
+@register.inclusion_tag('toko/form/hidden-input.html')
+def hidden(name, value):
+    return {'name': name, 'value': value}
+
 # Filters ===================================================================
 
 @register.filter
