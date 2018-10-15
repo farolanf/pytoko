@@ -196,7 +196,7 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
 class HtmlModelViewSetMixin:
     renderer_classes = [TemplateHTMLRenderer]
     template_dir = None
-    update_success_url = '/'
+    update_success_url = 'toko:ad-list'
 
     def list(self, request):
         """

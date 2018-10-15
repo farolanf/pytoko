@@ -9,7 +9,7 @@
         {% if style.input_type == 'checkbox' %}
         <label class="checkbox">
         {% endif %}
-        <input name="{{ field.name }}" class="input" type="{{ style.input_type }}" {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %} {% if field.value is not None %}value="{{ field.value }}"{% endif %} {% if style.autofocus %}autofocus{% endif %}>
+        <input name="{{ field.name }}" class="input" type="{{ style.input_type }}" {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %} {% if field.value is not None %}value="{{ field.value }}"{% endif %} {% if field.required %}required{% endif %} {% if style.autofocus %}autofocus{% endif %}>
         {% if style.input_type == 'checkbox' %}
           {{ field.label }}
         </label>

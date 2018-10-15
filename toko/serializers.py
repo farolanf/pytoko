@@ -9,6 +9,11 @@ from .utils.file import inc_filename
 
 User = get_user_model()
 
+def get_category_queryset():
+    root = models.Taxonomy.objects.get(slug='kategori')
+    categories = models.Taxonomy.objects.exclude(pk=root.pk).filter(tree_id=root.tree_id, rght=F('lft') + 1)
+    return categories.all()
+
 def get_category_choices():
 
     def get_display_name(obj):
@@ -125,8 +130,20 @@ class AdImageSerializer(serializers.HyperlinkedModelSerializer):
             data = {'image': data}
         return super().to_internal_value(data)
 
+class PathHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
+
+    def use_pk_only_optimization(self):
+        return False
+
+    def display_value(self, obj):
+        names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
+        return ' / '.join(names[1:])
+
 class AdSerializer(serializers.HyperlinkedModelSerializer):
-    category = serializers.ChoiceField(choices=get_category_choices())
+    category = PathHyperlinkedRelatedField(
+        queryset=get_category_queryset(),
+        view_name='toko:taxonomy-detail'
+    )
     
     user = serializers.HyperlinkedRelatedField(
         default=serializers.CurrentUserDefault(),
