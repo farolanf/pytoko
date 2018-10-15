@@ -32,7 +32,7 @@ class RegisterView(AnonFormView):
     def form_valid(self, data):
         username = 'user%s%s' % (get_random_string(3), User.objects.count())
         User.objects.create_user(username=username, email=data['email'], password=data['password'])
-        send_mail('Selamat datang', 'toko/mail/welcome.html', email)
+        send_mail('Selamat datang', 'toko/mail/welcome.html', data['email'])
 
 def logout_view(request):
     logout(request)
