@@ -12,22 +12,15 @@ def template(name, context=None):
 app_name = 'toko'
 
 api_router = DefaultRouter()
-api_router.register('users', views.UserViewSet)
-api_router.register('provinsi', views.ProvinsiViewSet)
-api_router.register('kabupaten', views.KabupatenViewSet)
-api_router.register('taxonomy', views.TaxonomyViewSet)
-api_router.register('images', views.AdImageViewSet)
-api_router.register('ads', views.AdViewSet, base_name='api-ad')
-
-api_urlpatterns = [
-    path('register/', views.RegisterView.as_view()),
-    path('password/email/', views.PasswordEmailView.as_view()),
-    path('password/reset/', views.PasswordResetView.as_view()),
-    path('', include(api_router.urls)),
-]
+api_router.register('users', views.AdminUserViewSet, base_name='admin-user')
+api_router.register('provinsi', views.AdminProvinsiViewSet, base_name='admin-provinsi')
+api_router.register('kabupaten', views.AdminKabupatenViewSet, base_name='admin-kabupaten')
+api_router.register('taxonomy', views.AdminTaxonomyViewSet, base_name='admin-taxonomy')
+api_router.register('adimages', views.AdminAdImageViewSet, base_name='admin-ad-image')
+api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
 
 router = SimpleRouter()
-router.register('ads', views.UserAdViewSet)
+router.register('ads', views.AdViewSet)
 
 urlpatterns = [
     url(r'^$', template('toko/front.html'), name='front'),
@@ -37,6 +30,6 @@ urlpatterns = [
     path('accounts/register/', views.RegisterView.as_view(), name='register'),
     path('accounts/register-success/', template('toko/account/register-success.html'), name='register-success'),
 
-    path('api/', include(api_urlpatterns)),
+    path('api/', include(api_router.urls)),
     path('', include(router.urls)),
 ]

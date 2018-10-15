@@ -3,8 +3,11 @@ from django.core.paginator import Paginator
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+class AdminPagination(PageNumberPagination):
+    page_size = 10
+
 class StandardPagination(PageNumberPagination):
-    page_size = 20
+    page_size = 10
     template = 'toko/pagination/numbers.html'
 
     def get_paginated_response(self, data):

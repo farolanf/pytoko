@@ -1,11 +1,9 @@
-from django.urls import reverse
 from django.db.models import F
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .mixins import FilterFieldsMixin, ValidatePasswordMixin
-from .permissions import IsAdminOrSelf
-from . import models
-from .utils.file import inc_filename
+from toko.mixins import ValidatePasswordMixin
+from toko import models
+from toko.utils.file import inc_filename
 
 User = get_user_model()
 
@@ -24,9 +22,6 @@ def get_category_choices():
     categories = root.get_descendants().filter(rght=F('lft') + 1)
     choices = [(obj.id, get_display_name(obj)) for obj in categories]
     return choices
-
-# Fields #####################################################################
-
 
 # Input Serializers ##########################################################
 
@@ -60,66 +55,46 @@ class PasswordResetSerializer(ValidatePasswordMixin, serializers.Serializer):
 
 # Model Serializers ##########################################################
 
-class ProvinsiSerializer(serializers.HyperlinkedModelSerializer):
+class ProvinsiSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.Provinsi
-        fields = ('id', 'url', 'name')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:provinsi-detail'},
-        }
+        fields = ('id', 'name')
 
-class KabupatenSerializer(serializers.HyperlinkedModelSerializer):
+class KabupatenSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.Kabupaten
-        fields = ('id', 'url', 'name', 'provinsi')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:kabupaten-detail'},
-            'provinsi': {'view_name': 'toko:provinsi-detail'},
-        }
+        fields = ('id', 'name', 'provinsi')
 
-class PublicUserSerializer(serializers.HyperlinkedModelSerializer):
+class PublicUserSerializer(serializers.ModelSerializer):
     
     class Meta:    
         model = User
-        fields = ('id', 'url', 'username')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:user-detail'},
-        }
+        fields = ('id', 'username')
 
-class FullUserSerializer(serializers.HyperlinkedModelSerializer):
+class FullUserSerializer(serializers.ModelSerializer):
     
     class Meta:    
         model = User
-        fields = ('id', 'url', 'username', 'email', 'permissions')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:user-detail'},
-        }
+        fields = ('id', 'username', 'email', 'permissions')
 
-class TaxonomySerializer(serializers.HyperlinkedModelSerializer):
+class TaxonomySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Taxonomy
-        fields = ('id', 'url', 'name', 'slug', 'parent_id', 'children')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:taxonomy-detail'},
-        }
+        fields = ('id', 'name', 'slug', 'parent_id', 'children')
 
     def get_children(self, instance):
         return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
 
-class AdImageSerializer(serializers.HyperlinkedModelSerializer):
+class AdImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.AdImage
-        fields = ('id', 'url', 'image', 'ad')
+        fields = ('id', 'image', 'ad')
         read_only_fields = ('ad',)
-        extra_kwargs = {
-            'url': {'view_name': 'toko:adimage-detail'},
-            'ad': {'view_name': 'toko:ad-detail'},
-        }
 
     def to_internal_value(self, data):
         """
@@ -128,9 +103,10 @@ class AdImageSerializer(serializers.HyperlinkedModelSerializer):
         """
         if not isinstance(data, dict):
             data = {'image': data}
+
         return super().to_internal_value(data)
 
-class PathHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
+class PathPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
     def use_pk_only_optimization(self):
         return False
@@ -139,16 +115,12 @@ class PathHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
         names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
         return ' / '.join(names[1:])
 
-class AdSerializer(serializers.HyperlinkedModelSerializer):
-    category = PathHyperlinkedRelatedField(
-        queryset=get_category_queryset(),
-        view_name='toko:taxonomy-detail'
-    )
+class AdSerializer(serializers.ModelSerializer):
+    category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
     
-    user = serializers.HyperlinkedRelatedField(
+    user = serializers.PrimaryKeyRelatedField(
         default=serializers.CurrentUserDefault(),
         read_only=True,
-        view_name='toko:user-detail',
     )
     
     title = serializers.CharField(min_length=10, max_length=70)
@@ -164,13 +136,7 @@ class AdSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Ad
-        fields = ('id', 'url', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:ad-detail'},
-            'category': {'view_name': 'toko:taxonomy-detail'},
-            'provinsi': {'view_name': 'toko:provinsi-detail'},
-            'kabupaten': {'view_name': 'toko:kabupaten-detail'},
-        }
+        fields = ('id', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
 
     def create(self, validated_data):
         images = validated_data.pop('images')
