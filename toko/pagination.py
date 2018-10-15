@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 class StandardPagination(PageNumberPagination):
     page_size = 20
+    template = 'toko/pagination/numbers.html'
 
     def get_paginated_response(self, data):
         return Response(OrderedDict([

@@ -30,6 +30,10 @@ def if_url(context, name, true_val, false_val=''):
     is_url = m.url_name == name or '%s:%s' % (m.app_name, m.url_name) == name
     return true_val if is_url else false_val
 
+@register.inclusion_tag('toko/pagination/pagination.html')
+def pagination(paginator):
+    return {'paginator': paginator}
+
 # Filters ===================================================================
 
 @register.filter

@@ -1,4 +1,5 @@
 {% extends 'toko/base.html' %}
+{% load utils %}
 
 {% block title %}
 Iklan Saya
@@ -6,11 +7,11 @@ Iklan Saya
 
 {% block content %}
 <h1>Iklan Saya</h1>
-
+{% pagination paginator %}
 {% for item in data.results %}
     <a href="{% url 'toko:ad-detail' item.id %}" class="db mb3">
         {% include 'toko/ad/item.html' %}
     </a>
 {% endfor %}
-
+{% pagination paginator %}
 {% endblock %}

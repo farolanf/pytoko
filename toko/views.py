@@ -203,8 +203,12 @@ class HtmlModelViewSetMixin:
         Show the list page with objects owned by the user.
         """
         response = super().list(request)
-        return Response({'data': response.data}, 
-                template_name=self.get_template_path('list.html'))
+        return Response({
+                'data': response.data,
+                'paginator': self.paginator,
+                'page': self.paginator.page,
+            }, 
+            template_name=self.get_template_path('list.html'))
 
     def retrieve(self, *args, **kwargs):
         """
