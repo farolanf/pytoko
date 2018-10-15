@@ -34,6 +34,10 @@ def if_url(context, name, true_val, false_val=''):
 def pagination(paginator):
     return {'paginator': paginator}
 
+@register.inclusion_tag('toko/errors.html')
+def errors(errors):
+    return {'errors': errors}
+
 # Filters ===================================================================
 
 @register.filter

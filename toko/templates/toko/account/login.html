@@ -1,4 +1,6 @@
 {% extends 'toko/base.html' %}
+{% load rest_framework %}
+{% load utils %}
 
 {% block title %}
 Masuk
@@ -8,16 +10,10 @@ Masuk
 <div class="columns">
     <div class="column is-narrow">
         <h1>Masuk</h1>
-        {% if form.non_field_errors %}
-            <div class="notification is-danger">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
+        {% errors errors %}
         <form action="{% url 'toko:login' %}?{{ request.GET.urlencode }}" method="post">
             {% csrf_token %}
-            {% include 'toko/fields/input.html' with field=form.email %}
-            {% include 'toko/fields/input.html' with field=form.password %}
-            {% include 'toko/fields/input.html' with field=form.password_confirm %}
+            {% render_form serializer template_pack='toko/bulma' %}
             <div class="field is-grouped">
                 <div class="control">
                     <button class="button is-link">Masuk</button>

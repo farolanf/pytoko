@@ -68,7 +68,7 @@ class ValidatePasswordMixin(object):
 
     def validate_password_confirm(self, value):
         if value != self.get_initial().get('password'):
-            raise serializers.ValidationError('Kedua password harus sama')
+            raise serializers.ValidationError('Password tidak sama')
         return value
 
 class FilterFieldsMixin(object):

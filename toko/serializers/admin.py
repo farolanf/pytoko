@@ -4,6 +4,15 @@ from toko import models
 
 User = get_user_model()
 
+class AdminUserSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:    
+        model = User
+        fields = ('id', 'url', 'username', 'email', 'permissions')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-user-detail'},
+        }
+
 class AdminProvinsiSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
@@ -21,15 +30,6 @@ class AdminKabupatenSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'view_name': 'toko:admin-kabupaten-detail'},
             'provinsi': {'view_name': 'toko:admin-provinsi-detail'},
-        }
-
-class AdminUserSerializer(serializers.HyperlinkedModelSerializer):
-    
-    class Meta:    
-        model = User
-        fields = ('id', 'url', 'username', 'email', 'permissions')
-        extra_kwargs = {
-            'url': {'view_name': 'toko:admin-user-detail'},
         }
 
 class AdminTaxonomySerializer(serializers.HyperlinkedModelSerializer):
