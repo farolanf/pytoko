@@ -193,10 +193,6 @@ class AdViewSet(ActionPermissionsMixin, viewsets.ModelViewSet):
         
     #     return queryset
 
-    def get_serializer_class(self):
-        return serializers.HyperlinkedAdSerializer if is_admin(self.request) \
-            else super().get_serializer_class()
-
 class HtmlModelViewSetMixin:
     renderer_classes = [TemplateHTMLRenderer]
     template_dir = None
