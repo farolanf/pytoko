@@ -64,7 +64,19 @@ class AdImageSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(data)
 
-class AdSerializer(serializers.ModelSerializer):
+class SetFieldLabelsMixin:
+
+    def get_fields(self):
+        fields = super().get_fields()
+        self.set_field_labels(fields)
+        return fields
+
+    def set_field_labels(self, fields):
+        if hasattr(self.Meta, 'field_labels'):
+            for field_name, field in fields.items():
+                field.label = self.Meta.field_labels.get(field_name, field.label)
+
+class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
     
     user = serializers.PrimaryKeyRelatedField(
@@ -88,6 +100,13 @@ class AdSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Ad
         fields = ('id', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        field_labels = {
+            'category': 'Kategori',
+            'title': 'Judul iklan',
+            'desc': 'Deskripsi iklan',
+            'price': 'Harga',
+            'nego': 'Bisa nego',
+        }        
 
     def create(self, validated_data):
         images = validated_data.pop('images')
