@@ -106,6 +106,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'desc': 'Deskripsi iklan',
             'price': 'Harga',
             'nego': 'Bisa nego',
+            'kabupaten': 'Kota',
         }        
 
     def create(self, validated_data):

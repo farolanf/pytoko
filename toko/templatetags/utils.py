@@ -5,6 +5,7 @@ from django.conf import settings
 from django.urls import resolve
 from django.forms import BoundField
 from django.utils.safestring import mark_safe
+from toko.renderers import FormRenderer
 
 locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
@@ -29,6 +30,22 @@ def if_url(context, name, true_val, false_val=''):
     m = resolve(context['request'].path)
     is_url = m.url_name == name or '%s:%s' % (m.app_name, m.url_name) == name
     return true_val if is_url else false_val
+
+@register.simple_tag
+def render_form(serializer, template_pack=None, form=None):
+    style = {'template_pack': template_pack} if template_pack else {}
+    renderer = FormRenderer(form=form)
+    return renderer.render(serializer.data, None, {'style': style})
+
+@register.simple_tag
+def render_field(field, style):
+    renderer = style.get('renderer', FormRenderer())
+    return renderer.render_field(field, style)
+
+@register.simple_tag
+def render_widget(field, style):
+    renderer = style.get('renderer', FormRenderer())
+    return renderer.render_widget(field, style)
 
 @register.inclusion_tag('toko/pagination/pagination.html')
 def pagination(paginator):

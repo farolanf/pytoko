@@ -1,6 +1,5 @@
 {% extends 'toko/base.html' %}
 {% load utils %}
-{% load rest_framework %}
 
 {% block title %}
 Ubah Iklan
@@ -13,7 +12,7 @@ Ubah Iklan
         <form action="{% url 'toko:ad-detail' obj.id %}" method="post">
             <input type="hidden" name="_method" value="put">
             {% csrf_token %}
-            {% render_form serializer template_pack='toko/bulma' %}
+            {% render_form serializer template_pack='toko/bulma' form='ad-detail.html' %}
             <div class="field">
                 <div class="control">
                     <button class="button is-link">Simpan</button>
