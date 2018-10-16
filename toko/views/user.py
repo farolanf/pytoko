@@ -55,9 +55,10 @@ class ResetPasswordView(AnonFormView):
     serializer_class = ResetPasswordSerializer
     template = 'toko/account/reset-password.html'
     success_url = 'toko:home'
+    validate_params = True
+    failed_params_template = 'toko/account/invalid-reset-password-token.html'
 
     def form_valid(self, data):
-        token = self.kwargs['token']
-        do_password_reset(token, data['password'])
-        user = authenticate(username=data['email'], password=data['password'])
+        password_reset = do_password_reset(data['token'], data['password'])
+        user = authenticate(username=password_reset.email, password=data['password'])
         login(self.request, user)

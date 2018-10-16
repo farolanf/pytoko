@@ -12,7 +12,21 @@ class FormView(APIView):
     template = None
     success_url = '/'
 
+    # validate params on GET request using serializer if True,
+    # else use check_params()
+    validate_params = False
+    
+    failed_params_template = ''
+
     def get(self, request, **kwargs):
+
+        try:
+            if self.validate_params:
+                self.do_validate_params(**kwargs)
+            else:
+                self.check_params(**kwargs)
+        except serializers.ValidationError as exc:
+            return self.get_failed_params_response(errors=exc.detail, exc=exc, **kwargs)
         
         # assign kwargs to data and provide empty str for missing fields
         data = defaultdict(str)
@@ -43,6 +57,22 @@ class FormView(APIView):
 
     def fail(self, msg, code=None):
         raise serializers.ValidationError(msg, code)
+
+    def do_validate_params(self, **kwargs):
+        data = dict()
+        data.update(kwargs)
+        serializer = self.serializer_class(data=data)
+        if not serializer.is_valid():
+            raise serializers.ValidationError(serializer.errors)
+
+    def check_params(self, **kwargs):
+        pass 
+
+    def get_failed_params_response(self, errors=None, exc=None, **kwargs):
+        return Response({
+            'errors': errors,
+            'params': kwargs,
+        }, template_name=self.failed_params_template, status=HTTP_400_BAD_REQUEST)
 
     def form_valid(self, data):
         pass
