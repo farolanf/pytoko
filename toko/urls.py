@@ -21,6 +21,7 @@ api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
 
 router = SimpleRouter()
 router.register('ads', views.AdViewSet)
+router.register('kabupaten', views.KabupatenViewSet)
 
 urlpatterns = [
     url(r'^$', template('toko/front.html'), name='front'),

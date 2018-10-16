@@ -13,6 +13,17 @@ from toko import mixins
 from toko import permissions
 from toko import pagination
 
+class KabupatenViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
+    queryset = models.Kabupaten.objects.all()
+    serializer_class = serializers.KabupatenSerializer
+    action_permissions = (
+        {
+            'actions': ['list'],
+            'permission_classes': [],
+        },
+    )
+    filter_fields = ('provinsi_id',)
+
 class AdViewSet(mixins.ActionPermissionsMixin, mixins.HtmlModelViewSetMixin, viewsets.ModelViewSet):
     queryset = models.Ad.objects.order_by('-updated_at').all()
     pagination_class = pagination.StandardPagination
