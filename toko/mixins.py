@@ -1,7 +1,11 @@
+import os
 from django.db import models
 from django.contrib.auth.password_validation import validate_password
+from django.shortcuts import redirect
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.renderers import TemplateHTMLRenderer
 from .permissions import IsAdminOrSelf, IsAdminOrOwner
 
 class ActionPermissionsMixin(object):
@@ -64,7 +68,7 @@ class ValidatePasswordMixin(object):
 
     def validate_password_confirm(self, value):
         if value != self.get_initial().get('password'):
-            raise serializers.ValidationError('Kedua password harus sama')
+            raise serializers.ValidationError('Password tidak sama')
         return value
 
 class FilterFieldsMixin(object):
@@ -110,3 +114,54 @@ def check_permissions(name, field_name, permissions, request, view, obj=None):
                 if not permission.has_object_permission(request, view, obj):
                     return False
     return True
+
+class HtmlModelViewSetMixin:
+    renderer_classes = [TemplateHTMLRenderer]
+    template_dir = None
+    update_success_url = '/'
+
+    def list(self, request):
+        """
+        Show the list page with objects owned by the user.
+        """
+        response = super().list(request)
+        return Response({
+                'data': response.data,
+                'paginator': self.paginator,
+                'page': self.paginator.page,
+            }, 
+            template_name=self.get_template_path('list.html'))
+
+    def retrieve(self, *args, **kwargs):
+        """
+        Show edit form for the object.
+        """
+        serializer = self.get_serializer(self.get_object())
+        return Response({
+            'obj': serializer.data,
+            'serializer': serializer,
+        }, template_name=self.get_template_path('detail.html'))
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        valid = serializer.is_valid()
+
+        if valid:
+            self.perform_update(serializer)
+
+            if getattr(instance, '_prefetched_objects_cache', None):
+                # If 'prefetch_related' has been applied to a queryset, we need to
+                # forcibly invalidate the prefetch cache on the instance.
+                instance._prefetched_objects_cache = {}
+
+            return redirect(self.update_success_url)
+
+        return Response({
+            'obj': instance,
+            'serializer': serializer,
+        }, template_name=self.get_template_path('detail.html'))
+
+    def get_template_path(self, name):
+        return os.path.join(self.template_dir, name)

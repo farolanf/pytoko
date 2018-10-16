@@ -1,0 +1,26 @@
+{% extends 'toko/base.html' %}
+{% load rest_framework %}
+{% load utils %}
+
+{% block title %}
+Daftar
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column is-narrow">
+        <h1>Daftar</h1>
+        {% errors errors %}
+        <form action="{% url 'toko:register' %}" method="post">
+            {% csrf_token %}
+            {% render_form serializer template_pack='toko/bulma' %}
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link">Daftar</button>
+                    <a href="{% url 'toko:login' %}" class="button is-text">Masuk</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

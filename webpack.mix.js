@@ -13,23 +13,6 @@ const path = require('path')
  |
  */
 
-mix.webpackConfig({
-  resolve: {
-    alias: {
-      '#': path.resolve(__dirname, 'app'),
-      '@': path.resolve(__dirname, 'app/components')
-    }
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      mapState: ['vuex', 'mapState'],
-      mapMutations: ['vuex', 'mapMutations'],
-      mapGetters: ['vuex', 'mapGetters'],
-      mapActions: ['vuex', 'mapActions'],
-    })
-  ]
-})
-
-mix.js('app/app.js', 'static/toko/js')
-  .sass('app/css/app.scss', 'static/toko/css')
+mix.js('toko/assets/js/app.js', 'static/toko/js')
+  .sass('toko/assets/css/app.scss', 'static/toko/css')
   .disableNotifications();

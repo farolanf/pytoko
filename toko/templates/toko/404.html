@@ -1,0 +1,14 @@
+{% extends 'toko/base.html' %}
+
+{% block title %}
+Halaman Tidak Ditemukan
+{% endblock %}
+
+{% block content %}
+<div class="notification is-danger mt4">
+    <h1 class="title">404 - Halaman Tidak Ditemukan</h1>
+    <div class="content">
+        <p>{{ request.build_absolute_uri }}</p>
+    </div>
+</div>
+{% endblock %}

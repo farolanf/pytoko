@@ -9,9 +9,15 @@ from .utils.file import get_ad_img_upload_path
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 class Kabupaten(models.Model):
     name = models.CharField(max_length=100)
     provinsi = models.ForeignKey(Provinsi, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 class User(AbstractUser):
     email = models.EmailField(_('email address'), blank=True, unique=True)
@@ -61,6 +67,7 @@ class Ad(models.Model):
     title = models.CharField(max_length=70)
     desc = models.CharField(max_length=4000)
     price = models.IntegerField()
+    nego = models.BooleanField(verbose_name='Bisa nego')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,0 +1,49 @@
+{% load compress %}
+{% load utils %}
+
+{% define '[]' as scripts %}
+{% define '{}' as js_vars %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <title>Juwal - {% block title %}{% endblock %}</title>
+
+        <link href="/assets/favicon.ico" rel="shortcut icon">
+        {% compress css %}
+        <link href="/static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <link href="/static/lib/bulma.min.css" rel="stylesheet">
+        <link href="/static/lib/tachyons.min.css" rel="stylesheet">
+        <link href="/static/toko/css/app.css" rel="stylesheet">
+        {% endcompress %}
+    </head>
+    <body>
+        {% include 'toko/topbar.html' %}
+        
+        <div class="container ph2 ph0-ns">
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer class="footer mt5">
+            <div class="container">
+                <div class="content has-text-centered">
+                    <strong>Juwal</strong> &copy; {% now "Y" %} juwal.com
+                </div>
+            </div>
+        </footer>
+
+        {% compress js %}
+        <script>
+            const DATA = {{ js_vars|json }}
+        </script>
+        <script src="/static/lib/jquery.min.js"></script>
+        <script src="/static/toko/js/app.js"></script>
+        {% for src in scripts|unique %}
+        <script src="{{ src }}"></script>
+        {% endfor %}
+        {% endcompress %}
+    </body>
+</html>
