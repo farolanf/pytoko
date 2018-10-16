@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,11 +13,15 @@ class FormView(APIView):
     success_url = '/'
 
     def get(self, request, **kwargs):
-        serializer = self.serializer_class()
+        
+        # assign kwargs to data and provide empty str for missing fields
+        data = defaultdict(str)
+        data.update(kwargs)
+
+        serializer = self.serializer_class(data)
 
         return Response({
             'serializer': serializer,
-            'params': kwargs,
         }, template_name=self.template)
 
     def post(self, request):
