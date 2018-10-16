@@ -21,8 +21,18 @@ def exception_handler(exc, context):
         return
     
     if response.status_code == 401:
-        return render(request, 'toko/401.html')
+        return handler401(request)
     elif response.status_code == 403 or isinstance(exc, exceptions.PermissionDenied):
-        return render(request, 'toko/403.html')
+        return handler403(request)
     elif response.status_code == 404:
-        return render(request, 'toko/404.html')
+        return handler404(request)
+
+def handler401(request):
+    return render(request, '401.html')
+
+def handler403(request):
+    return render(request, '403.html')
+
+def handler404(request):
+    return render(request, '404.html')
+
