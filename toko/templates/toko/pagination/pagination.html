@@ -1,7 +1,8 @@
+{% if paginator.page.paginator.count %}
 <div class="level">
     <div class="level-left"></div>
     <div class="level-right">
         {{ paginator.to_html }}
     </div>
 </div>
-    
+{% endif %}
