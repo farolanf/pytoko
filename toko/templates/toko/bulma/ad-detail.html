@@ -3,17 +3,20 @@
 {% render_field form.category style %}
 {% render_field form.title style %}
 {% render_field form.desc style %}
-<label class="label">{{ form.price.label }}</label>
-<div class="field has-addons items-center">
-    <div class="control">
-        <button class="button is-static">Rp</button>
-    </div>
-    <div class="control w-40 w-25-ns">
-        {% render_widget form.price style %}
-    </div>
-    <div class="control ml2">
-        {% render_widget form.nego style %}
+<div class="field">
+    <label class="label">{{ form.price.label }}</label>
+    <div class="field has-addons items-center">
+        <div class="control">
+            <button class="button is-static">Rp</button>
+        </div>
+        <div class="control w-40 w-25-ns">
+            {% render_widget form.price style %}
+        </div>
+        <div class="control ml2">
+            {% render_widget form.nego style %}
+        </div>
     </div>
 </div>
+{% render_field form.images style %}
 {% render_field form.provinsi style %}
 {% render_field form.kabupaten style %}
