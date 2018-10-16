@@ -4,6 +4,7 @@ from rest_framework import serializers
 from toko.mixins import ValidatePasswordMixin
 from toko import models
 from toko.utils.file import inc_filename
+from toko.fields import WriteQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
 
 User = get_user_model()
 
@@ -63,15 +64,6 @@ class AdImageSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(data)
 
-class PathPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
-    def use_pk_only_optimization(self):
-        return False
-
-    def display_value(self, obj):
-        names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
-        return ' / '.join(names[1:])
-
 class AdSerializer(serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
     
@@ -90,6 +82,8 @@ class AdSerializer(serializers.ModelSerializer):
     })
 
     images = AdImageSerializer(many=True)
+
+    kabupaten = WriteQuerysetPrimaryKeyRelatedField(write_queryset=models.Kabupaten.objects)
 
     class Meta:
         model = models.Ad
