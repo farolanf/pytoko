@@ -145,25 +145,18 @@ class HtmlModelViewSetMixin:
             }, 
             template_name=self.get_template_path('list.html'))
 
-    def retrieve(self, *args, **kwargs):
+    @action(detail=True)
+    def view(self, *args, **kwargs):
         """
         Show detail page for the object.
         """
         return self.render_detail('detail.html')
 
-    @action(detail=True)
-    def edit(self, *args, **kwargs):
+    def retrieve(self, *args, **kwargs):
         """
         Show edit form for the object.
         """
         return self.render_detail('edit.html')
-
-    def render_detail(self, template=None):
-        serializer = self.get_serializer(self.get_object())
-        return Response({
-            'obj': serializer.data,
-            'serializer': serializer,
-        }, template_name=self.get_template_path(template))
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -181,10 +174,23 @@ class HtmlModelViewSetMixin:
 
             return redirect(self.update_success_url)
 
+        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html')
+
+    def get_edit_obj(self, serializer, instance, data):
+        obj = serializer.to_representation(instance)
+        for field in serializer._writable_fields:
+            obj[field.field_name] = field.get_value(data)
+        return obj
+
+    def render_detail(self, template):
+        serializer = self.get_serializer(self.get_object())
+        return self.render_object(serializer.data, serializer, template)
+
+    def render_object(self, obj, serializer, template):
         return Response({
-            'obj': instance,
+            'obj': obj,
             'serializer': serializer,
-        }, template_name=self.get_template_path('detail.html'))
+        }, template_name=self.get_template_path(template))
 
     def get_template_path(self, name):
         return os.path.join(self.template_dir, name)

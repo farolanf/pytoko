@@ -70,3 +70,5 @@ class WriteQuerysetPrimaryKeyRelatedField(DynamicQuerysetPrimaryKeyRelatedField)
 
         if hasattr(self.root, 'initial_data'):
             return self.eval_queryset(self.write_queryset)
+
+        return self.eval_queryset(self.write_queryset).none()

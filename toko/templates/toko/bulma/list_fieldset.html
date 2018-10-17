@@ -1,5 +1,11 @@
+{% load utils %}
+
+{{ field }}
+
 <div class="field">
     {% if field.label %}
-    <label {% if style.hide_label %}class="sr-only"{% endif %}>{{ field.label }}</label>
+    <label class="label{% if style.hide_label %} sr-only{% endif %}">{{ field.label }}</label>
+    <div class="control">
+    </div>
     {% endif %}
 </div>

@@ -1,5 +1,7 @@
+from django.core.files import File
 from django.db.models import F
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin
 from toko import models
@@ -48,21 +50,29 @@ class TaxonomySerializer(serializers.ModelSerializer):
         return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
 
 class AdImageSerializer(serializers.ModelSerializer):
+    default_error_messages = {
+        'invalid': _('"{input}" not a dict.')
+    }
 
     class Meta:
         model = models.AdImage
         fields = ('id', 'image', 'ad')
-        read_only_fields = ('ad',)
 
     def to_internal_value(self, data):
-        """
-        Wrap uploaded file in a dict.
-        If data is not a dict then assume it's a file object and wrap it.
-        """
         if not isinstance(data, dict):
-            data = {'image': data}
+            self.fail('invalid', input=data)
+        data['image'].name = inc_filename(data['image'].name)
+        return data
 
-        return super().to_internal_value(data)
+class AdImageListSerializer(serializers.ListSerializer):
+    child = AdImageSerializer()
+
+    def validate(self, attrs):
+        if not isinstance(attrs, (list, tuple)):
+            raise serializers.ValidationError('Not a list or tuple')
+        if len(attrs) > 8:
+            raise serializers.ValidationError('Jumlah foto melebihi batas')
+        return attrs
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
@@ -81,9 +91,9 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         'rows': 15,
     })
 
-    images = AdImageSerializer(many=True)
+    images = AdImageListSerializer()
 
-    kabupaten = WriteQuerysetPrimaryKeyRelatedField(write_queryset=models.Kabupaten.objects)
+    kabupaten = WriteQuerysetPrimaryKeyRelatedField(write_queryset=models.Kabupaten.objects.all())
 
     class Meta:
         model = models.Ad
@@ -97,30 +107,21 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'kabupaten': 'Kota',
         }        
 
-    def create(self, validated_data):
-        images = validated_data.pop('images')
-        ad = models.Ad.objects.create(**validated_data)
-        for image in images:
-            image['image'].name = inc_filename(image['image'].name)
-            models.AdImage.objects.create(ad=ad, image=image['image'])
-        return ad
+    # def create(self, validated_data):
+    #     images = validated_data.pop('images')
+    #     ad = models.Ad.objects.create(**validated_data)
+    #     for image in images:
+    #         image['image'].name = inc_filename(image['image'].name)
+    #         models.AdImage.objects.create(ad=ad, image=image['image'])
+    #     return ad
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
 
-        for key, val in validated_data.items():
-            setattr(instance, key, val)
-        
+        super().update(instance, validated_data)
+
         instance.images.all().delete()
+        images = map(lambda file: {'image': file, 'ad': instance}, images)
+        self.fields['images'].create(images)
 
-        for image in images:
-            image['image'].name = inc_filename(image['image'].name)
-            models.AdImage.objects.create(ad=instance, image=image['image'])
-
-        instance.save()
         return instance
-
-    def validate_images(self, value):
-        if len(value) > 8:
-            raise serializers.ValidationError('Jumlah foto melebihi batas (maksimal 8 foto).')
-        return value
