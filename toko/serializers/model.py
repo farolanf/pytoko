@@ -84,7 +84,7 @@ def get_kabupaten_queryset(field):
     return models.Kabupaten.objects.all()
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
-    category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
+    category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
     
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),

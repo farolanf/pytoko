@@ -3,15 +3,6 @@ from django.db.models.query import QuerySet
 from rest_framework import serializers
 from rest_framework.fields import get_attribute
 
-class PathPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
-    def use_pk_only_optimization(self):
-        return False
-
-    def display_value(self, obj):
-        names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
-        return ' / '.join(names[1:])
-
 class DynamicQuerysetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """
     Allow callable queryset.
@@ -36,6 +27,15 @@ class DynamicQuerysetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
             return queryset.all()
         
         return queryset
+
+class PathPrimaryKeyRelatedField(DynamicQuerysetPrimaryKeyRelatedField):
+
+    def use_pk_only_optimization(self):
+        return False
+
+    def display_value(self, obj):
+        names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
+        return ' / '.join(names[1:])
 
 class ChildQuerysetPrimaryKeyRelatedField(DynamicQuerysetPrimaryKeyRelatedField):
     """

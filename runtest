@@ -4,4 +4,4 @@ else
     TEST=$1
 fi
 
-watch "coverage run --source='.' manage.py test $TEST && coverage report" app/ pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/
+watch "coverage run --source='.' manage.py test $TEST && coverage report" pytoko/ toko/ --wait=10 --interval=3 --ignoreDirectoryPattern /screenshots/
