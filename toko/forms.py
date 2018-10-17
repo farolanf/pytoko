@@ -15,6 +15,7 @@ class FormView(APIView):
     # validate params on GET request using serializer if True,
     # else use check_params()
     validate_params = False
+    params_serializer_class = None
     
     failed_params_template = ''
 
@@ -59,9 +60,12 @@ class FormView(APIView):
         raise serializers.ValidationError(msg, code)
 
     def do_validate_params(self, **kwargs):
+        assert self.params_serializer_class, (
+            '`params_serializer_class` is not set.'
+        )
         data = dict()
         data.update(kwargs)
-        serializer = self.serializer_class(data=data)
+        serializer = self.params_serializer_class(data=data)
         if not serializer.is_valid():
             raise serializers.ValidationError(serializer.errors)
 

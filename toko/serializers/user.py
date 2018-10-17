@@ -23,6 +23,11 @@ class ForgotPasswordSerializer(serializers.Serializer):
         validate_exists(User, 'email', 'Email tidak terdaftar'),
     ])
 
+class ResetPasswordParamsSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255, validators=[
+        validate_exists(PasswordReset, 'token', 'Token tidak terdaftar'),
+    ], style={'input_type': 'hidden'})
+
 class ResetPasswordSerializer(ValidatePasswordMixin, serializers.Serializer):
     token = serializers.CharField(max_length=255, validators=[
         validate_exists(PasswordReset, 'token', 'Token tidak terdaftar'),

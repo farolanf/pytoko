@@ -26,3 +26,5 @@ def do_password_reset(token, password):
     user.save()
     
     password_reset.delete()
+
+    return password_reset

@@ -6,7 +6,7 @@ from django.views.generic.edit import FormView
 
 from rest_framework import serializers
 
-from toko.serializers import LoginSerializer, RegisterSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
+from toko.serializers import LoginSerializer, RegisterSerializer, ForgotPasswordSerializer, ResetPasswordParamsSerializer, ResetPasswordSerializer
 from toko.utils.mail import send_mail
 from toko.utils.password import create_password_reset, do_password_reset
 from toko.forms import AnonFormView
@@ -56,6 +56,7 @@ class ResetPasswordView(AnonFormView):
     template = 'toko/account/reset-password.html'
     success_url = 'toko:home'
     validate_params = True
+    params_serializer_class = ResetPasswordParamsSerializer
     failed_params_template = 'toko/account/invalid-reset-password-token.html'
 
     def form_valid(self, data):
