@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from .permissions import IsAdminOrSelf, IsAdminOrOwner
 
 class ActionPermissionsMixin(object):
@@ -174,7 +175,7 @@ class HtmlModelViewSetMixin:
 
             return redirect(self.update_success_url)
 
-        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html')
+        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=HTTP_400_BAD_REQUEST)
 
     def get_edit_obj(self, serializer, instance, data):
         obj = serializer.to_representation(instance)
@@ -186,11 +187,11 @@ class HtmlModelViewSetMixin:
         serializer = self.get_serializer(self.get_object())
         return self.render_object(serializer.data, serializer, template)
 
-    def render_object(self, obj, serializer, template):
+    def render_object(self, obj, serializer, template, status=None):
         return Response({
             'obj': obj,
             'serializer': serializer,
-        }, template_name=self.get_template_path(template))
+        }, template_name=self.get_template_path(template), status=status)
 
     def get_template_path(self, name):
         return os.path.join(self.template_dir, name)
