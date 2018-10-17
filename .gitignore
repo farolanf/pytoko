@@ -1,7 +1,7 @@
 **/node_modules/
 **/vendor/
 
-env/
+env
 .env
 
 .vscode/
@@ -12,9 +12,9 @@ env/
 static/CACHE
 uploads/
 
-db.sqlite3
 mix-manifest.json
 
 .*
 ~*
 *.log
+*.sqlite
