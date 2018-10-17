@@ -1,5 +1,6 @@
 const mix = require('laravel-mix');
 const webpack = require('webpack')
+const fs = require('fs')
 const path = require('path')
 
 /*
@@ -13,6 +14,18 @@ const path = require('path')
  |
  */
 
+const jsDir = 'toko/assets/components/js'
+const cssDir = 'toko/assets/components/css'
+
+fs.readdirSync(jsDir).forEach(file => {
+  mix.js(path.resolve(jsDir, file), 'static/toko/js')
+})
+
+fs.readdirSync(cssDir).forEach(file => {
+  mix.sass(path.resolve(cssDir, file), 'static/toko/css')
+})
+
 mix.js('toko/assets/js/app.js', 'static/toko/js')
   .sass('toko/assets/css/app.scss', 'static/toko/css')
-  .disableNotifications();
+
+mix.disableNotifications();

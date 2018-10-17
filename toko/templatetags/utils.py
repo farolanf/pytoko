@@ -11,19 +11,43 @@ locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
 register = template.Library()
 
+def init_global(context, name, default):
+    context.render_context[name] = context.render_context.get(name, default)
+
+def get_global(context, name, default):
+    init_global(context, name, default)
+    return context.render_context[name]
+
 @register.simple_tag
 def define(exp):
     return eval(exp)
 
 @register.simple_tag(takes_context=True)
 def js(context, src):
-    context['scripts'].append(src)
+    get_global(context, 'scripts', []).append(src)
+    return ''
+
+@register.simple_tag(takes_context=True)
+def css(context, href):
+    get_global(context, 'styles', []).append(href)
     return ''
 
 @register.simple_tag(takes_context=True)
 def jsvar(context, **kwargs):
-    context['js_vars'].update(kwargs)
+    get_global(context, 'js_vars', {}).update(kwargs)
     return ''
+
+@register.simple_tag(takes_context=True)
+def scripts(context):
+    return get_global(context, 'scripts', [])
+
+@register.simple_tag(takes_context=True)
+def styles(context):
+    return get_global(context, 'styles', [])
+
+@register.simple_tag(takes_context=True)
+def js_vars(context):
+    return get_global(context, 'js_vars', {})
 
 @register.simple_tag(takes_context=True)
 def if_url(context, name, true_val, false_val=''):

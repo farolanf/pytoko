@@ -1,8 +1,8 @@
 {% load compress %}
 {% load utils %}
 
-{% define '[]' as scripts %}
-{% define '{}' as js_vars %}
+{% css '/static/toko/css/ad.css' %}
+{% css '/static/toko/css/app.css' %}
 
 <!DOCTYPE html>
 <html>
@@ -18,6 +18,10 @@
         <link href="/static/lib/bulma.min.css" rel="stylesheet">
         <link href="/static/lib/tachyons.min.css" rel="stylesheet">
         <link href="/static/toko/css/app.css" rel="stylesheet">
+        {% styles as styles %}
+        {% for href in styles|unique %}
+        <link href="{{ href }}" rel="stylesheet">
+        {% endfor %}
         {% endcompress %}
     </head>
     <body>
@@ -37,10 +41,12 @@
 
         {% compress js %}
         <script>
+            {% js_vars as js_vars %}
             const DATA = {{ js_vars|json }}
         </script>
         <script src="/static/lib/jquery.min.js"></script>
         <script src="/static/toko/js/app.js"></script>
+        {% scripts as scripts %}
         {% for src in scripts|unique %}
         <script src="{{ src }}"></script>
         {% endfor %}
