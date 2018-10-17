@@ -84,6 +84,6 @@ class AdViewSet(mixins.ActionPermissionsMixin, mixins.HtmlModelViewSetMixin, vie
     def filter_queryset(self, queryset):
         
         if self.action == 'list':
-            queryset = self.request.user.ads.all()
+            queryset = self.request.user.ads.order_by('-updated_at').all()
 
         return super().filter_queryset(queryset)
