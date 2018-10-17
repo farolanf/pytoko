@@ -9,7 +9,7 @@ env/
 **/__pycache__/
 **/tests/screenshots/
 
-static/
+static/CACHE
 uploads/
 
 db.sqlite3
