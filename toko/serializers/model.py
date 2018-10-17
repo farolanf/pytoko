@@ -6,7 +6,7 @@ from rest_framework import serializers
 from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin
 from toko import models
 from toko.utils.file import inc_filename
-from toko.fields import WriteQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
+from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
 
 User = get_user_model()
 
@@ -74,6 +74,15 @@ class AdImageListSerializer(serializers.ListSerializer):
             raise serializers.ValidationError('Jumlah foto melebihi batas')
         return attrs
 
+def get_kabupaten_queryset(field):
+    """
+    Return kabupaten queryset from provinsi field on output.
+    Return all kabupaten queryset on input.
+    """
+    if field.root.instance and not hasattr(field.root, 'initial_data'):
+        return field.root.instance.provinsi.kabupaten_set.all()
+    return models.Kabupaten.objects.all()
+
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
     
@@ -93,7 +102,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     images = AdImageListSerializer()
 
-    kabupaten = WriteQuerysetPrimaryKeyRelatedField(write_queryset=models.Kabupaten.objects.all())
+    kabupaten = DynamicQuerysetPrimaryKeyRelatedField(queryset=get_kabupaten_queryset, with_self=True)
 
     class Meta:
         model = models.Ad
@@ -125,3 +134,9 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         self.fields['images'].create(images)
 
         return instance
+
+    def validate_kabupaten(self, obj):
+        provinsi = self.get_initial()['provinsi']
+        if obj.provinsi.pk != int(provinsi):
+            raise serializers.ValidationError('Kabupaten dan provinsi tidak sesuai')
+        return obj

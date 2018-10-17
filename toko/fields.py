@@ -17,13 +17,20 @@ class DynamicQuerysetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     Allow callable queryset.
     """
 
+    def __init__(self, *args, **kwargs):
+        self.with_self = kwargs.pop('with_self', False)
+        super().__init__(*args, **kwargs)
+
     def get_queryset(self):
         return self.eval_queryset(self.queryset)
 
     def eval_queryset(self, queryset):
 
         if callable(queryset):
-            return queryset()
+            if self.with_self:
+                return queryset(self)
+            else:
+                return queryset()
 
         if isinstance(queryset, (QuerySet, Manager)):
             return queryset.all()
