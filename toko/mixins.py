@@ -2,6 +2,7 @@ import os
 from django.db import models
 from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import redirect
+from rest_framework.decorators import action
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -134,7 +135,7 @@ class HtmlModelViewSetMixin:
 
     def list(self, request):
         """
-        Show the list page with objects owned by the user.
+        Show list page with objects owned by the user.
         """
         response = super().list(request)
         return Response({
@@ -146,13 +147,23 @@ class HtmlModelViewSetMixin:
 
     def retrieve(self, *args, **kwargs):
         """
+        Show detail page for the object.
+        """
+        return self.render_detail('detail.html')
+
+    @action(detail=True)
+    def edit(self, *args, **kwargs):
+        """
         Show edit form for the object.
         """
+        return self.render_detail('edit.html')
+
+    def render_detail(self, template=None):
         serializer = self.get_serializer(self.get_object())
         return Response({
             'obj': serializer.data,
             'serializer': serializer,
-        }, template_name=self.get_template_path('detail.html'))
+        }, template_name=self.get_template_path(template))
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
