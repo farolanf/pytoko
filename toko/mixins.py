@@ -132,6 +132,7 @@ class SetFieldLabelsMixin:
 class HtmlModelViewSetMixin:
     renderer_classes = [TemplateHTMLRenderer]
     template_dir = None
+    create_success_url = '/'
     update_success_url = '/'
 
     def list(self, request):
@@ -146,16 +147,33 @@ class HtmlModelViewSetMixin:
             }, 
             template_name=self.get_template_path('list.html'))
 
-    @action(detail=True)
-    def view(self, *args, **kwargs):
+    def retrieve(self, *args, **kwargs):
         """
         Show detail page for the object.
         """
         return self.render_detail('detail.html')
 
-    def retrieve(self, *args, **kwargs):
+    def new(self, *args, **kwargs):
         """
-        Show edit form for the object.
+        Show creation form.
+        """
+        serializer = self.get_serializer()
+        return Response({
+            'serializer': serializer,
+        }, template_name=self.get_template_path('new.html'))
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return redirect(self.create_success_url)
+
+        return self.render_object(self.get_new_obj(serializer, request.data), serializer, 'new.html', status=HTTP_400_BAD_REQUEST)
+
+    def edit(self, *args, **kwargs):
+        """
+        Show edit form for the object get.
         """
         return self.render_detail('edit.html')
 
@@ -176,6 +194,12 @@ class HtmlModelViewSetMixin:
             return redirect(self.update_success_url)
 
         return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=HTTP_400_BAD_REQUEST)
+
+    def get_new_obj(self, serializer, data):
+        obj = {}
+        for field in serializer._writable_fields:
+            obj[field.field_name] = field.get_value(data)
+        return obj
 
     def get_edit_obj(self, serializer, instance, data):
         obj = serializer.to_representation(instance)

@@ -86,9 +86,8 @@ def get_kabupaten_queryset(field):
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
     
-    user = serializers.PrimaryKeyRelatedField(
+    user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
-        read_only=True,
     )
     
     title = serializers.CharField(min_length=10, max_length=70)
@@ -106,7 +105,9 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = models.Ad
+
         fields = ('id', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        
         field_labels = {
             'category': 'Kategori',
             'title': 'Judul iklan',
@@ -116,13 +117,15 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'kabupaten': 'Kota',
         }        
 
-    # def create(self, validated_data):
-    #     images = validated_data.pop('images')
-    #     ad = models.Ad.objects.create(**validated_data)
-    #     for image in images:
-    #         image['image'].name = inc_filename(image['image'].name)
-    #         models.AdImage.objects.create(ad=ad, image=image['image'])
-    #     return ad
+    def create(self, validated_data):
+        images = validated_data.pop('images')
+
+        instance = super().create(validated_data)
+
+        images = map(lambda file: {'image': file, 'ad': instance}, images)
+        self.fields['images'].create(images)
+
+        return instance
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')

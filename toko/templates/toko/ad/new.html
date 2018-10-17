@@ -2,15 +2,14 @@
 {% load utils %}
 
 {% block title %}
-Ubah Iklan
+Pasang Iklan
 {% endblock %}
 
 {% block content %}
 <div class="columns">
     <div class="column is-7">
-        <h1>Ubah Iklan</h1>
-        <form action="{% url 'toko:ad-edit' obj.id %}" method="post">
-            <input type="hidden" name="_method" value="put">
+        <h1>Pasang Iklan</h1>
+        <form action="{% url 'toko:ad-new' %}" method="post">
             {% csrf_token %}
             {% render_form serializer template_pack='toko/bulma' form='ad-detail.html' %}
             <div class="field">

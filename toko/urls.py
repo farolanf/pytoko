@@ -1,8 +1,9 @@
 from django.urls import path, include
 from django.conf.urls import url
 from django.shortcuts import render
-from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.routers import DefaultRouter
 from . import views
+from .routers import AppRouter
 
 def template(name, context=None):
     def _render(request):
@@ -19,7 +20,7 @@ api_router.register('taxonomy', views.AdminTaxonomyViewSet, base_name='admin-tax
 api_router.register('adimages', views.AdminAdImageViewSet, base_name='admin-ad-image')
 api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
 
-router = SimpleRouter()
+router = AppRouter()
 router.register('ads', views.AdViewSet)
 router.register('kabupaten', views.KabupatenViewSet)
 

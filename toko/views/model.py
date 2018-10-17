@@ -43,6 +43,7 @@ class AdViewSet(mixins.ActionPermissionsMixin, mixins.HtmlModelViewSetMixin, vie
         },
     )
     template_dir = 'toko/ad'
+    create_success_url = 'toko:ad-list'
     update_success_url = 'toko:ad-list'
 
     # TODO: move to filter backend
