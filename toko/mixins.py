@@ -115,6 +115,18 @@ def check_permissions(name, field_name, permissions, request, view, obj=None):
                     return False
     return True
 
+class SetFieldLabelsMixin:
+
+    def get_fields(self):
+        fields = super().get_fields()
+        self.set_field_labels(fields)
+        return fields
+
+    def set_field_labels(self, fields):
+        if hasattr(self.Meta, 'field_labels'):
+            for field_name, field in fields.items():
+                field.label = self.Meta.field_labels.get(field_name, field.label)
+
 class HtmlModelViewSetMixin:
     renderer_classes = [TemplateHTMLRenderer]
     template_dir = None

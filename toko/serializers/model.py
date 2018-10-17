@@ -1,7 +1,7 @@
 from django.db.models import F
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from toko.mixins import ValidatePasswordMixin
+from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin
 from toko import models
 from toko.utils.file import inc_filename
 from toko.fields import WriteQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
@@ -63,18 +63,6 @@ class AdImageSerializer(serializers.ModelSerializer):
             data = {'image': data}
 
         return super().to_internal_value(data)
-
-class SetFieldLabelsMixin:
-
-    def get_fields(self):
-        fields = super().get_fields()
-        self.set_field_labels(fields)
-        return fields
-
-    def set_field_labels(self, fields):
-        if hasattr(self.Meta, 'field_labels'):
-            for field_name, field in fields.items():
-                field.label = self.Meta.field_labels.get(field_name, field.label)
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset())
