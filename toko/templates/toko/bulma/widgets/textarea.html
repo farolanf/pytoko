@@ -1,0 +1,1 @@
+<textarea name="{{ field.name }}" class="textarea{% if field.errors %} is-danger{% endif %}" {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %} {% if style.rows %}rows="{{ style.rows }}"{% endif %}>{% if field.value %}{{ field.value }}{% endif %}</textarea>
