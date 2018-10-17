@@ -13,6 +13,9 @@ from toko import mixins
 from toko import permissions
 from toko import pagination
 
+class HtmlModelViewSet(mixins.HtmlModelViewSetMixin, viewsets.ModelViewSet):
+    pass
+
 class KabupatenViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = models.Kabupaten.objects.all()
     serializer_class = serializers.KabupatenSerializer
@@ -24,7 +27,7 @@ class KabupatenViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     )
     filter_fields = ('provinsi_id',)
 
-class AdViewSet(mixins.ActionPermissionsMixin, mixins.HtmlModelViewSetMixin, viewsets.ModelViewSet):
+class AdViewSet(mixins.ActionPermissionsMixin, HtmlModelViewSet):
     queryset = models.Ad.objects.order_by('-updated_at').all()
     pagination_class = pagination.StandardPagination
     serializer_class = serializers.AdSerializer
@@ -34,11 +37,11 @@ class AdViewSet(mixins.ActionPermissionsMixin, mixins.HtmlModelViewSetMixin, vie
             'permission_classes': [],
         },
         {
-            'actions': ['list', 'create'],
+            'actions': ['list', 'new', 'create'],
             'permission_classes': [IsAuthenticated],
         },
         {
-            'actions': ['retrieve', 'update', 'partial_update'],
+            'actions': ['retrieve', 'edit', 'update', 'partial_update'],
             'permission_classes': [permissions.IsAdminOrOwner],
         },
     )
