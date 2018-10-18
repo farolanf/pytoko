@@ -1,8 +1,16 @@
-<div class="image-upload card">
+<div class="image-upload card relative hide-child">
     <figure class="image is-128x128 overflow-hidden">
         {% if item.image %}
         <img src="{{ item.image }}" class="of-cover">
         {% endif %}
     </figure>
-    <input type="file" accept="image/*" class="dn">
+    <div class="child absolute absolute--fill">
+        <span class="image-upload__remove icon absolute top--05 right--05 bg-red br-100 grow pointer">
+            <i class="fa fa-remove f4 white"></i>
+        </span>
+        <span class="image-upload__crop icon absolute top--05 left--05 has-background-link br-100 grow pointer">
+                <i class="fa fa-crop f4 white"></i>
+        </span>
+    </div>
+    <input type="file" accept="image/*" class="image-upload__input dn">
 </div>

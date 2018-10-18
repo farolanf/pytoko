@@ -1,4 +1,3 @@
-
 $(function () {
     utils.scrollToError()
 })
