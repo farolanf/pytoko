@@ -219,3 +219,23 @@ class HtmlModelViewSetMixin:
 
     def get_template_path(self, name):
         return os.path.join(self.template_dir, name)
+
+class ExtraItemsMixin:
+    extras = 2
+    max_length = None
+
+    def to_representation(self, data):
+        data = super().to_representation(data)
+        return self.with_extras(data)
+
+    def get_initial(self):
+        return self.with_extras(super().get_initial())
+
+    def with_extras(self, data):
+        if self.max_length is None or len(data) == self.max_length:
+            return data
+        if len(data) > self.max_length:
+            return data[:self.max_length]
+        num_extras = min(self.extras, self.max_length - len(data))
+        extras = [{} for i in range(num_extras)]
+        return data + extras

@@ -3,7 +3,7 @@ from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin
+from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMixin
 from toko import models
 from toko.utils.file import inc_filename
 from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
@@ -64,20 +64,17 @@ class AdImageSerializer(serializers.ModelSerializer):
         data['image'].name = inc_filename(data['image'].name)
         return data
 
-class AdImageListSerializer(serializers.ListSerializer):
+class AdImageListSerializer(ExtraItemsMixin, serializers.ListSerializer):
     child = AdImageSerializer()
+    extras = 8
+    max_length = 8
 
     def validate(self, attrs):
         if not isinstance(attrs, (list, tuple)):
             raise serializers.ValidationError('Not a list or tuple')
-        if len(attrs) > 8:
+        if len(attrs) > self.max_length:
             raise serializers.ValidationError('Jumlah foto melebihi batas')
         return attrs
-
-    def to_representation(self, data):
-        data = super().to_representation(data)
-        extras = [{} for i in range(8 - len(data))]
-        return data + extras
 
 def get_kabupaten_queryset(field):
     """
