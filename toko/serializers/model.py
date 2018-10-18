@@ -81,7 +81,10 @@ def get_kabupaten_queryset(field):
     Return kabupaten queryset from provinsi field on output.
     Return all kabupaten queryset on input.
     """
-    if field.root.instance and not hasattr(field.root, 'initial_data'):
+    if hasattr(field.root, 'initial_data'):
+        provinsi_id = field.root.get_initial()['provinsi']
+        return models.Provinsi.objects.get(pk=provinsi_id).kabupaten_set.all()
+    elif field.root.instance:
         return field.root.instance.provinsi.kabupaten_set.all()
     return field.root.fields['provinsi'].get_queryset().first().kabupaten_set.all()
 
@@ -142,6 +145,8 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']
+        print(provinsi)
+        print(obj.pk)
         if obj.provinsi.pk != int(provinsi):
             raise serializers.ValidationError('Kabupaten dan provinsi tidak sesuai')
         return obj
