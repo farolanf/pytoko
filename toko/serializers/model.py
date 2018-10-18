@@ -1,5 +1,4 @@
 from django.core.files import File
-from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -7,13 +6,9 @@ from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMi
 from toko import models
 from toko.utils.file import inc_filename
 from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
+from toko.querysets import KabupatenDynamicQueryset, get_category_queryset
 
 User = get_user_model()
-
-def get_category_queryset():
-    root = models.Taxonomy.objects.get(slug='kategori')
-    categories = models.Taxonomy.objects.exclude(pk=root.pk).filter(tree_id=root.tree_id, rght=F('lft') + 1)
-    return categories.all()
 
 class ProvinsiSerializer(serializers.ModelSerializer):
     
@@ -76,18 +71,6 @@ class AdImageListSerializer(ExtraItemsMixin, serializers.ListSerializer):
             raise serializers.ValidationError('Jumlah foto melebihi batas')
         return attrs
 
-def get_kabupaten_queryset(field):
-    """
-    Return kabupaten queryset from provinsi field on output.
-    Return all kabupaten queryset on input.
-    """
-    if hasattr(field.root, 'initial_data'):
-        provinsi_id = field.root.get_initial()['provinsi']
-        return models.Provinsi.objects.get(pk=provinsi_id).kabupaten_set.all()
-    elif field.root.instance:
-        return field.root.instance.provinsi.kabupaten_set.all()
-    return field.root.fields['provinsi'].get_queryset().first().kabupaten_set.all()
-
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
     
@@ -106,7 +89,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     images = AdImageListSerializer(style={'base_template': 'image-uploads.html'})
 
-    kabupaten = DynamicQuerysetPrimaryKeyRelatedField(queryset=get_kabupaten_queryset, with_self=True)
+    kabupaten = DynamicQuerysetPrimaryKeyRelatedField(queryset=KabupatenDynamicQueryset(), with_self=True)
 
     class Meta:
         model = models.Ad
@@ -145,8 +128,6 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']
-        print(provinsi)
-        print(obj.pk)
         if obj.provinsi.pk != int(provinsi):
             raise serializers.ValidationError('Kabupaten dan provinsi tidak sesuai')
         return obj
