@@ -81,7 +81,7 @@ def get_kabupaten_queryset(field):
     """
     if field.root.instance and not hasattr(field.root, 'initial_data'):
         return field.root.instance.provinsi.kabupaten_set.all()
-    return models.Kabupaten.objects.all()
+    return field.root.fields['provinsi'].get_queryset().first().kabupaten_set.all()
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
