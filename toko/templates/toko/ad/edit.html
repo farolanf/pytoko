@@ -6,6 +6,7 @@ Ubah Iklan
 {% endblock %}
 
 {% block content %}
+{{ greet }}
 <div class="columns">
     <div class="column is-7">
         <h1>Ubah Iklan</h1>
@@ -22,6 +23,12 @@ Ubah Iklan
     </div>
 </div>
 {% jsvar kabupaten_id=obj.kabupaten %}
+
+{% css '/static/lib/dragula/dragula.min.css' %}
+{% js '/static/lib/dragula/dragula.min.js' %}
+
+{% css '/static/toko/css/ad.css' %}
+
 {% js '/static/toko/js/provinsi.js' %}
 {% js '/static/toko/js/dom.js' %}
 {% js '/static/toko/js/form.js' %}

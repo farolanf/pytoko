@@ -74,6 +74,11 @@ class AdImageListSerializer(serializers.ListSerializer):
             raise serializers.ValidationError('Jumlah foto melebihi batas')
         return attrs
 
+    def to_representation(self, data):
+        data = super().to_representation(data)
+        extras = [{} for i in range(8 - len(data))]
+        return data + extras
+
 def get_kabupaten_queryset(field):
     """
     Return kabupaten queryset from provinsi field on output.
@@ -99,7 +104,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         'rows': 15,
     })
 
-    images = AdImageListSerializer()
+    images = AdImageListSerializer(style={'base_template': 'image-uploads.html'})
 
     kabupaten = DynamicQuerysetPrimaryKeyRelatedField(queryset=get_kabupaten_queryset, with_self=True)
 

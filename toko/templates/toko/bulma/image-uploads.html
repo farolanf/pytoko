@@ -1,0 +1,17 @@
+<div class="field">
+    <label class="label">{{ field.label }}</label>
+    <div class="control image-uploads__container">
+        {% for item in field.value %}
+        {% include './image-upload.html' %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+window.addEventListener('load', function () {
+    const containers = [document.querySelector('.image-uploads__container')]
+    const drake = dragula(containers, {
+        direction: 'horizontal',
+    })
+})
+</script>
