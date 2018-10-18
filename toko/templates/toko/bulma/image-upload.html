@@ -1,6 +1,14 @@
 <div class="image-upload card">
-    <figure class="image is-128x128  overflow-hidden">
+    <figure class="image is-128x128 overflow-hidden">
+        {% if item.image %}
         <img src="{{ item.image }}" class="of-cover">
+        {% endif %}
     </figure>
     <input type="file" accept="image/*" class="dn">
 </div>
+
+<script>
+once(function imageUpload() {
+    console.log('image-upload')
+})
+</script>

@@ -1,0 +1,12 @@
+<script>
+/**
+ * Run function once.
+ */
+function once (fn) {
+    if (!fn.name) throw new Error('once() requires named function')
+    this.__onceMap = this.__onceMap || {}
+    if (this.__onceMap[fn.name]) return
+    this.__onceMap[fn.name] = fn
+    window.addEventListener('load', fn)
+}
+</script>
