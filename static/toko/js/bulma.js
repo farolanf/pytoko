@@ -8,14 +8,21 @@ once(function bulmaInit () {
         
         const $el = $(el)
 
+        this.setOptions = function setOptions (opts) {
+            options = opts
+        }
+
         this.show = function show () {
+            options.onShow && options.onShow()
             $el.addClass('is-active')
         }
 
         this.hide = function hide () {
+            options.onHide && options.onHide()
             $el.removeClass('is-active')
         }
 
-        $el.children('.modal-close, .modal-background').on('click', this.hide)
+        $el.find('.modal-close, .modal-background, .modal-card-head .delete, .close-button')
+            .on('click', this.hide)
     }
 })

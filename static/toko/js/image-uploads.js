@@ -12,21 +12,44 @@ once(function imageUploads () {
 
     function ImageUpload (el) {
 
-        let cropper
-
-        const $img = $('img', el)
-
         $('.image-upload__crop', el).on('click', function () {
-            showCropperModal()
+            
+            const $modal = $('.image-uploads__cropper-modal')
+            const $img = $('img', el)
+            let cropper
+
+            $modal.modal({
+                onShow () {
+                    cropper = initCropper()
+                },
+                onHide () {
+                    if (cropper) {
+                        cropper.destroy()
+                        cropper = null
+                    }
+                }
+            })
+            
+            function initCropper () {
+                const img = $modal.find('img').get(0)
+                img.src = $img.attr('src')
+                return new Cropper(img, {
+                    rotatable: true,
+                    viewMode: 2
+                })
+            }
+
+            $modal.find('.button.rotate-left')
+                .off('click')
+                .on('click', function () {
+                    cropper.rotate(-90)
+                })
+
+            $modal.find('.button.rotate-right')
+                .off('click')
+                .on('click', function () {
+                    cropper.rotate(90)
+                })
         })
-
-    }
-
-    function showCropperModal () {
-        const $modal = $('.image-uploads__cropper-modal').modal()
-
-        // cropper = new Cropper($img.get(0), {
-        //     rotatable: true
-        // })
     }
 })

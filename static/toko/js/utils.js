@@ -38,20 +38,31 @@ const utils = {
 
         function invoke (el, method, args) {
 
+            const options = typeof method === 'object' ? method : undefined
+
             if (!el[instanceName]) {
-                const options = typeof method === 'object' ? method : {}
                 el[instanceName] = new constructor(el, options)
+                call(el[instanceName], method)
+                return
             }
 
             const instance = el[instanceName]
+
+            if (options) {
+                instance.setOptions && instance.setOptions(options)
+            }
+
+            call(instance, method)
+
+            function call(instance, method) {
+                method = typeof method !== 'string' ? defaultMethod : method
     
-            method = typeof method !== 'string' ? defaultMethod : method
-    
-            if (method) {
-                if (!instance.hasOwnProperty(method)) {
-                    throw new Error(`invalid method ${method}`)
+                if (method) {
+                    if (!instance.hasOwnProperty(method)) {
+                        throw new Error(`invalid method ${method}`)
+                    }
+                    instance[method].apply(instance, args)
                 }
-                instance[method].apply(instance, args)
             }
         }
     }
