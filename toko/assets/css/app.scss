@@ -2,3 +2,7 @@
 @import 'variables';
 
 @import 'utilities';
+
+input[type="number"] {
+    text-align: right;
+}
