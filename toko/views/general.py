@@ -12,7 +12,7 @@ def exception_handler(exc, context):
 
     response = _exception_handler(exc, context)
 
-    if request.path.startswith('/api/'):
+    if request.is_ajax() or request.path.startswith('/api/'):
         return response
 
     if isinstance(exc, Throttled):
