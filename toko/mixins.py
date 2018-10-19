@@ -222,7 +222,6 @@ class HtmlModelViewSetMixin:
 
 class ExtraItemsMixin:
     extras = 2
-    max_length = None
 
     def to_representation(self, data):
         data = super().to_representation(data)

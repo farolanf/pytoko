@@ -101,17 +101,10 @@ class AdImageSerializer(serializers.ModelSerializer):
         data['image'].name = inc_filename(data['image'].name)
         return data
 
-class AdImageListSerializer(ExtraItemsMixin, serializers.ListSerializer):
+class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     child = AdImageSerializer()
     extras = 8
     max_length = 8
-
-    def validate(self, attrs):
-        if not isinstance(attrs, (list, tuple)):
-            raise serializers.ValidationError('Not a list or tuple')
-        if len(attrs) > self.max_length:
-            raise serializers.ValidationError('Jumlah foto melebihi batas')
-        return attrs
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
