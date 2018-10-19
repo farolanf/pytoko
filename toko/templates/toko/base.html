@@ -38,18 +38,18 @@
         </footer>
 
         {% compress css %}
-        {% for href in styles|unique %}
+        {% for href in global.styles|unique %}
         <link href="{{ href }}" rel="stylesheet">
         {% endfor %}
         {% endcompress %}
 
         {% compress js %}
         <script>
-            const DATA = {{ js_vars|json }}
+            const DATA = {{ global.js_vars|json }}
         </script>
         <script src="/static/lib/jquery.min.js"></script>
         <script src="/static/toko/js/app.js"></script>
-        {% for src in scripts|unique %}
+        {% for src in global.scripts|unique %}
         <script src="{{ src }}"></script>
         {% endfor %}
         {% endcompress %}

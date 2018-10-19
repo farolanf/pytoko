@@ -17,24 +17,26 @@ def define(exp):
 
 @register.simple_tag(takes_context=True)
 def init_scripts_context(context):
-    context['scripts'] = []
-    context['styles'] = []
-    context['js_vars'] = {}
+    context['global'] = {
+        'scripts': [],
+        'styles': [],
+        'js_vars': {},
+    }
     return ''
 
 @register.simple_tag(takes_context=True)
 def js(context, src):
-    context['scripts'].append(src)
+    context['global']['scripts'].append(src)
     return ''
 
 @register.simple_tag(takes_context=True)
 def css(context, href):
-    context['styles'].append(href)
+    context['global']['styles'].append(href)
     return ''
 
 @register.simple_tag(takes_context=True)
 def jsvar(context, **kwargs):
-    context['js_vars'].update(kwargs)
+    context['global']['js_vars'].update(kwargs)
     return ''
 
 @register.simple_tag(takes_context=True)
@@ -43,16 +45,16 @@ def if_url(context, name, true_val, false_val=''):
     is_url = m.url_name == name or '%s:%s' % (m.app_name, m.url_name) == name
     return true_val if is_url else false_val
 
-@register.simple_tag
-def render_form(serializer, template_pack=None, form=None):
+@register.simple_tag(takes_context=True)
+def render_form(context, serializer, template_pack=None, form=None):
     style = {'template_pack': template_pack} if template_pack else {}
     renderer = FormRenderer(form=form)
-    return renderer.render(serializer.data, None, {'style': style})
+    return renderer.render(serializer.data, None, {'style': style, 'global': context['global']})
 
-@register.simple_tag
-def render_field(field, style):
+@register.simple_tag(takes_context=True)
+def render_field(context, field, style):
     renderer = style.get('renderer', FormRenderer())
-    return renderer.render_field(field, style)
+    return renderer.render_field(field, style, {'global': context['global']})
 
 @register.simple_tag
 def render_widget(field, style):
