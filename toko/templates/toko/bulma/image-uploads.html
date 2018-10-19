@@ -1,29 +1,36 @@
+{% load utils %}
+
+{% js '/static/lib/vue.min.js' %}
+
+{% jsvar imageUploads=field.value %}
+
+{% include './image-upload.html' %}
+
 <div class="field">
     <label class="label">{{ field.label }}</label>
     <div class="control image-uploads__container">
-        {% for item in field.value %}
-        {% include './image-upload.html' %}
-        {% endfor %}
+        <image-upload v-for="item in imageUploads" :key="item.id" :item="item">
+        </image-upload>
     </div>
 </div>
 
-<div class="modal image-uploads__cropper-modal">
-    <div class="modal-background"></div>
+<div class="modal image-uploads__cropper-modal" :class="{'is-active': visible}">
+    <div class="modal-background" @click="hide"></div>
     <div class="modal-card">
         <div class="modal-card-head">
             <p class="modal-card-title">Pilih tampilan terbaik dari gambar</p>
-            <a class="delete"></a>
+            <a class="delete" @click="hide"></a>
         </div>
         <div class="modal-card-body flex">
-            <img class="w-100">
+            <img class="w-100" ref="img">
         </div>
         <div class="modal-card-foot">
-            <a class="button is-link">Simpan</a>
-            <a class="button is-text close-button">Batal</a>
-            <a class="button rotate-left">
+            <a class="button is-link" @click="save">Simpan</a>
+            <a class="button is-text" @click="hide">Batal</a>
+            <a class="button" @click="rotateLeft">
                 <i class="fa fa-rotate-left"></i>
             </a>
-            <a class="button rotate-right">
+            <a class="button" @click="rotateRight">
                 <i class="fa fa-rotate-right"></i>
             </a>
         </div>

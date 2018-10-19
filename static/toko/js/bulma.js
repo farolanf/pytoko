@@ -22,7 +22,7 @@ once(function bulmaInit () {
             $el.removeClass('is-active')
         }
 
-        $el.find('.modal-close, .modal-background, .modal-card-head .delete, .close-button')
+        $el.find('.modal-close, .modal-background, .modal-card-head .delete, .modal__close')
             .on('click', this.hide)
     }
 })

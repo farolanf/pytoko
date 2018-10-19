@@ -1,56 +1,90 @@
 once(function imageUploads () {
-    
-    const containers = [document.querySelector('.image-uploads__container')]
-    
-    const drake = dragula(containers, {
-        direction: 'horizontal',
-    })
 
-    $('.image-upload').each(function (i, el) {
-        new ImageUpload(el)
-    })
+    const events = new Vue()
+    let cropper
 
-    const $modal = $('.image-uploads__cropper-modal')
-
-    function ImageUpload (el) {
-
-        const $img = $('img', el)
-        let cropper
-
-        function onShow () {
-            cropper = initCropper()
-        }
-
-        function onHide () {
-            if (cropper) {
-                cropper.destroy()
-                cropper = null
+    Vue.component('image-upload', {
+        template: $('#image-upload-template').html(),
+        props: ['item'],
+        methods: {
+            onCrop () {
+                events.$emit('crop', this.item)
+            },
+            onRemove () {
+                events.$emit('remove', this.item)
             }
         }
+    })
 
-        function initCropper () {
-            const img = $modal.find('img').get(0)
-            img.src = $img.attr('src')
-            return new Cropper(img, {
-                rotatable: true,
-                viewMode: 2
+    new Vue({
+        el: document.querySelector('.image-uploads__container'),
+        data: {
+            imageUploads: DATA.imageUploads,
+            currentItem: null,
+        },
+        methods: {
+            saveCurrentItem (item) {
+                this.currentItem = item
+            },
+            onRemove (item) {
+                item.image = ''
+            },
+            onSave () {
+
+            }
+        },
+        created () {
+            events.$on('crop', this.saveCurrentItem)
+            events.$on('remove', this.onRemove)
+            events.$on('save', this.onSave)
+        },
+        mounted () {
+            dragula([document.querySelector('.image-uploads__container')], {
+                direction: 'horizontal'
             })
         }
+    })
 
-        $('.image-upload__crop', el).on('click', function () {
-            $modal.modal({ onShow, onHide })
-
-            $modal.find('.button.rotate-left')
-                .off('click')
-                .on('click', function () {
-                    cropper.rotate(-90)
+    new Vue({
+        el: document.querySelector('.image-uploads__cropper-modal'),
+        data: {
+            visible: false,
+        },
+        methods: {
+            show (item) {
+                this.visible = true
+                cropper = this.initCropper(item)
+            },
+            hide () {
+                this.destroyCropper()
+                this.visible = false
+            },
+            save () {
+                events.$emit('save')
+                this.hide()
+            },
+            rotateLeft () {
+                cropper.rotate(-90)
+            },
+            rotateRight () {
+                cropper.rotate(90)
+            },
+            initCropper (item) {
+                this.$refs.img.src = item.image
+                return new Cropper(this.$refs.img, {
+                    rotatable: true,
+                    viewMode: 2
                 })
-
-            $modal.find('.button.rotate-right')
-                .off('click')
-                .on('click', function () {
-                    cropper.rotate(90)
-                })
-        })
-    }
+            },
+            destroyCropper () {
+                if (cropper) {
+                    cropper.destroy()
+                    cropper = null
+                }
+            }
+        },
+        created () {
+            events.$on('crop', this.show)
+        }
+    })
 })
