@@ -11,6 +11,10 @@ User = get_user_model()
 class ModelViewSet(viewsets.ModelViewSet):
     pagination_class = pagination.AdminPagination
 
+class AdminFileViewSet(ModelViewSet):
+    queryset = models.File.objects.all()
+    serializer_class = serializers.AdminFileSerializer
+
 class AdminUserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.AdminUserSerializer

@@ -13,6 +13,15 @@ class AdminUserSerializer(serializers.HyperlinkedModelSerializer):
             'url': {'view_name': 'toko:admin-user-detail'},
         }
 
+class AdminFileSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:    
+        model = models.File
+        fields = ('id', 'url', 'file')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-file-detail'},
+        }
+
 class AdminProvinsiSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:

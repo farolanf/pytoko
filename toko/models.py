@@ -6,6 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 from .utils.file import get_ad_img_upload_path
 
+class File(models.Model):
+    file = models.FileField(upload_to='tmp')
+    
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
 

@@ -16,6 +16,16 @@ from toko import pagination
 class HtmlModelViewSet(mixins.HtmlModelViewSetMixin, viewsets.ModelViewSet):
     pass
 
+class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
+    queryset = models.File.objects.all()
+    serializer_class = serializers.FilesUploadSerializer
+    action_permissions = (
+        {
+            'actions': ['create'],
+            'permission_classes': [],
+        },
+    )
+        
 class KabupatenViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = models.Kabupaten.objects.all()
     serializer_class = serializers.KabupatenSerializer

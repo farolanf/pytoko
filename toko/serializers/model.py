@@ -10,6 +10,48 @@ from toko.querysets import KabupatenDynamicQueryset, get_category_queryset
 
 User = get_user_model()
 
+class ListSerializer(serializers.ListSerializer):
+    min_length = None
+    max_length = None
+
+    default_error_messages = {
+        'not_a_list': _('Expected a list of items but got type "{input_type}".'),
+        'min_length': _('Ensure this field has at least {min_length} items.'),
+        'max_length': _('Ensure this field has no more than {max_length} items.'),
+        'empty': _('This list may not be empty.')
+    }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self.min_length and len(attrs) < self.min_length:
+            self.fail('min_length', min_length=self.min_length)
+        if self.max_length and len(attrs) > self.max_length:
+            self.fail('max_length', max_length=self.max_length)
+        return attrs
+
+class FileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.File
+        fields = ('id', 'file')
+
+    def to_internal_value(self, data):
+        return {'file': data}
+
+class FileListSerializer(ListSerializer):
+    child = FileSerializer()
+    min_length = 1
+    max_length = 10
+
+class FilesUploadSerializer(serializers.Serializer):
+
+    files = FileListSerializer()
+
+    def create(self, validated_data):
+        return {
+            'files': self.fields['files'].create(validated_data['files'])
+        }
+
 class ProvinsiSerializer(serializers.ModelSerializer):
     
     class Meta:

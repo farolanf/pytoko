@@ -14,6 +14,7 @@ app_name = 'toko'
 
 api_router = DefaultRouter()
 api_router.register('users', views.AdminUserViewSet, base_name='admin-user')
+api_router.register('files', views.AdminFileViewSet, base_name='admin-file')
 api_router.register('provinsi', views.AdminProvinsiViewSet, base_name='admin-provinsi')
 api_router.register('kabupaten', views.AdminKabupatenViewSet, base_name='admin-kabupaten')
 api_router.register('taxonomy', views.AdminTaxonomyViewSet, base_name='admin-taxonomy')
@@ -23,6 +24,7 @@ api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
 router = AppRouter()
 router.register('ads', views.AdViewSet)
 router.register('kabupaten', views.KabupatenViewSet)
+router.register('files', views.FileViewSet)
 
 urlpatterns = [
     url(r'^$', template('toko/front.html'), name='front'),
