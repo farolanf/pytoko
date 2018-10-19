@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core import exceptions
 from rest_framework.views import exception_handler as _exception_handler
 from rest_framework.exceptions import Throttled
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
 def index(request):
     return render(request, 'toko/index.html')
@@ -28,11 +29,11 @@ def exception_handler(exc, context):
         return handler404(request)
 
 def handler401(request):
-    return render(request, '401.html')
+    return render(request, '401.html', status=HTTP_401_UNAUTHORIZED)
 
 def handler403(request):
-    return render(request, '403.html')
+    return render(request, '403.html', status=HTTP_403_FORBIDDEN)
 
 def handler404(request):
-    return render(request, '404.html')
+    return render(request, '404.html', status=HTTP_404_NOT_FOUND)
 
