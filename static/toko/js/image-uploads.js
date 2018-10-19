@@ -10,34 +10,35 @@ once(function imageUploads () {
         new ImageUpload(el)
     })
 
+    const $modal = $('.image-uploads__cropper-modal')
+
     function ImageUpload (el) {
 
-        $('.image-upload__crop', el).on('click', function () {
-            
-            const $modal = $('.image-uploads__cropper-modal')
-            const $img = $('img', el)
-            let cropper
+        const $img = $('img', el)
+        let cropper
 
-            $modal.modal({
-                onShow () {
-                    cropper = initCropper()
-                },
-                onHide () {
-                    if (cropper) {
-                        cropper.destroy()
-                        cropper = null
-                    }
-                }
-            })
-            
-            function initCropper () {
-                const img = $modal.find('img').get(0)
-                img.src = $img.attr('src')
-                return new Cropper(img, {
-                    rotatable: true,
-                    viewMode: 2
-                })
+        function onShow () {
+            cropper = initCropper()
+        }
+
+        function onHide () {
+            if (cropper) {
+                cropper.destroy()
+                cropper = null
             }
+        }
+
+        function initCropper () {
+            const img = $modal.find('img').get(0)
+            img.src = $img.attr('src')
+            return new Cropper(img, {
+                rotatable: true,
+                viewMode: 2
+            })
+        }
+
+        $('.image-upload__crop', el).on('click', function () {
+            $modal.modal({ onShow, onHide })
 
             $modal.find('.button.rotate-left')
                 .off('click')
