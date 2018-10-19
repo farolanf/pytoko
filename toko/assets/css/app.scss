@@ -6,3 +6,9 @@
 input[type="number"] {
     text-align: right;
 }
+
+#topbar {
+    position: sticky;
+    top: 0;
+    transition: box-shadow .1s;
+}
