@@ -136,6 +136,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'title': 'Judul iklan',
             'desc': 'Deskripsi iklan',
             'price': 'Harga',
+            'images': 'Foto',
             'nego': 'Bisa nego',
             'kabupaten': 'Kota',
         }        
