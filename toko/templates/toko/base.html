@@ -18,7 +18,9 @@
         <link href="/static/lib/tachyons.min.css" rel="stylesheet">
         <link href="/static/toko/css/app.css" rel="stylesheet">
         {% endcompress %}
+        {% compress js %}
         {% include './bootstrap-script.html' %}
+        {% endcompress %}
     </head>
     <body>
         {% include 'toko/topbar.html' %}
