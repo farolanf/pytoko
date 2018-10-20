@@ -1,5 +1,7 @@
 from .common import *
 
+COMPRESS_ENABLED = True
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -12,5 +14,3 @@ DATABASES = {
         'COLLATION': 'utf8_general_ci',
     },
 }
-
-COMPRESS_ENABLED = True

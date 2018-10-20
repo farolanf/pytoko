@@ -7,17 +7,10 @@ For more information on this file, see
 https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 """
 
-import os, sys
+import os
 
 from django.core.wsgi import get_wsgi_application
 
-if os.getenv('ENV') == 'production':
-    settings = 'prod'
-elif 'test' in sys.argv:
-    settings = 'test'
-else:
-    settings = 'dev'
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pytoko.settings.%s' % settings)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pytoko.settings.prod')
 
 application = get_wsgi_application()

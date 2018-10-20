@@ -1,3 +1,4 @@
+import os
 import json as jsonlib
 import locale
 from django import template
@@ -10,6 +11,10 @@ from toko.renderers import FormRenderer
 locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
 register = template.Library()
+
+@register.simple_tag
+def env(key, default):
+    return os.getenv(key, default)
 
 @register.simple_tag
 def define(exp):
