@@ -1,4 +1,4 @@
-from django.core.files import File
+from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -96,10 +96,13 @@ class AdImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'image', 'ad')
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict):
-            self.fail('invalid', input=data)
-        data['image'].name = inc_filename(data['image'].name)
-        return data
+        """
+        Convert file id to dict with file obj.
+        """
+        file = models.File.objects.get(pk=int(data)).file
+        return {
+            'image': UploadedFile(file, file.name, size=file.size)
+        }
 
 class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     child = AdImageSerializer()
@@ -145,19 +148,25 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         images = validated_data.pop('images')
 
         instance = super().create(validated_data)
+        
+        for img in images:
+            img['ad'] = instance
 
-        images = map(lambda file: {'image': file, 'ad': instance}, images)
         self.fields['images'].create(images)
 
         return instance
 
     def update(self, instance, validated_data):
+        print(validated_data)
         images = validated_data.pop('images')
 
         super().update(instance, validated_data)
 
         instance.images.all().delete()
-        images = map(lambda file: {'image': file, 'ad': instance}, images)
+
+        for img in images:
+            img['ad'] = instance
+
         self.fields['images'].create(images)
 
         return instance

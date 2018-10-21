@@ -9,6 +9,7 @@ Ubah Iklan
 <div class="columns">
     <div class="column is-7">
         <h1>Ubah Iklan</h1>
+        {% errors serializer.errors.non_field_errors %}
         <form action="{% url 'toko:ad-edit' obj.id %}" method="post" id="ad-form">
             <input type="hidden" name="_method" value="put">
             {% csrf_token %}

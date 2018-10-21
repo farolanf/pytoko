@@ -12,6 +12,7 @@
         <image-upload v-for="item in imageUploads" :key="item.id" :item="item" :data-id="item.id">
         </image-upload>
     </div>
+    {% include './field-help.html' %}
 </div>
 
 <div class="modal image-uploads__cropper-modal" :class="{'is-active': visible}">
