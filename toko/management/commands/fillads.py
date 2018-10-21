@@ -47,7 +47,7 @@ class Command(BaseCommand):
         price = math.floor(float(columns[4]) * 15000)
 
         ad = Ad.objects.create(user=self.user, title=columns[1][:70], 
-            desc=columns[2][:4000], price=price, category=category, 
+            desc=columns[2][:4000], price=price, nego=random.random() > 0.5, category=category, 
             provinsi=provinsi, kabupaten=kabupaten)
 
         names = ['apple.jpg', 'brocoli.jpg', 'burger.jpg', 'nasi goreng udang.jpg']
