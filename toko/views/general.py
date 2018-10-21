@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render
 from django.core import exceptions
 from rest_framework.views import exception_handler as _exception_handler
@@ -12,7 +13,7 @@ def exception_handler(exc, context):
 
     response = _exception_handler(exc, context)
 
-    if request.is_ajax() or request.path.startswith('/api/'):
+    if settings.DEBUG or request.is_ajax() or request.path.startswith('/api/'):
         return response
 
     if isinstance(exc, Throttled):
