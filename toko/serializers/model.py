@@ -1,3 +1,4 @@
+import os
 from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -154,10 +155,12 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
         self.fields['images'].create(images)
 
+        for img in images:
+            os.remove(img['image'].file.path)
+
         return instance
 
     def update(self, instance, validated_data):
-        print(validated_data)
         images = validated_data.pop('images')
 
         super().update(instance, validated_data)
@@ -168,6 +171,9 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             img['ad'] = instance
 
         self.fields['images'].create(images)
+
+        for img in images:
+            os.remove(img['image'].file.path)
 
         return instance
 
