@@ -11,11 +11,13 @@ once(function adForm () {
         if (uploaded) return
         e.preventDefault()
         uploadFiles().then(resp => {
-            $('[name="images[]"]').each((i, el) => {
-                if (i >= resp.files.length) return
-                el.name = `images[${i}]`;
-                el.value = resp.files[i].id
-            })
+            if (resp) {
+                $('[name="images[]"]').each((i, el) => {
+                    if (i >= resp.files.length) return
+                    el.name = `images[${i}]`;
+                    el.value = resp.files[i].id
+                })
+            }
             uploaded = true
             $form.submit()
         })        
@@ -28,11 +30,16 @@ once(function adForm () {
             .then(blobs => {
                 const fd = new FormData()
                 fd.append(tokenField, csrfToken)
+
+                let count = 0
                 blobs.forEach((blob, i) => {
                     if (!blob) return
+                    count++
                     const name = $(imgs[i]).attr('data-name')
                     fd.append(`files[${i}]`, blob, name)
                 })
+                if (!count) return
+
                 return $.ajax({
                     url: '/files/new/',
                     method: 'POST',
