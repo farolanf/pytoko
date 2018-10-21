@@ -215,6 +215,7 @@ class HtmlModelViewSetMixin:
         return Response({
             'obj': obj,
             'serializer': serializer,
+            'errors': serializer.errors if hasattr(serializer, '_errors') else None
         }, template_name=self.get_template_path(template), status=status)
 
     def get_template_path(self, name):
