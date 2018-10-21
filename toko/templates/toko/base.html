@@ -1,4 +1,3 @@
-{% load compress %}
 {% load utils %}
 
 {% init_scripts_context %}
@@ -8,23 +7,23 @@
 {% js '/static/toko/js/topbar.js' %}
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
-        <title>Juwal - {% block title %}{% endblock %}</title>
+        <meta name="description" content="{% block description %}{% endblock %}">
+        <meta name="theme-color" content="#AAAAAA">
 
-        <link href="/assets/favicon.ico" rel="shortcut icon">
-        {% compress css %}
+        <title>{% env 'APP_NAME' 'App' %} - {% block title %}{% endblock %}</title>
+
+        <link href="/static/favicon.ico" rel="shortcut icon">
+        <link href="/static/manifest.json" rel="manifest">
+
         <link href="/static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <link href="/static/lib/bulma.min.css" rel="stylesheet">
         <link href="/static/lib/tachyons.min.css" rel="stylesheet">
         <link href="/static/toko/css/app.css" rel="stylesheet">
-        {% endcompress %}
-        {% compress js %}
         {% include './bootstrap-script.html' %}
-        {% endcompress %}
     </head>
     <body>
         {% include 'toko/topbar.html' %}
@@ -41,13 +40,10 @@
             </div>
         </footer>
 
-        {% compress css %}
         {% for href in global.styles|unique %}
         <link href="{{ href }}" rel="stylesheet">
         {% endfor %}
-        {% endcompress %}
 
-        {% compress js %}
         <script>
             const DATA = {{ global.js_vars|json }}
         </script>
@@ -56,6 +52,11 @@
         {% for src in global.scripts|unique %}
         <script src="{{ src }}"></script>
         {% endfor %}
-        {% endcompress %}
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+            }
+        </script>
     </body>
 </html>
