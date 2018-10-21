@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.urls import path, include
 from django.contrib import admin
+from django.views.static import serve
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 urlpatterns = [
@@ -30,11 +31,17 @@ urlpatterns = [
 
 if settings.DEBUG:
     
+    def serve_file(path):
+        def view(request):
+            return serve(request, path, document_root='toko/static')
+        return view
+
     from django.conf.urls.static import static
     import debug_toolbar
 
     urlpatterns = \
         static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + \
         static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + [
+            path('sw.js', serve_file('sw.js')),
             path('__debug__/', include(debug_toolbar.urls)),
         ] + urlpatterns
