@@ -23,9 +23,12 @@ once(function imageUploads () {
             handleFile (e) {
                 if (!e.target.files.length) return
     
+                const name = e.target.files[0].name
+
                 const reader = new FileReader();
                 reader.onload = e => {
                     events.$emit('load', {
+                        name,
                         dataUrl: e.target.result, 
                         item: this.item
                     })
@@ -68,8 +71,9 @@ once(function imageUploads () {
                 item.image = ''
                 this.sort()
             },
-            onLoadFile ({ dataUrl, item }) {
+            onLoadFile ({ name, dataUrl, item }) {
                 this.$set(item, 'image', dataUrl)
+                this.$set(item, 'name', name)
             },
             onSave () {
                 const dataUrl = cropper.getCroppedCanvas().toDataURL()
@@ -77,6 +81,7 @@ once(function imageUploads () {
             },
             initData () {
                 this.imageUploads.forEach((item, i) => {
+                    item.image && this.$set(item, 'name', utils.lastSegment(item.image))
                     if (!item.id) {
                         this.$set(item, 'id', Date.now() + i)
                     }

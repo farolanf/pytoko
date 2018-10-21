@@ -65,5 +65,9 @@ const utils = {
                 }
             }
         }
+    },
+
+    lastSegment (url) {
+        return url.slice(url.lastIndexOf('/') + 1)
     }
 }

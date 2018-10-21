@@ -3,7 +3,7 @@
     <div class="image-upload card relative hide-child">
 
         <figure class="image is-128x128 overflow-hidden">
-            <img v-if="item.image" :src="item.image" class="of-cover">
+            <img v-if="item.image" :src="item.image" class="of-cover" :data-name="item.name">
         </figure>
 
         <div v-if="item.image" class="child absolute absolute--fill move" data-move-handle>
