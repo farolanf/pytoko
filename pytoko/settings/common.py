@@ -35,7 +35,6 @@ INTERNAL_IPS = ['127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'debug_toolbar',
     'toko.apps.TokoConfig',
     'mptt',
     'compressor',
@@ -52,7 +51,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'toko.middlewares.method_unwrap',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

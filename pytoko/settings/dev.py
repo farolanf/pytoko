@@ -14,3 +14,15 @@ DATABASES = {
         'COLLATION': 'utf8_general_ci',
     },
 }
+
+DEBUG_TOOLBAR = False
+
+if DEBUG_TOOLBAR:
+
+    INSTALLED_APPS = [
+        'debug_toolbar',
+    ] + INSTALLED_APPS
+
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ] + MIDDLEWARE
