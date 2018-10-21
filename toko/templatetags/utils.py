@@ -78,6 +78,10 @@ def errors(errors):
 def hidden(name, value):
     return {'name': name, 'value': value}
 
+@register.inclusion_tag('toko/script.html')
+def script(path, min=False):
+    return {'url': ('%s.min.js' if min else '%s.js') % path}
+
 # Filters ===================================================================
 
 @register.filter

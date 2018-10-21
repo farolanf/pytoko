@@ -1,6 +1,6 @@
 {% load utils %}
 
-{% js '/static/lib/vue.min.js' %}
+{% script '/static/lib/vue' %}
 
 {% jsvar imageUploads=field.value %}
 
@@ -9,7 +9,7 @@
 <div class="field">
     <label class="label">{{ field.label }}</label>
     <div class="control image-uploads__container">
-        <image-upload v-for="item in imageUploads" :key="item.id" :item="item">
+        <image-upload v-for="item in imageUploads" :key="item.id" :item="item" :data-id="item.id">
         </image-upload>
     </div>
 </div>

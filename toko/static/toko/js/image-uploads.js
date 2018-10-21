@@ -23,11 +23,12 @@ once(function imageUploads () {
             handleFile (e) {
                 if (!e.target.files.length) return
     
-                this.$emit('file', e.target.files[0])
-                
                 const reader = new FileReader();
                 reader.onload = e => {
-                    this.$emit('image', e.target.result)
+                    events.$emit('load', {
+                        dataUrl: e.target.result, 
+                        item: this.item
+                    })
                 }
                 reader.readAsDataURL(e.target.files[0])
             }
@@ -44,6 +45,16 @@ once(function imageUploads () {
             currentItem: null,
         },
         methods: {
+            saveCurrentItem (item) {
+                this.currentItem = item
+            },
+            getItem (id) {
+                return this.imageUploads.find(item => item.id === id)
+            },
+            sort () {
+                this.imageUploads = this.imageUploads.filter(item => item.image)
+                    .concat(this.imageUploads.filter(item => !item.image))
+            },
             onBrowse () {
                 // use first empty slot
                 this.imageUploads.find(item => {
@@ -53,14 +64,16 @@ once(function imageUploads () {
                     }
                 })
             },
-            saveCurrentItem (item) {
-                this.currentItem = item
-            },
             onRemove (item) {
                 item.image = ''
+                this.sort()
+            },
+            onLoadFile ({ dataUrl, item }) {
+                this.$set(item, 'image', dataUrl)
             },
             onSave () {
-
+                const dataUrl = cropper.getCroppedCanvas().toDataURL()
+                this.$set(this.currentItem, 'image', dataUrl)
             },
             initData () {
                 this.imageUploads.forEach((item, i) => {
@@ -75,14 +88,30 @@ once(function imageUploads () {
             events.$on('crop', this.saveCurrentItem)
             events.$on('browse', this.onBrowse)
             events.$on('remove', this.onRemove)
+            events.$on('load', this.onLoadFile)
             events.$on('save', this.onSave)
         },
         mounted () {
-            dragula([document.querySelector('.image-uploads__container')], {
+            const drake = dragula([document.querySelector('.image-uploads__container')], {
                 direction: 'horizontal',
-                moves (el, src, handle) {
+                moves: (el, src, handle) => {
                     return $(handle).is('[data-move-handle]')
+                },
+                accepts: (el, target, src, sibling) => {
+                    const prev = sibling ? sibling.previousSibling : null
+                    const next = sibling || target.children[target.children.length - 1]
+                    const prevItem = this.getItem(+$(prev).attr('data-id'))
+                    const nextItem = this.getItem(+$(next).attr('data-id'))
+                    return (prevItem && prevItem.image) || (nextItem && nextItem.image)
                 }
+            })
+            drake.on('drop', () => {
+                const list = []
+                $('.image-upload', this.$el).each((i, el) => {
+                    const item = this.getItem(+$(el).attr('data-id'))
+                    list.push(item)
+                })
+                this.imageUploads = list
             })
         }
     })
