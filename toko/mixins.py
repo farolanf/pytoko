@@ -171,8 +171,11 @@ class HtmlModelViewSetMixin:
             if request.is_ajax():
                 headers = self.get_success_headers(serializer.data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            else:
-                return redirect(self.create_success_url)
+    
+            return redirect(self.create_success_url)
+
+        if request.is_ajax():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return self.render_object(self.get_new_obj(serializer, request.data), serializer, 'new.html', status=status.HTTP_400_BAD_REQUEST)
 
@@ -196,7 +199,13 @@ class HtmlModelViewSetMixin:
                 # forcibly invalidate the prefetch cache on the instance.
                 instance._prefetched_objects_cache = {}
 
+            if request.is_ajax():
+                return Response(serializer.data)
+
             return redirect(self.update_success_url)
+
+        if request.is_ajax():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=status.HTTP_400_BAD_REQUEST)
 
