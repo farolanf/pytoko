@@ -33,10 +33,6 @@ class AdminKabupatenViewSet(ModelViewSet):
     serializer_class = serializers.AdminKabupatenSerializer
     filter_fields = ('provinsi_id',)
 
-class AdminAdImageViewSet(ModelViewSet):
-    queryset = models.AdImage.objects.all()
-    serializer_class = serializers.AdminAdImageSerializer
-
 class AdminAdViewSet(ModelViewSet):
     queryset = models.Ad.objects.order_by('-updated_at').all()
     serializer_class = serializers.AdminAdSerializer

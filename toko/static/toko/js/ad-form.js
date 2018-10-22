@@ -26,28 +26,27 @@ once(function adForm () {
     function uploadFiles () {
         const imgs = $('.image-upload img', $form).toArray()
 
-        return fetchImageBlobs(imgs)
-            .then(blobs => {
-                const fd = new FormData()
-                fd.append(tokenField, csrfToken)
+        return fetchImageBlobs(imgs).then(blobs => {
+            const fd = new FormData()
+            fd.append(tokenField, csrfToken)
 
-                let count = 0
-                blobs.forEach((blob, i) => {
-                    if (!blob) return
-                    count++
-                    const name = $(imgs[i]).attr('data-name')
-                    fd.append(`files[${i}]`, blob, name)
-                })
-                if (!count) return
-
-                return $.ajax({
-                    url: '/files/new/',
-                    method: 'POST',
-                    processData: false,
-                    contentType: false,
-                    data: fd,
-                })
+            let count = 0
+            blobs.forEach((blob, i) => {
+                if (!blob) return
+                count++
+                const name = $(imgs[i]).attr('data-name')
+                fd.append(`files[${i}]`, blob, name)
             })
+            if (!count) return
+
+            return $.ajax({
+                url: '/files/new/',
+                method: 'POST',
+                processData: false,
+                contentType: false,
+                data: fd,
+            })
+        })
     }
 
     function fetchImageBlobs(imgs) {

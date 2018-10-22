@@ -18,7 +18,6 @@ api_router.register('files', views.AdminFileViewSet, base_name='admin-file')
 api_router.register('provinsi', views.AdminProvinsiViewSet, base_name='admin-provinsi')
 api_router.register('kabupaten', views.AdminKabupatenViewSet, base_name='admin-kabupaten')
 api_router.register('taxonomy', views.AdminTaxonomyViewSet, base_name='admin-taxonomy')
-api_router.register('adimages', views.AdminAdImageViewSet, base_name='admin-ad-image')
 api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
 
 router = AppRouter()

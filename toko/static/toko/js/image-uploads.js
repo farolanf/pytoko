@@ -55,33 +55,33 @@ once(function imageUploads () {
                 return this.imageUploads.find(item => item.id === id)
             },
             sort () {
-                this.imageUploads = this.imageUploads.filter(item => item.image)
-                    .concat(this.imageUploads.filter(item => !item.image))
+                this.imageUploads = this.imageUploads.filter(item => item.file)
+                    .concat(this.imageUploads.filter(item => !item.file))
             },
             onBrowse () {
                 // use first empty slot
                 this.imageUploads.find(item => {
-                    if (!item.image) {
+                    if (!item.file) {
                         events.$emit('do browse', item)
                         return true
                     }
                 })
             },
             onRemove (item) {
-                item.image = ''
+                item.file = ''
                 this.sort()
             },
             onLoadFile ({ name, dataUrl, item }) {
-                this.$set(item, 'image', dataUrl)
+                this.$set(item, 'file', dataUrl)
                 this.$set(item, 'name', name)
             },
             onSave () {
                 const dataUrl = cropper.getCroppedCanvas().toDataURL()
-                this.$set(this.currentItem, 'image', dataUrl)
+                this.$set(this.currentItem, 'file', dataUrl)
             },
             initData () {
                 this.imageUploads.forEach((item, i) => {
-                    item.image && this.$set(item, 'name', utils.lastSegment(item.image))
+                    item.file && this.$set(item, 'name', utils.lastSegment(item.file))
                     if (!item.id) {
                         this.$set(item, 'id', Date.now() + i)
                     }
@@ -107,7 +107,7 @@ once(function imageUploads () {
                     const next = sibling || target.children[target.children.length - 1]
                     const prevItem = this.getItem(+$(prev).attr('data-id'))
                     const nextItem = this.getItem(+$(next).attr('data-id'))
-                    return (prevItem && prevItem.image) || (nextItem && nextItem.image)
+                    return (prevItem && prevItem.file) || (nextItem && nextItem.file)
                 }
             })
             drake.on('drop', () => {
@@ -146,7 +146,7 @@ once(function imageUploads () {
                 cropper.rotate(90)
             },
             initCropper (item) {
-                this.$refs.img.src = item.image
+                this.$refs.img.src = item.file
                 return new Cropper(this.$refs.img, {
                     rotatable: true,
                     viewMode: 2

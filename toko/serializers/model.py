@@ -1,5 +1,5 @@
 import os
-from django.core.files.uploadedfile import UploadedFile
+from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -31,15 +31,32 @@ class ListSerializer(serializers.ListSerializer):
         return attrs
 
 class FileSerializer(serializers.ModelSerializer):
+    default_error_messages = {
+        'invalid': _('Invalid data. Expected a dictionary, file, or pk, but got {datatype} {value}.')
+    }
+
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(),
+    )
 
     class Meta:
         model = models.File
-        fields = ('id', 'file')
+        fields = ('id', 'file', 'user', 'created_at')
 
     def to_internal_value(self, data):
-        return {'file': data}
+        if isinstance(data, File):
+            data = {'file': data}
+        elif isinstance(data, (int, str)):
+            obj = models.File.objects.get(pk=data)
+            data = {'file': obj.file}
+        elif not isinstance(data, dict):
+            self.fail('invalid', datatype=type(data).__name__, value=data)
+        return super().to_internal_value(data)
 
-class FileListSerializer(ListSerializer):
+    def update(self, instance, validated_data):
+        instance = instance.update(**validated_data)
+
+class FileListSerializer(ExtraItemsMixin, ListSerializer):
     child = FileSerializer()
     min_length = 1
     max_length = 10
@@ -87,27 +104,10 @@ class TaxonomySerializer(serializers.ModelSerializer):
     def get_children(self, instance):
         return [TaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
 
-class AdImageSerializer(serializers.ModelSerializer):
-    default_error_messages = {
-        'invalid': _('"{input}" not a dict.')
-    }
-
-    class Meta:
-        model = models.AdImage
-        fields = ('id', 'image', 'ad')
-
-    def to_internal_value(self, data):
-        """
-        Convert file id to dict with file obj.
-        """
-        file = models.File.objects.get(pk=int(data)).file
-        return {
-            'image': UploadedFile(file, file.name, size=file.size)
-        }
-
 class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
-    child = AdImageSerializer()
+    child = FileSerializer()
     extras = 8
+    min_length = 0
     max_length = 8
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
@@ -147,34 +147,19 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop('images')
-
         instance = super().create(validated_data)
-        
         for img in images:
-            img['ad'] = instance
-
-        self.fields['images'].create(images)
-
-        for img in images:
-            os.remove(img['image'].file.path)
-
+            obj = models.File.objects.get(file=img['file'])
+            instance.images.add(obj)
         return instance
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
-
         super().update(instance, validated_data)
-
         instance.images.all().delete()
-
         for img in images:
-            img['ad'] = instance
-
-        self.fields['images'].create(images)
-
-        for img in images:
-            os.remove(img['image'].file.path)
-
+            obj = models.File.objects.get(file=img['file'])
+            instance.images.add(obj)
         return instance
 
     def validate_kabupaten(self, obj):

@@ -6,7 +6,7 @@ def inc_filename(filename):
     num += 1
     return re.sub(r'\d*(\.\w+)$', r'%s\1' % num, filename)
     
-def get_upload_path(subdir, parent_attr, obj, filename):
+def get_file_upload_path(subdir, parent_attr, obj, filename):
     """
     Get upload path in the form of user_{id}/{subdir}/{filename}
 
@@ -30,5 +30,5 @@ def get_upload_path(subdir, parent_attr, obj, filename):
 
     return '%s_%s/%s/%s' % ('user', user.id, subdir, filename)
 
-def get_ad_img_upload_path(obj, filename):
-    return get_upload_path('img', 'ad', obj, filename)
+def get_upload_path(obj, filename):
+    return get_file_upload_path('files', None, obj, filename)

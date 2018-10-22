@@ -3,10 +3,10 @@
     <div class="image-upload card relative hide-child">
 
         <figure class="image is-128x128 overflow-hidden">
-            <img v-if="item.image" :src="item.image" class="of-cover" :data-name="item.name">
+            <img v-if="item.file" :src="item.file" class="of-cover" :data-name="item.name">
         </figure>
 
-        <div v-if="item.image" class="child absolute absolute--fill move" data-move-handle>
+        <div v-if="item.file" class="child absolute absolute--fill move" data-move-handle>
 
             <span class="icon absolute top--05 right--05 bg-red br-100 grow pointer" @click="onRemove">
                 <i class="fa fa-remove f4 white"></i>

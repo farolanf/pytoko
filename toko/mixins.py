@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework import status
 from .permissions import IsAdminOrSelf, IsAdminOrOwner
 
 class ActionPermissionsMixin(object):
@@ -130,7 +130,7 @@ class SetFieldLabelsMixin:
                 field.label = self.Meta.field_labels.get(field_name, field.label)
 
 class HtmlModelViewSetMixin:
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_dir = None
     create_success_url = '/'
     update_success_url = '/'
@@ -164,12 +164,17 @@ class HtmlModelViewSetMixin:
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        
+
         if serializer.is_valid():
             self.perform_create(serializer)
-            return redirect(self.create_success_url)
 
-        return self.render_object(self.get_new_obj(serializer, request.data), serializer, 'new.html', status=HTTP_400_BAD_REQUEST)
+            if request.is_ajax():
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                return redirect(self.create_success_url)
+
+        return self.render_object(self.get_new_obj(serializer, request.data), serializer, 'new.html', status=status.HTTP_400_BAD_REQUEST)
 
     def edit(self, *args, **kwargs):
         """
@@ -193,7 +198,7 @@ class HtmlModelViewSetMixin:
 
             return redirect(self.update_success_url)
 
-        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=HTTP_400_BAD_REQUEST)
+        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=status.HTTP_400_BAD_REQUEST)
 
     def get_new_obj(self, serializer, data):
         obj = {}
@@ -222,7 +227,7 @@ class HtmlModelViewSetMixin:
         return os.path.join(self.template_dir, name)
 
 class ExtraItemsMixin:
-    extras = 2
+    extras = 0
 
     def to_representation(self, data):
         data = super().to_representation(data)

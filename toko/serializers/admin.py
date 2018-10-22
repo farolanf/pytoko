@@ -17,9 +17,10 @@ class AdminFileSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:    
         model = models.File
-        fields = ('id', 'url', 'file')
+        fields = ('id', 'url', 'file', 'user', 'created_at')
         extra_kwargs = {
             'url': {'view_name': 'toko:admin-file-detail'},
+            'user': {'view_name': 'toko:admin-user-detail'},
         }
 
 class AdminProvinsiSerializer(serializers.HyperlinkedModelSerializer):
@@ -53,17 +54,6 @@ class AdminTaxonomySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_children(self, instance):
         return [AdminTaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
-
-class AdminAdImageSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = models.AdImage
-        fields = ('id', 'url', 'image', 'ad')
-        read_only_fields = ('ad',)
-        extra_kwargs = {
-            'url': {'view_name': 'toko:admin-ad-image-detail'},
-            'ad': {'view_name': 'toko:admin-ad-detail'},
-        }
 
 class AdminAdSerializer(serializers.HyperlinkedModelSerializer):
 
