@@ -9,7 +9,7 @@
 <div class="field">
     <label class="label">{{ field.label }}</label>
     <div class="control image-uploads__container">
-        <image-upload v-for="item in imageUploads" :key="item.id" :item="item" :data-id="item.id">
+        <image-upload v-for="item, i in imageUploads" :key="item.id" :item="item" :index="i" :data-id="item.id">
         </image-upload>
     </div>
     {% include './field-help.html' %}

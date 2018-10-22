@@ -3,9 +3,19 @@ once(function imageUploads () {
     const events = new Vue()
     let cropper
 
+    DATA.imageUploads.forEach((item, i) => {
+        if (item.file) {
+            item.name = utils.lastSegment(item.file)
+        }
+        if (!item.id) {
+            item.id = Date.now() + i
+        }
+        item.originalFile = item.file
+    })
+
     Vue.component('image-upload', {
         template: $('#image-upload-template').html(),
-        props: ['item'],
+        props: ['item', 'index'],
         methods: {
             browse (item) {
                 if (item.id !== this.item.id) return
@@ -55,8 +65,10 @@ once(function imageUploads () {
                 return this.imageUploads.find(item => item.id === id)
             },
             sort () {
-                this.imageUploads = this.imageUploads.filter(item => item.file)
+                const list = this.imageUploads.filter(item => item.file)
                     .concat(this.imageUploads.filter(item => !item.file))
+                const args = [0, this.imageUploads.length].concat(list)
+                this.imageUploads.splice.apply(this.imageUploads, args)
             },
             onBrowse () {
                 // use first empty slot
@@ -78,18 +90,9 @@ once(function imageUploads () {
             onSave () {
                 const dataUrl = cropper.getCroppedCanvas().toDataURL()
                 this.$set(this.currentItem, 'file', dataUrl)
-            },
-            initData () {
-                this.imageUploads.forEach((item, i) => {
-                    item.file && this.$set(item, 'name', utils.lastSegment(item.file))
-                    if (!item.id) {
-                        this.$set(item, 'id', Date.now() + i)
-                    }
-                })
             }
         },
         created () {
-            this.initData()
             events.$on('crop', this.saveCurrentItem)
             events.$on('browse', this.onBrowse)
             events.$on('remove', this.onRemove)
@@ -116,7 +119,8 @@ once(function imageUploads () {
                     const item = this.getItem(+$(el).attr('data-id'))
                     list.push(item)
                 })
-                this.imageUploads = list
+                const args = [0, this.imageUploads.length].concat(list)
+                this.imageUploads.splice.apply(this.imageUploads, args)
             })
         }
     })

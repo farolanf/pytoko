@@ -5,56 +5,98 @@ once(function adForm () {
     const tokenField = 'csrfmiddlewaretoken'
     const csrfToken = $(`[name="${tokenField}"]`, $form).val()
     
-    let uploaded = false
+    let processed = false
 
     $form.on('submit', function (e) {
-        if (uploaded) return
+        if (processed) return
         e.preventDefault()
-        uploadFiles().then(resp => {
-            if (resp) {
-                $('[name="images[]"]').each((i, el) => {
-                    if (i >= resp.files.length) return
-                    el.name = `images[${i}]`;
-                    el.value = resp.files[i].id
+        processFiles().then(result => {
+
+            if (result) {
+                // save new ids 
+                result.data.add && result.data.add.forEach((item, i) => {
+                    result.post.add[i].id = item.id
                 })
             }
-            uploaded = true
-            $form.submit()
+
+            processed = true
+
+            // wait for vue to render the ids
+            setTimeout(() => {
+                $form.submit()
+            })
         })        
     })
 
-    function uploadFiles () {
-        const imgs = $('.image-upload img', $form).toArray()
+    function processFiles () {
 
-        return fetchImageBlobs(imgs).then(blobs => {
-            const fd = new FormData()
-            fd.append(tokenField, csrfToken)
+        const post = {
+            del: [],
+            add: [],
+            update: [],
+        }
 
-            let count = 0
-            blobs.forEach((blob, i) => {
-                if (!blob) return
-                count++
-                const name = $(imgs[i]).attr('data-name')
-                fd.append(`files[${i}]`, blob, name)
-            })
-            if (!count) return
+        DATA.imageUploads.forEach((item, i) => {
+            if (item.originalFile && !item.file) {
+                post.del.push(item)
+            } else if (!item.originalFile && item.file) {
+                post.add.push(item)
+            } else if (item.file !== item.originalFile) {
+                post.update.push(item)
+            }
+        })
 
-            return $.ajax({
-                url: '/files/new/',
-                method: 'POST',
-                processData: false,
-                contentType: false,
-                data: fd,
-            })
+        if (!post.del.length && !post.add.length && !post.update.length) {
+            return Promise.resolve()
+        }
+
+        return Promise.all([
+            Promise.all(generateBlobs(post.del)),
+            Promise.all(generateBlobs(post.add)),
+            Promise.all(generateBlobs(post.update)),
+        ]).then(results => {
+            post.del = results[0]
+            post.add = results[1]
+            post.update = results[2]
+            return postData(post)
         })
     }
 
-    function fetchImageBlobs(imgs) {
-        return Promise.all(
-            imgs.map(img => img.src ? blobFromDataUrl(img.src) : null)
-        )
+    function postData(post) {
+        const fd = new FormData()
+        fd.append(tokenField, csrfToken)
+
+        post.del.forEach((item, i) => {
+            fd.append(`del[${i}]`, item.id)
+        })
+
+        post.add.forEach((item, i) => {
+            fd.append(`add[${i}]`, item.blob, item.name)
+        })
+
+        post.update.forEach((item, i) => {
+            fd.append(`update[${i}]id`, item.id)
+            fd.append(`update[${i}]file`, item.blob)
+        })
+
+        return $.ajax({
+            url: '/files/process/',
+            method: 'POST',
+            processData: false,
+            contentType: false,
+            data: fd,
+        }).then(data => ({ data, post }))
     }
 
+    function generateBlobs(items) {
+        return items.map(item => 
+            blobFromDataUrl(item.file).then(blob => {
+                item.blob = blob
+                return item
+            })
+        )
+    }
+    
     function blobFromDataUrl(dataUrl) {
         return fetch(dataUrl).then(r => r.blob())
     }

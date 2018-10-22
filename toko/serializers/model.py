@@ -156,7 +156,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
         super().update(instance, validated_data)
-        instance.images.all().delete()
+        instance.images.clear()
         for img in images:
             obj = models.File.objects.get(file=img['file'])
             instance.images.add(obj)

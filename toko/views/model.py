@@ -6,11 +6,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import exception_handler as _exception_handler
+from rest_framework.utils.html import parse_html_list, parse_html_dict
+from rest_framework import status
 
 from toko import models
 from toko import serializers
 from toko import mixins
-from toko import permissions
+from toko.permissions import IsAdminOrOwner
 from toko import pagination
 
 class HtmlModelViewSet(mixins.HtmlModelViewSetMixin, viewsets.ModelViewSet):
@@ -21,10 +23,51 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     serializer_class = serializers.FilesUploadSerializer
     action_permissions = (
         {
-            'actions': ['create'],
+            'actions': ['process'],
             'permission_classes': [],
         },
+        {
+            'actions': ['create', 'update', 'destroy'],
+            'permission_classes': [IsAdminOrOwner],
+        },
     )
+
+    @action(detail=False, methods=['post'])
+    def process(self, request):
+        delete = parse_html_list(request.data, 'del')
+        add = parse_html_list(request.data, 'add')
+        update = parse_html_list(request.data, 'update')
+
+        print('del', delete)
+        print('add', add)
+        print('update', update)
+
+        # delete
+        models.File.objects.filter(pk__in=delete).delete()
+
+        errors = {}
+
+        # add
+        if add:
+            serializer = serializers.FileListSerializer(data=add, context={'request': request})
+
+            if not serializer.is_valid():
+                errors['add'] = serializer.errors
+
+            serializer.save()
+            add = serializer.data
+
+        # update
+        print(update)
+
+        if errors:
+            Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'add': add,
+            'update': update
+        })
+
         
 class KabupatenViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = models.Kabupaten.objects.all()
@@ -52,7 +95,7 @@ class AdViewSet(mixins.ActionPermissionsMixin, HtmlModelViewSet):
         },
         {
             'actions': ['retrieve', 'edit', 'update', 'partial_update'],
-            'permission_classes': [permissions.IsAdminOrOwner],
+            'permission_classes': [IsAdminOrOwner],
         },
     )
     template_dir = 'toko/ad'

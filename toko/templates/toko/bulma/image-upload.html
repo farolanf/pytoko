@@ -23,7 +23,7 @@
             </span>
         </div>
 
-        <input name="images[]" class="dn">
+        <input v-if="item.file" :name="`images[${index}]`" :value="item.id" class="dn">
         <input type="file" accept="image/*" class="dn" ref="file" @change="handleFile">
     </div>
 </template>
