@@ -2,7 +2,7 @@ import os
 from rest_framework.status import HTTP_201_CREATED
 from toko.models import File
 from toko.utils import Bunch
-from toko.utils.file import get_upload_path
+from toko.utils.file import get_file_upload_path
 from .base import TestCase
 from .utils import TEST_DIR
 from .utils.user import create_user
@@ -13,7 +13,7 @@ class FileTestCase(TestCase):
         obj = Bunch(user=Bunch(
             id=25
         ))
-        path = get_upload_path('img', None, obj, 'apple.jpg')
+        path = get_file_upload_path('img', None, obj, 'apple.jpg')
         self.assertEqual(path, 'user_25/img/apple.jpg')
 
     def test_get_upload_path_with_parent(self):
@@ -22,12 +22,12 @@ class FileTestCase(TestCase):
                 id=25
             )
         ))
-        path = get_upload_path('img', 'parent', obj, 'apple.jpg')
+        path = get_file_upload_path('img', 'parent', obj, 'apple.jpg')
         self.assertEqual(path, 'user_25/img/apple.jpg')
 
     def test_get_upload_path_without_user(self):
         obj = Bunch()
-        path = get_upload_path('img', None, obj, 'apple.jpg')
+        path = get_file_upload_path('img', None, obj, 'apple.jpg')
         self.assertEqual(path, 'img/apple.jpg')
 
     def test_upload(self):
