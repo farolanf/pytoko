@@ -24,7 +24,7 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     action_permissions = (
         {
             'actions': ['process'],
-            'permission_classes': [],
+            'permission_classes': [IsAuthenticated],
         },
         {
             'actions': ['create', 'update', 'destroy'],
@@ -34,6 +34,7 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def process(self, request):
+
         delete = parse_html_list(request.data, 'del')
         add = parse_html_list(request.data, 'add')
         update = parse_html_list(request.data, 'update')
@@ -43,25 +44,46 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
         print('update', update)
 
         # delete
-        models.File.objects.filter(pk__in=delete).delete()
+        delete_queryset = models.File.objects.filter(pk__in=delete).all()
+
+        for obj in delete_queryset:
+            self.check_object_permissions(request, obj)
+
+        delete_queryset.delete()
+
+        # TODO: make sure deleted objects are removed from the join table
 
         errors = {}
 
-        # add
         if add:
             serializer = serializers.FileListSerializer(data=add, context={'request': request})
 
-            if not serializer.is_valid():
+            if serializer.is_valid():
+                serializer.save()
+                add = serializer.data
+            else:
                 errors['add'] = serializer.errors
 
-            serializer.save()
-            add = serializer.data
+        if update:
+            result = []
 
-        # update
-        print(update)
+            for attrs in update:
+                obj = models.File.objects.get(pk=attrs['id'])
+                self.check_object_permissions(request, obj)
+
+                serializer = serializers.FileSerializer(obj, data=attrs, context={'request': request})
+
+                if serializer.is_valid():
+                    serializer.save()
+                    result.append(serializer.data)
+                else:
+                    errors['update'] = errors.get('update', []) 
+                    errors['update'].append(serializer.errors)
+
+            update = result
 
         if errors:
-            Response(errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({
             'add': add,

@@ -28,10 +28,10 @@ class User(AbstractUser):
         return group_permissions
 
 class File(models.Model):
-    file = models.FileField(upload_to=get_upload_path)
+    file = models.FileField(upload_to=get_upload_path, unique=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+   
 class Provinsi(models.Model):
     name = models.CharField(max_length=100)
 

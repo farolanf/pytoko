@@ -37,11 +37,11 @@ once(function adForm () {
         }
 
         DATA.imageUploads.forEach((item, i) => {
-            if (item.originalFile && !item.file) {
+            if (isDeleted(item)) {
                 post.del.push(item)
-            } else if (!item.originalFile && item.file) {
+            } else if (isAdded(item)) {
                 post.add.push(item)
-            } else if (item.file !== item.originalFile) {
+            } else if (isChanged(item)) {
                 post.update.push(item)
             }
         })
@@ -60,6 +60,18 @@ once(function adForm () {
             post.update = results[2]
             return postData(post)
         })
+    }
+
+    function isDeleted(item) {
+        return item.originalFile && !item.file
+    }
+
+    function isAdded(item) {
+        return !item.originalFile && item.file
+    }
+
+    function isChanged(item) {
+        return item.file !== item.originalFile
     }
 
     function postData(post) {

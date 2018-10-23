@@ -2,6 +2,7 @@ import os
 from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
+from rest_framework.fields import empty
 from rest_framework import serializers
 from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMixin
 from toko import models
@@ -52,9 +53,6 @@ class FileSerializer(serializers.ModelSerializer):
         elif not isinstance(data, dict):
             self.fail('invalid', datatype=type(data).__name__, value=data)
         return super().to_internal_value(data)
-
-    def update(self, instance, validated_data):
-        instance = instance.update(**validated_data)
 
 class FileListSerializer(ExtraItemsMixin, ListSerializer):
     child = FileSerializer()
@@ -145,21 +143,24 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'kabupaten': 'Kota',
         }        
 
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get('data', empty)
+        super().__init__(*args, **kwargs)
+        if data is not empty:
+            self.fields['images'].child = serializers.IntegerField()
+
     def create(self, validated_data):
         images = validated_data.pop('images')
         instance = super().create(validated_data)
-        for img in images:
-            obj = models.File.objects.get(file=img['file'])
-            instance.images.add(obj)
+        queryset = models.File.objects.filter(pk__in=images).all()
+        instance.images.set(queryset)
         return instance
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
         super().update(instance, validated_data)
-        instance.images.clear()
-        for img in images:
-            obj = models.File.objects.get(file=img['file'])
-            instance.images.add(obj)
+        queryset = models.File.objects.filter(pk__in=images).all()
+        instance.images.set(queryset)
         return instance
 
     def validate_kabupaten(self, obj):
