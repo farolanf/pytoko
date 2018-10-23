@@ -33,7 +33,7 @@ class ListSerializer(serializers.ListSerializer):
 
 class FileSerializer(serializers.ModelSerializer):
     default_error_messages = {
-        'invalid': _('Invalid data. Expected a dictionary, file, or pk, but got {datatype} {value}.')
+        'invalid': _('Invalid data. Expected a dictionary or file, but got {datatype} {value}.')
     }
 
     user = serializers.HiddenField(
@@ -47,9 +47,6 @@ class FileSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if isinstance(data, File):
             data = {'file': data}
-        elif isinstance(data, (int, str)):
-            obj = models.File.objects.get(pk=data)
-            data = {'file': obj.file}
         elif not isinstance(data, dict):
             self.fail('invalid', datatype=type(data).__name__, value=data)
         return super().to_internal_value(data)

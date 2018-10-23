@@ -39,10 +39,6 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
         add = parse_html_list(request.data, 'add')
         update = parse_html_list(request.data, 'update')
 
-        print('del', delete)
-        print('add', add)
-        print('update', update)
-
         # delete
         delete_queryset = models.File.objects.filter(pk__in=delete).all()
 
@@ -50,8 +46,6 @@ class FileViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
             self.check_object_permissions(request, obj)
 
         delete_queryset.delete()
-
-        # TODO: make sure deleted objects are removed from the join table
 
         errors = {}
 
