@@ -15,6 +15,7 @@ User = get_user_model()
 class ListSerializer(serializers.ListSerializer):
     min_length = None
     max_length = None
+    order = None
 
     default_error_messages = {
         'not_a_list': _('Expected a list of items but got type "{input_type}".'),
@@ -30,6 +31,11 @@ class ListSerializer(serializers.ListSerializer):
         if self.max_length and len(attrs) > self.max_length:
             self.fail('max_length', max_length=self.max_length)
         return attrs
+
+    def to_representation(self, data):
+        if self.order:
+            data = data.order_by(*self.order)
+        return super().to_representation(data)
 
 class FileSerializer(serializers.ModelSerializer):
     default_error_messages = {
@@ -104,10 +110,7 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     extras = 8
     min_length = 0
     max_length = 8
-
-    def to_representation(self, data):
-        data = data.order_by('adimages__order')
-        return super().to_representation(data)
+    order = ['adimages__order']
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
