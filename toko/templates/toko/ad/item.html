@@ -1,6 +1,6 @@
 {% load utils %}
 
-<div class="box">
+<div class="box ad-item">
     <div class="media overflow-hidden">
         <div class="media-left">
             {% if item.images %}
@@ -9,10 +9,10 @@
                 </figure>
             {% endif %}
         </div>
-        <div class="media-content">
+        <div class="media-content flex flex-column">
             <h4 class="f4 ttc">{{ item.title }}</h4>
             <p>{{ item.desc|capfirst }}</p>
-            <div class="tag">{{ item.price|money }}</div>
+            <div class="tag flex-no-shrink">{{ item.price|money }}</div>
         </div>
     </div>
 </div>

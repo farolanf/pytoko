@@ -35,6 +35,11 @@
      object-fit: cover;
 }
 
+.flex-no-shrink {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
 input[type="number"] {
   text-align: right;
 }

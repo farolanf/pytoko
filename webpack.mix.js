@@ -18,14 +18,14 @@ const jsDir = 'toko/assets/components/js'
 const cssDir = 'toko/assets/components/css'
 
 fs.readdirSync(jsDir).forEach(file => {
-  mix.js(path.resolve(jsDir, file), 'static/toko/js')
+  mix.js(path.resolve(jsDir, file), 'toko/static/toko/js')
 })
 
 fs.readdirSync(cssDir).forEach(file => {
-  mix.sass(path.resolve(cssDir, file), 'static/toko/css')
+  mix.sass(path.resolve(cssDir, file), 'toko/static/toko/css')
 })
 
-mix.js('toko/assets/js/app.js', 'static/toko/js')
-  .sass('toko/assets/css/app.scss', 'static/toko/css')
+mix.js('toko/assets/js/app.js', 'toko/static/toko/js')
+  .sass('toko/assets/css/app.scss', 'toko/static/toko/css')
 
 mix.disableNotifications();

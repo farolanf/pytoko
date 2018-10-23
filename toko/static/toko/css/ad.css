@@ -1,14 +1,4 @@
-.image-uploads__container {
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-}
-
-.image-upload {
-  margin-right: 1rem;
-  margin-bottom: 1rem;
-}
-
-.image-upload img {
-  height: 100%;
+.ad-item .media-content {
+  height: 180px;
 }
 
