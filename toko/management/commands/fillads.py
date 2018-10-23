@@ -3,10 +3,10 @@ import csv
 import math
 import random
 from django.contrib.auth import get_user_model
-from django.core.files.images import ImageFile
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.db.models import F
-from toko.models import Ad, Taxonomy, Provinsi, Kabupaten
+from toko.models import Ad, Taxonomy, Provinsi, Kabupaten, AdImages, File as FileModel
 
 class Command(BaseCommand):
     help = 'Fill ads table'
@@ -54,9 +54,9 @@ class Command(BaseCommand):
 
         random.shuffle(names)
 
-        for name in names:
+        for i, name in enumerate(names):
             path = os.path.join('toko/data', name)
-            image = ImageFile(open(path, 'rb'))
-            image.name = name
-            ad.images.create(image=image)
+            file = File(open(path, 'rb'))
+            file_obj = FileModel.objects.create(user=ad.user, file=file)
+            AdImages.objects.create(ad=ad, file=file_obj, order=i)
                 
