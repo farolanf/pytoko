@@ -73,6 +73,11 @@ class Ad(models.Model):
     desc = models.CharField(max_length=4000)
     price = models.IntegerField()
     nego = models.BooleanField()
-    images = models.ManyToManyField(File)
+    images = models.ManyToManyField(File, through='AdImages')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class AdImages(models.Model):
+    ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    order = models.SmallIntegerField()

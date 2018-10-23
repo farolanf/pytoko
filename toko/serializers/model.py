@@ -105,6 +105,10 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     min_length = 0
     max_length = 8
 
+    def to_representation(self, data):
+        data = data.order_by('adimages__order')
+        return super().to_representation(data)
+
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
     
@@ -149,16 +153,24 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         images = validated_data.pop('images')
         instance = super().create(validated_data)
-        queryset = models.File.objects.filter(pk__in=images).all()
-        instance.images.set(queryset)
+        self.update_images(images, instance)
         return instance
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
         super().update(instance, validated_data)
-        queryset = models.File.objects.filter(pk__in=images).all()
-        instance.images.set(queryset)
+        self.update_images(images, instance, remove_others=True)
         return instance
+
+    def update_images(self, images, ad, remove_others=False):
+
+        if remove_others:
+            # remove other images
+            models.AdImages.objects.filter(ad=ad).exclude(file__in=images).delete()
+        
+        # update order
+        for i, file_id in enumerate(images):
+            models.AdImages.objects.update_or_create(ad=ad, file=file_id, defaults={'order': i})
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']
