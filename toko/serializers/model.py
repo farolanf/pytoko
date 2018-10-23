@@ -173,7 +173,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         
         # update order
         for i, file_id in enumerate(images):
-            models.AdImages.objects.update_or_create(ad=ad, file=file_id, defaults={'order': i})
+            models.AdImages.objects.update_or_create(ad=ad, file_id=file_id, defaults={'order': i})
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']
