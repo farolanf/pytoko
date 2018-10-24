@@ -7,7 +7,8 @@ COMPRESS_ENABLED = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': 'localhost',
         'NAME': 'pytoko',
         'USER': 'pytoko',
         'PASSWORD': 'pytoko',
