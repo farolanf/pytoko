@@ -78,11 +78,19 @@ class Ad(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def suggest(self):
-        return [
+        """ 
+        Return every single and double consecutive words from title.
+        """
+        words = [
             item 
             for item in re.split(r'\s+', self.title)
             if len(item)
         ]
+        inputs = words[:]
+        for i, item in enumerate(words):
+            if len(words) - i > 1:
+                inputs.append(' '.join(words[i:i+2]))
+        return inputs
 
 class AdImages(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)

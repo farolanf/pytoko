@@ -19,13 +19,14 @@ class SearchViewSet(ViewSet):
 
         response = AdDocument.search().suggest('suggestions', query, completion={
             'field': 'suggest',
+            'analyzer': 'keyword',
+            'fuzzy': {
+                'fuzziness': 1
+            },
+            'skip_duplicates': True
         }).execute()
         
-        options = []
-
-        for opt in response.suggest.suggestions[0].options:
-            if opt.text not in options:
-                options.append(opt.text)
+        options = [item.text for item in response.suggest.suggestions[0].options]
 
         return Response({
             'options': options

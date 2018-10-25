@@ -13,6 +13,7 @@
         <div class="navbar-menu">
             <div class="navbar-start">
                 <a href="/about" class="navbar-item">Tentang kami</a>
+                {% include './search-bar.html' %}
             </div>
             <div class="navbar-end">
                 {% if request.user.is_authenticated %}

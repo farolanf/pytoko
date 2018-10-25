@@ -1,0 +1,17 @@
+{% load utils %}
+
+<div id="search-suggestions" class="navbar-item has-dropdown" :class="{'is-active': visible}">
+    <div class="backdrop" :class="{active: visible}" @click="hide"></div>
+    <div class="navbar-item ph0">
+        <input type="text" class="input" placeholder="cari..." v-model="query" @focus="show">
+    </div>
+    <div class="navbar-dropdown">
+        <a v-for="str, i in suggestions" :key="i" class="navbar-item" @click.prevent="suggestionClick(str)">
+            ${ str }
+        </a>
+    </div>
+</div>
+
+{% js '/static/lib/vue.js' %}
+{% js '/static/lib/lodash.min.js' %}
+{% js '/static/toko/js/search.js' %}

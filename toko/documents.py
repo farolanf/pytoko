@@ -1,5 +1,8 @@
+from elasticsearch_dsl.analysis import analyzer
 from django_elasticsearch_dsl import DocType, Index, fields
 from .models import Ad
+
+keyword = analyzer('keyword')
 
 ad_index = Index('ads')
 ad_index.settings(
@@ -10,7 +13,7 @@ ad_index.settings(
 @ad_index.doc_type
 class AdDocument(DocType):
 
-    suggest = fields.CompletionField()
+    suggest = fields.CompletionField(analyzer=keyword)
 
     class Meta:
         model = Ad
