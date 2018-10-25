@@ -36,8 +36,9 @@ INSTALLED_APPS = [
     'toko.apps.TokoConfig',
     'mptt',
     'compressor',
-    'django_filters',
     'rest_framework',
+    'django_elasticsearch_dsl',
+    'django_filters',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -112,6 +113,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_THROTTLE_RATES': {
         'password-email': '6/min',
+        'search': '60/min',
     },
     'EXCEPTION_HANDLER': 'toko.views.exception_handler',
 }
@@ -128,6 +130,12 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 ]
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

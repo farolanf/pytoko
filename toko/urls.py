@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf.urls import url
 from django.shortcuts import render
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
 from . import views
 from .routers import AppRouter
 
@@ -25,7 +25,11 @@ router.register('ads', views.AdViewSet)
 router.register('kabupaten', views.KabupatenViewSet)
 router.register('files', views.FileViewSet)
 
+simple_router = SimpleRouter()
+simple_router.register('search', views.SearchViewSet, base_name='search')
+
 urlpatterns = [
+
     url(r'^$', template('toko/front.html'), name='front'),
 
     path('accounts/', template('toko/account/home.html'), name='home'),
@@ -44,5 +48,6 @@ urlpatterns = [
     path('accounts/reset-password/<token>/', views.ResetPasswordView.as_view(), name='reset-password'),
 
     path('api/', include(api_router.urls)),
+    path('', include(simple_router.urls)),
     path('', include(router.urls)),
 ]

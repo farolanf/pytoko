@@ -77,6 +77,13 @@ class Ad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def suggest(self):
+        return [
+            item 
+            for item in re.split(r'\s+', self.title)
+            if len(item)
+        ]
+
 class AdImages(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
