@@ -9,6 +9,8 @@ once(function imageUploads () {
         }
         if (!item.id) {
             item.id = Date.now() + i
+        } else {
+            item.id = +item.id
         }
         item.originalFile = item.file
     })

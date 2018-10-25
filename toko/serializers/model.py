@@ -53,6 +53,8 @@ class FileSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if isinstance(data, File):
             data = {'file': data}
+        elif isinstance(data, dict) and 'id' in data:
+            return data
         elif not isinstance(data, dict):
             self.fail('invalid', datatype=type(data).__name__, value=data)
         return super().to_internal_value(data)
@@ -147,12 +149,6 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             'kabupaten': 'Kota',
         }        
 
-    def __init__(self, *args, **kwargs):
-        data = kwargs.get('data', empty)
-        super().__init__(*args, **kwargs)
-        if data is not empty:
-            self.fields['images'].child = serializers.IntegerField()
-
     def create(self, validated_data):
         images = validated_data.pop('images')
         instance = super().create(validated_data)
@@ -166,14 +162,15 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         return instance
 
     def update_images(self, images, ad, remove_others=False):
-
         if remove_others:
             # remove other images
-            models.AdImages.objects.filter(ad=ad).exclude(file__in=images).delete()
+            file_ids = [img['id'] for img in images if img['id']]
+            models.AdImages.objects.filter(ad=ad).exclude(file_id__in=file_ids).delete()
         
         # update order
-        for i, file_id in enumerate(images):
-            models.AdImages.objects.update_or_create(ad=ad, file_id=file_id, defaults={'order': i})
+        for i, img in enumerate(images):
+            if not img['id']: continue
+            models.AdImages.objects.update_or_create(ad=ad, file_id=img['id'], defaults={'order': i})
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']

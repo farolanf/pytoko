@@ -13,9 +13,10 @@ once(function adForm () {
         processFiles().then(result => {
 
             if (result) {
-                // save new ids 
                 result.data.add && result.data.add.forEach((item, i) => {
-                    result.post.add[i].id = item.id
+                    result.post.add[i].id = +item.id
+                    result.post.add[i].file = item.file
+                    result.post.add[i].created_at = item.created_at
                 })
             }
 

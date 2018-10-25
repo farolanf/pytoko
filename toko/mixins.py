@@ -207,16 +207,10 @@ class HtmlModelViewSetMixin:
         if request.is_ajax():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return self.render_object(self.get_edit_obj(serializer, instance, request.data), serializer, 'edit.html', status=status.HTTP_400_BAD_REQUEST)
+        return self.render_object(instance, serializer, 'edit.html', status=status.HTTP_400_BAD_REQUEST)
 
     def get_new_obj(self, serializer, data):
         obj = {}
-        for field in serializer._writable_fields:
-            obj[field.field_name] = field.get_value(data)
-        return obj
-
-    def get_edit_obj(self, serializer, instance, data):
-        obj = serializer.to_representation(instance)
         for field in serializer._writable_fields:
             obj[field.field_name] = field.get_value(data)
         return obj
