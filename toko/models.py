@@ -61,6 +61,10 @@ class Taxonomy(MPTTModel):
     class MPTTMeta:
         verbose_name_plural = 'Taxonomies'
 
+    def path_str(self):
+        ids = self.get_ancestors(include_self=True).values_list('id', flat=True)
+        return '/'.join([str(x) for x in ids])
+
     def __str__(self):
         return self.name
 

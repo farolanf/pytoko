@@ -33,6 +33,15 @@ class PathPrimaryKeyRelatedField(DynamicQuerysetPrimaryKeyRelatedField):
     def use_pk_only_optimization(self):
         return False
 
+    def to_representation(self, obj):
+        names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
+        return ' / '.join(names[1:])
+
+class PathChoicePrimaryKeyRelatedField(DynamicQuerysetPrimaryKeyRelatedField):
+
+    def use_pk_only_optimization(self):
+        return False
+
     def display_value(self, obj):
         names = obj.get_ancestors(include_self=True).values_list('name', flat=True)
         return ' / '.join(names[1:])

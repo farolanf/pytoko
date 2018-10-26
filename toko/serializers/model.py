@@ -7,7 +7,7 @@ from rest_framework import serializers
 from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMixin
 from toko import models
 from toko.utils.file import inc_filename
-from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField
+from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField, PathChoicePrimaryKeyRelatedField
 from toko.querysets import KabupatenDynamicQueryset, get_category_queryset
 
 User = get_user_model()
@@ -115,8 +115,9 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     order = ['adimages__order']
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
-    category = PathPrimaryKeyRelatedField(queryset=get_category_queryset)
-    
+    category = PathChoicePrimaryKeyRelatedField(queryset=get_category_queryset)
+    category_path = PathPrimaryKeyRelatedField(source='category', read_only=True)
+
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
     )
@@ -137,7 +138,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Ad
 
-        fields = ('id', 'category', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'category', 'category_path', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
         
         field_labels = {
             'category': 'Kategori',

@@ -1,0 +1,23 @@
+{% extends 'toko/base.html' %}
+{% load utils %}
+
+{% block title %}Cari{% endblock %}
+
+{% block description %}Halaman hasil pencarian website Juwal.{% endblock %}
+
+{% block content %}
+<h1>Cari</h1>
+{% pagination paginator %}
+{% if not results %}
+<div class="box has-text-centered">
+    Tidak ditemukan
+</div>
+{% endif %}
+<div class="columns is-multiline">
+    {% for item in results %}
+    {% include 'toko/ad/search-item.html' %}
+    {% endfor %}
+</div>
+{% pagination paginator %}
+{% css '/static/toko/css/ad.css' %}
+{% endblock %}

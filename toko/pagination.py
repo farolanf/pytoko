@@ -20,3 +20,7 @@ class StandardPagination(PageNumberPagination):
             ('page_num', self.page.number),
             ('results', data)
         ]))
+
+class SearchPagination(PageNumberPagination):
+    page_size = 20
+    template = 'toko/pagination/numbers.html'

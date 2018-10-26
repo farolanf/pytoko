@@ -4,21 +4,21 @@ from .models import Ad
 
 keyword = analyzer('keyword')
 
-ad_index = Index('ads')
-ad_index.settings(
+ads = Index('ads')
+ads.settings(
     number_of_shards=1,
     number_of_replicas=0
 )
 
-@ad_index.doc_type
+@ads.doc_type
 class AdDocument(DocType):
 
-    suggest = fields.CompletionField(analyzer=keyword)
+    suggest = fields.CompletionField()
+    category_path = fields.StringField(attr='category.path_str', analyzer=keyword)
 
     class Meta:
         model = Ad
         fields = [
             'title',
-            'desc'
+            'desc',
         ]
-        queryset_pagination = 20

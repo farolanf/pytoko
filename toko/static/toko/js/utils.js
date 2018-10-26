@@ -1,5 +1,12 @@
 const utils = {
-    
+
+    setUrl (pathname, query, update = false) {
+        const url = URLParse(document.URL, true)
+        pathname && url.set('pathname', pathname)
+        url.set('query', update ? Object.assign({}, url.query, query) : query)
+        window.location.assign(url.toString())
+    },
+
     scrollToError () {
         const target = $('.field').toArray().find(el => $('.is-danger', el).length)
         if (!target) return

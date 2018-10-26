@@ -56,6 +56,7 @@
             const DATA = {{ global.js_vars|json }}
         </script>
         <script src="/static/lib/jquery.min.js"></script>
+        <script src="/static/lib/url-parse.min.js"></script>
         <script src="/static/toko/js/app.js"></script>
         {% for src in global.scripts|unique %}
         <script src="{{ src }}"></script>

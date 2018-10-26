@@ -35,5 +35,8 @@
     "vue-style-loader": "^4.1.2",
     "vuex": "^3.0.1"
   },
-  "author": "Farolan Faisal <farolanfaisal@gmail.com>"
+  "author": "Farolan Faisal <farolanfaisal@gmail.com>",
+  "dependencies": {
+    "url-parse": "^1.4.3"
+  }
 }

@@ -3,13 +3,16 @@
 <div id="search-suggestions" class="navbar-item has-dropdown" :class="{'is-active': visible}">
     <div class="backdrop" :class="{active: visible}" @click="hide"></div>
     <div class="navbar-item ph0">
-        <input type="text" class="input" placeholder="cari..." v-model="query" @focus="show">
+        <input type="text" class="input" placeholder="cari..." v-model="query" ref="input" @input="onQueryInput" @focus="show" @click="show" @keyup.enter="search(query)">
     </div>
     <div class="navbar-dropdown">
-        <a v-for="str, i in suggestions" :key="i" class="navbar-item" @click.prevent="suggestionClick(str)">
-            ${ str }
+        <a v-for="item, i in suggestions" :key="i" class="navbar-item" @click.prevent="onSuggestion(item, true)">
+            ${ item.text } &nbsp;<small>${ item.category_path }</small>
         </a>
-    </div>
+        <a v-for="item, i in suggestions" :key="i" class="navbar-item" @click.prevent="onSuggestion(item)">
+            ${ item.text }
+        </a>
+        </div>
 </div>
 
 {% js '/static/lib/vue.min.js' %}
