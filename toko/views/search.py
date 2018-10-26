@@ -29,6 +29,16 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
     )
 
     def list(self, request):
+        search = AdDocument.search()
+        response, serializer = self.paginate_search(search, self.build_query(request))
+        return Response({
+            'took': response.took,
+            'total': response.hits.total,
+            'paginator': self.paginator,
+            'results': serializer.data,
+        }, template_name='toko/search.html')
+
+    def build_query(self, request):
         query = request.query_params.get('q', '')
         category_slug = request.query_params.get('category', None)
 
@@ -55,16 +65,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             }
         })
 
-        search = AdDocument.search()
-
-        response, serializer = self.paginate_search(search, q)
-
-        return Response({
-            'took': response.took,
-            'total': response.hits.total,
-            'paginator': self.paginator,
-            'results': serializer.data,
-        }, template_name='toko/search.html')
+        return q
 
     def paginate_search(self, search, query):
         page_size = self.pagination_class.page_size
