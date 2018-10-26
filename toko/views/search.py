@@ -1,6 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from elasticsearch_dsl import Q
 from elasticsearch_dsl.analysis import analyzer
@@ -75,10 +76,11 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         search = search[start:end].query(query)
         response = search.execute()
 
-        if response.hits.total == 0:
-            return response, self.get_serializer([], many=True)
+        try:      
+            self.paginate_queryset(range(response.hits.total))
+        except NotFound as exc:
+            pass
 
-        self.paginate_queryset(range(response.hits.total))
         serializer = self.get_serializer(search.to_queryset(), many=True)
 
         return response, serializer
