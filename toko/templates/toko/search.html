@@ -7,12 +7,12 @@
 
 {% block content %}
 <h1>Cari</h1>
+{% include './search-filter.html' %}
 {% if not results %}
 <div class="box has-text-centered">
     Tidak ditemukan
 </div>
 {% endif %}
-{% include './search-filter.html' %}
 {% pagination paginator %}
 <div class="columns is-multiline">
     {% for item in results %}
