@@ -1,10 +1,4 @@
 <nav class="pagination">
-    <a href="{% if previous_url %}{{ previous_url }}{% else %}#{% endif %}" class="pagination-previous" aria-label="Previous" {% if not previous_url %}disabled{% endif %}>
-        <i class="fa fa-angle-left"></i>
-    </a>
-    <a href="{% if next_url %}{{ next_url }}{% else %}#{% endif %}" class="pagination-next" aria-label="Next" {% if not next_url %}disabled{% endif %}>
-        <i class="fa fa-angle-right"></i>
-    </a>
     <ul class="pagination-list">
         {% for page_link in page_links %}
         {% if page_link.is_break %}
@@ -18,4 +12,10 @@
         {% endif %}
         {% endfor %}
     </ul>
+    <a href="{% if previous_url %}{{ previous_url }}{% else %}#{% endif %}" class="pagination-previous" aria-label="Previous" {% if not previous_url %}disabled{% endif %}>
+            <i class="fa fa-angle-left"></i>
+    </a>
+    <a href="{% if next_url %}{{ next_url }}{% else %}#{% endif %}" class="pagination-next" aria-label="Next" {% if not next_url %}disabled{% endif %}>
+        <i class="fa fa-angle-right"></i>
+    </a>
 </nav>
