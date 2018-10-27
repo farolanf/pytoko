@@ -51,10 +51,11 @@
         {% endfor %}
         {% endcompress %}
 
-        {% compress js %}
         <script>
             const DATA = {{ global.js_vars|json }}
         </script>
+
+        {% compress js %}
         <script src="/static/lib/jquery.min.js"></script>
         <script src="/static/lib/url-parse.min.js"></script>
         <script src="/static/toko/js/app.js"></script>
