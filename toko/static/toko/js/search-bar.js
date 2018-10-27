@@ -1,4 +1,4 @@
-once(function search () {
+once(function searchBar () {
 
     $('.search-bar').each((i, el) => init(el))
 

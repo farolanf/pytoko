@@ -1,0 +1,14 @@
+{% load utils %}
+
+<div class="field is-horizontal">
+    <div class="control">
+        <div class="select">
+            <select id="category-filter">
+                <option value>-- Telusuri kategori --</option>
+                {% for category in categories.categories %}
+                <option value="">{{ category.path }} ({{ category.count }})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
