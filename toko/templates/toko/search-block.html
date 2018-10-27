@@ -1,0 +1,28 @@
+{% load utils %}
+
+<div class="field search-bar pb2">
+    <div class="backdrop" :class="{active: visible}" @click="hide"></div>
+    <div class="control">
+        <div class="dropdown w-100" :class="{'is-active': visible}">
+            <div class="dropdown-trigger w-100">
+
+                <input type="text" class="input" placeholder="cari..." v-model="query" ref="input" @input="onQueryInput" @focus="show" @click="show" @keyup.enter="search(query)">
+
+            </div>
+            <div class="dropdown-menu">
+                <div class="dropdown-content">
+                    <a v-for="item, i in suggestions" :key="i" class="dropdown-item" @click.prevent="onSuggestion(item, true)">
+                        ${ item.text } &nbsp;<small>${ item.category_path }</small>
+                    </a>
+                    <a v-for="item, i in suggestions" v-if="item.category" :key="i" class="dropdown-item" @click.prevent="onSuggestion(item)">
+                        ${ item.text }
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% js '/static/lib/vue.min.js' %}
+{% js '/static/lib/lodash.min.js' %}
+{% js '/static/toko/js/search.js' %}

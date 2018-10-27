@@ -1,10 +1,10 @@
 <div class="box">
-    <div class="level">
+    <div class="level f7">
         <div class="level-left">
-            <p class="f7">Dicari dalam {{ took }}ms</p>
+            Dicari dalam {{ took }}ms
         </div>
         <div class="level-right">
-            <p class="f7">Jumlah {{ total }}{% if start|add:1 <= end %}, menampilkan {% if start|add:1 == end %}yang ke-{{ end }}{% else %}{{ start|add:1 }} s/d {{ end }}{% endif %}{% endif %}</p>
+            Jumlah {{ total }}{% if start|add:1 <= end %}, menampilkan {% if start|add:1 == end %}yang ke-{{ end }}{% else %}{{ start|add:1 }} s/d {{ end }}{% endif %}{% endif %}
         </div>
     </div>
 </div>

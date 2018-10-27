@@ -1,9 +1,9 @@
 {% load utils %}
 
-<div id="search-suggestions" class="navbar-item has-dropdown" :class="{'is-active': visible}">
+<div class="navbar-item has-dropdown mh2 search-bar" :class="{'is-active': visible}" data-fresh="true">
     <div class="backdrop" :class="{active: visible}" @click="hide"></div>
-    <div class="navbar-item ph0">
-        <input type="text" class="input" placeholder="cari..." v-model="query" ref="input" @input="onQueryInput" @focus="show" @click="show" @keyup.enter="search(query, '')">
+    <div class="navbar-item dropdown-trigger ph0">
+        <input type="text" class="input" placeholder="cari..." v-model="query" ref="input" @input="onQueryInput" @focus="show" @click="show" @keyup.enter="search(query)">
     </div>
     <div class="navbar-dropdown">
         <a v-for="item, i in suggestions" :key="i" class="navbar-item" @click.prevent="onSuggestion(item, true)">
