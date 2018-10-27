@@ -15,11 +15,13 @@
 </div>
 {% endif %}
 {% pagination paginator %}
-<div class="columns is-multiline">
+<div class="columns is-multiline" id="search-results">
     {% for item in results %}
     {% include 'toko/ad/search-item.html' %}
     {% endfor %}
 </div>
 {% pagination paginator %}
+{% js '/static/lib/mark.min.js' %}
 {% css '/static/toko/css/ad.css' %}
+{% js '/static/toko/js/search-results.js' %}
 {% endblock %}
