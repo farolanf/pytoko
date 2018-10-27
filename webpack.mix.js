@@ -28,4 +28,6 @@ fs.readdirSync(cssDir).forEach(file => {
 mix.js('toko/assets/js/app.js', 'toko/static/toko/js')
   .sass('toko/assets/css/app.scss', 'toko/static/toko/css')
 
+mix.copy('toko/assets/components/js/*.js', 'toko/static/toko/js')
+
 mix.disableNotifications();
