@@ -7,7 +7,7 @@
         </li>
         {% else %}
         <li>
-            <a href="{{ page_link.url }}" class="pagination-link {% if page_link.is_active %}is-current{% endif %} pe-none">{{ page_link.number }}</a>
+            <a href="{{ page_link.url }}" class="pagination-link {% if page_link.is_active %}is-current pe-none{% endif %}">{{ page_link.number }}</a>
         </li>
         {% endif %}
         {% endfor %}
