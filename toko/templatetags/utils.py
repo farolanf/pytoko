@@ -115,5 +115,10 @@ def money(val):
 
 @register.filter
 def mark(text, keyword):
-    text = re.sub(keyword, '<span class="keyword-highlight">%s</span>' % keyword, text, flags=re.IGNORECASE)
+    
+    def repl(match):
+        keyword = match.group(0)
+        return '<span class="keyword-highlight">%s</span>' % keyword
+
+    text = re.sub(keyword, repl, text, flags=re.IGNORECASE)
     return mark_safe(text)
