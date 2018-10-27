@@ -26,6 +26,10 @@
   right: -0.5rem;
 }
 
+.ttuf::first-letter {
+  text-transform: uppercase;
+}
+
 .move {
   cursor: move;
 }

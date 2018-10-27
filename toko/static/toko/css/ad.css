@@ -26,9 +26,3 @@
   height: 180px;
 }
 
-@media screen and (min-width: 769px) {
-  .ad-search-item {
-    height: 300px;
-  }
-}
-
