@@ -1,4 +1,5 @@
 import os
+import re
 import json as jsonlib
 import locale
 from django import template
@@ -111,3 +112,8 @@ def field_error(bound_field):
 @register.filter
 def money(val):
     return locale.currency(val, grouping=True)
+
+@register.filter
+def mark(text, keyword):
+    text = re.sub(keyword, '<span class="keyword-highlight">%s</span>' % keyword, text, flags=re.IGNORECASE)
+    return mark_safe(text)

@@ -1,3 +1,5 @@
+{% load utils %}
+
 <div class="column is-one-fifth">
     <a href="/ads/{{ item.id }}">
         <div class="card ad-search-item">
@@ -7,7 +9,7 @@
                 </figure>
             </div>
             <div class="card-content pa2">
-                <h6 class="f6 ttc">{{ item.title }}</h6>
+                <h6 class="f6 ttc">{{ item.title|mark:query }}</h6>
             </div>
         </div>
     </a>
