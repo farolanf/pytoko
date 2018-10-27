@@ -1,7 +1,11 @@
+@import '~bulma/sass/utilities/all';
+
 .ad-item .media-content {
     height: 180px;
 }
 
 .ad-search-item {
-    height: 300px;
-}
+    @include from($tablet) {
+        height: 300px;
+    }
+}        

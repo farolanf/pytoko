@@ -1,8 +1,34 @@
+@-webkit-keyframes spinAround {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
+@keyframes spinAround {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
 .ad-item .media-content {
   height: 180px;
 }
 
-.ad-search-item {
-  height: 300px;
+@media screen and (min-width: 769px) {
+  .ad-search-item {
+    height: 300px;
+  }
 }
 

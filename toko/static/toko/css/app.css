@@ -40,6 +40,12 @@
       flex-shrink: 0;
 }
 
+.v-spacer {
+  -webkit-box-flex: 100;
+      -ms-flex: 100 1 auto;
+          flex: 100 1 auto;
+}
+
 .backdrop {
   display: none;
   position: fixed;
