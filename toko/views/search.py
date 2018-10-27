@@ -34,6 +34,8 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         response, serializer = self.paginate_search(search, self.build_query(request))
         end = min(end, response.hits.total)
         return Response({
+            'query': self.get_query_str(),
+            'category_path': self.get_category_path(),
             'took': response.took,
             'total': response.hits.total,
             'start': start,
@@ -42,8 +44,19 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'results': serializer.data,
         }, template_name='toko/search.html')
 
+    def get_query_str(self):
+        return self.request.query_params.get('q', '')
+
+    def get_category_path(self):
+        category_slug = self.request.query_params.get('category', None)
+
+        if category_slug:
+            return Taxonomy.objects.get(slug=category_slug).path_name()
+
+        return 'Semua kategori'
+
     def build_query(self, request):
-        query = request.query_params.get('q', '')
+        query = self.get_query_str()
         category_slug = request.query_params.get('category', None)
 
         if category_slug:

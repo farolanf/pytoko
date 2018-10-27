@@ -65,6 +65,10 @@ class Taxonomy(MPTTModel):
         ids = self.get_ancestors(include_self=True).values_list('id', flat=True)
         return '/'.join([str(x) for x in ids])
 
+    def path_name(self):
+        names = self.get_ancestors(include_self=True).values_list('name', flat=True)
+        return ' / '.join(names)
+
     def __str__(self):
         return self.name
 

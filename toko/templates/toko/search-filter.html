@@ -1,4 +1,7 @@
-<div class="box">
+<div class="box content">
+    {% if query %}
+    <p>Hasil cari <strong>{{ query }}</strong> dalam <small>{{ category_path }}</small></p>
+    {% endif %}
     <div class="level f7">
         <div class="level-left">
             Dicari dalam {{ took }}ms
