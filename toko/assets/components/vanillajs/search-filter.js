@@ -16,6 +16,9 @@ once(function searchFilter () {
             }
         },
         methods: {
+            inputChange (e) {
+                this.$emit('input', $(e.target).val())
+            },
             optionClick (e) {
                 this.$emit('input', $(e.target).data('value'))
                 this.hide()

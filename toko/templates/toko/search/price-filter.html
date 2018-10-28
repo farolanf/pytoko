@@ -27,7 +27,7 @@
     <div class="dropdown" :class="{'is-active': visible}">
         <div class="backdrop" :class="{active: visible}" @click="hide"></div>
         <div class="dropdown-trigger">
-            <input type="number" class="input w4" :placeholder="placeholder" :value="value" @click="show">
+            <input type="number" class="input w4" :placeholder="placeholder" :value="value" @click="show" @change="inputChange" @keyup.enter="inputChange">
         </div>
         <div class="dropdown-menu">
             <div class="dropdown-content has-text-right w4 pv0 ph3">
