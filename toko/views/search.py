@@ -30,17 +30,16 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
     def list(self, request):
         start, end, page_size = self.get_page_info()
+
         search = AdDocument.search()
         search = self.build_aggregations(search)
-        response, serializer = self.paginate_search(search, self.build_query(request))
+
+        response = self.paginate_search(search, self.build_query(request))
+
         end = min(end, response.hits.total)
 
-        categories = response.aggregations.categories.value
-        categories.categories = [
-            obj
-            for key, obj in categories.categories.to_dict().items()
-        ]
-        categories.categories = sorted(categories.categories, key=lambda x: x.path)
+        categories = response.aggregations.categories.value.to_dict().items()
+        categories = sorted(categories, key=lambda x: x[0])
 
         return Response({
             'query': self.get_query_str(),
@@ -50,33 +49,29 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'start': start,
             'end': end,
             'paginator': self.paginator,
-            'results': serializer.data,
+            'results': response.hits.hits,
             'categories': categories,
         }, template_name='toko/search/search.html')
 
     def build_aggregations(self, search):
         search.aggs.metric('categories', 'scripted_metric', 
             init_script="""
-                params._agg.total = 0;
                 params._agg.categories = new HashMap();
                 """,
             map_script="""
-                params._agg.total++;
                 def category = doc.category[0];
                 if (!params._agg.categories.containsKey(category)) {
                     def obj = new HashMap();
                     obj.put('count', 1);
-                    obj.put('path', category);
+                    obj.put('slug', doc.category_slug[0]);
                     params._agg.categories.put(category, obj);
                 } else {
                     params._agg.categories.get(category).count++;
                 }
                 """,
             reduce_script="""
-                def total = 0;
                 def categories = new HashMap();
                 for (agg in params._aggs) {
-                    total += agg.total;
                     agg.categories.forEach((key, val) -> {
                         if (!categories.containsKey(key)) {
                             categories.put(key, val);
@@ -85,10 +80,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                         }
                     })
                 } 
-                def ret = new HashMap();
-                ret.put('total', total);
-                ret.put('categories', categories);
-                return ret
+                return categories
                 """
         )
         return search
@@ -122,9 +114,19 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                         }
                     },
                     {
-                        'multi_match': {
-                            'query': query,
-                            'fields': ['title', 'desc']
+                        'bool': {
+                            'should': [
+                                {
+                                    'match_phrase': {
+                                        'title': query,
+                                    }
+                                },
+                                {
+                                    'match_phrase': {
+                                        'desc': query,
+                                    }
+                                }
+                            ]
                         }
                     }
                 ]
@@ -155,21 +157,14 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         except NotFound as exc:
             pass
 
-        serializer = self.get_serializer(search.to_queryset(), many=True)
-
-        return response, serializer
+        return response
 
     @action(detail=False)
     def suggest(self, request):
         query = request.query_params.get('q', '')
 
-        data = self.get_suggest(query, completion={
-            'field': 'suggest',
-            'skip_duplicates': True
-        })
-
         return Response({
-            'options': data
+            'options': []
         })
 
     def get_suggest(self, query, **kwargs):

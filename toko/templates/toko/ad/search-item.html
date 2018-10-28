@@ -1,21 +1,21 @@
 {% load utils %}
 
 <div class="column is-one-fifth">
-    <a href="/ads/{{ item.id }}">
+    <a href="/ads/{{ item|attr:'_id' }}">
         <div class="card ad-search-item flex flex-column h-100">
             <div class="card-image">
                 <figure class="image is-square">
-                    <img src="{{ item.images.0.file }}" class="of-cover">
+                    <img src="{{ item|attr:'_source.images.0' }}" class="of-cover">
                 </figure>
             </div>
             <div class="card-content pa2 flex flex-column flex-grow-1">
-                <h6 class="f4 f6-ns ttc">{{ item.title|mark:query }}</h6>
+                <h6 class="f4 f6-ns ttc">{{ item|attr:'_source.title'|mark:query }}</h6>
                 <div class="v-spacer pt2-ns"></div>
                 <div class="level">
                     <div class="level-left"></div>
                     <div class="level-right is-pulled-right">
                         <div class="tag fw5">
-                            {{ item.price|money }}
+                            {{ item|attr:'_source.price'|money }}
                         </div>
                     </div>
                 </div>

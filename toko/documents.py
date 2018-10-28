@@ -10,13 +10,16 @@ ads.settings(
 @ads.doc_type
 class AdDocument(DocType):
 
-    suggest = fields.CompletionField()
     category = fields.KeywordField(attr='category.path_name')
     category_path = fields.KeywordField(attr='category.path_ids_str')
+    category_slug = fields.KeywordField(attr='category.slug')
+
+    images = fields.ListField(fields.KeywordField('images_url'))
 
     class Meta:
         model = Ad
         fields = [
             'title',
             'desc',
+            'price'
         ]

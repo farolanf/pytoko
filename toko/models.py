@@ -85,13 +85,20 @@ class Ad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def images_url(self):
+        return [
+            img.file.url
+            for img in self.images.all()
+        ]
+
     def suggest(self):
         """ 
         Return every single and double consecutive words from title.
         """
+        title = re.sub(r'[^\w\s]', '', self.title)
         words = [
-            item 
-            for item in re.split(r'\s+', self.title)
+            item
+            for item in re.split(r'\s+', title)
             if len(item)
         ]
         inputs = words[:]

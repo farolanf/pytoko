@@ -1,14 +1,14 @@
-{% load utils %}
-
+{% if categories|length > 1 %}
 <div class="field is-horizontal">
     <div class="control">
         <div class="select">
             <select id="category-filter">
-                <option value>-- Telusuri kategori --</option>
-                {% for category in categories.categories %}
-                <option value="">{{ category.path }} ({{ category.count }})</option>
+                <option value>-- Hasil dalam kategori --</option>
+                {% for key, val in categories %}
+                <option value="{{ val.slug }}">{{ key }} ({{ val.count }})</option>
                 {% endfor %}
             </select>
         </div>
     </div>
 </div>
+{% endif %}
