@@ -1,0 +1,42 @@
+{% load utils %}
+
+<div class="columns is-variable is-1 price-filter">
+    <div class="column pt3-ns">
+        <div class="field has-addons is-horizontal">
+            <div class="control">
+                <div class="button is-static">Rp</div>
+            </div>
+            <div class="control">
+                <price-dropdown placeholder="dari harga" v-model="priceFrom" id="price-filter__from"></price-dropdown>
+            </div>
+        </div>
+    </div>
+    <div class="column pt0 pt3-ns">
+        <div class="field has-addons">
+            <div class="control">
+                <div class="button is-static">Rp</div>
+            </div>
+            <div class="control">
+                <price-dropdown placeholder="s/d harga" v-model="priceTo" id="price-filter__to"></price-dropdown>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="price-dropdown-template">
+    <div class="dropdown" :class="{'is-active': visible}">
+        <div class="backdrop" :class="{active: visible}" @click="hide"></div>
+        <div class="dropdown-trigger">
+            <input type="number" class="input w4" :placeholder="placeholder" :value="value" @click="show">
+        </div>
+        <div class="dropdown-menu">
+            <div class="dropdown-content has-text-right w4 pv0 ph3">
+                {% for price in prices %}
+                <a class="dropdown-item price-option" data-value="{{ price }}" @click="optionClick">{{ price|money:False }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</template>
+
+{% js '/static/lib/vue.min.js' %}

@@ -51,7 +51,12 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'paginator': self.paginator,
             'results': response.hits.hits,
             'categories': categories,
+            'prices': self.get_prices()
         }, template_name='toko/search/search.html')
+
+    def get_prices(self):
+        return [n for n in range(100000, 500001, 100000)] + \
+            [n for n in range(1000000, 5000001, 1000000)]
 
     def build_aggregations(self, search):
         search.aggs.metric('categories', 'scripted_metric', 
@@ -99,6 +104,15 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
     def build_query(self, request):
         query = self.get_query_str()
         category_slug = request.query_params.get('category', None)
+        
+        try:
+            prices = request.query_params.get('price', '0-0')
+            prices = [int(s) for s in prices.split('-')]
+            price_from = prices[0]
+            price_to = prices[1]
+        except:
+            price_from = 0
+            price_to = 0
 
         if category_slug:
             category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
@@ -108,9 +122,17 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         q = Q({
             'bool': {
                 'must': [
-                    {
+                    { 
                         'prefix': { 
                             'category_path': category_path
+                        },
+                    },
+                    {
+                        'range': {
+                            'price': {
+                                'gte': price_from,
+                                'lte': price_to
+                            }
                         }
                     },
                     {

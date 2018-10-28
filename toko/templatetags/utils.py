@@ -126,8 +126,11 @@ def field_error(bound_field):
     return bound_field
 
 @register.filter
-def money(val):
-    return locale.currency(val, grouping=True)
+def money(val, frac=True):
+    nstr = locale.currency(val, grouping=True)
+    if not frac:
+        nstr = nstr[:-3]
+    return nstr
 
 @register.filter
 def mark(text, keyword):

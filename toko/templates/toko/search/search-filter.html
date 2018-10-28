@@ -1,12 +1,17 @@
 {% load utils %}
 
-{% js '/static/toko/js/search-filter.js' %}
-
 <div class="box content">
-    {% if query %}
-    <p>Hasil cari <strong>{{ query }}</strong> dalam <small>{{ category_path }}</small></p>
-    {% endif %}
-    {% include './category-filter.html' %}
+    <div class="columns">
+        <div class="column is-narrow">
+            {% if query %}
+            <p>Hasil cari <strong>{{ query }}</strong> dalam <small>{{ category_path }}</small></p>
+            {% endif %}
+            {% include './category-filter.html' %}
+            {% include './price-filter.html' %}
+        </div>
+        <div class="column">
+        </div>
+    </div>
     <div class="level f7">
         <div class="level-left">
             Dicari dalam {{ took }}ms
@@ -16,3 +21,5 @@
         </div>
     </div>
 </div>
+
+{% js '/static/toko/js/search-filter.js' %}
