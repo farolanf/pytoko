@@ -65,9 +65,11 @@
         {% endcompress %}
         {% compress js inline %}
         <script>
+            {% if not debug %}
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js')
             }
+            {% endif %}
         </script>
         {% endcompress %}
     </body>
