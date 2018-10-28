@@ -13,6 +13,17 @@ locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
 register = template.Library()
 
+def get_attribute(obj, attrs):
+    for attr in attrs:
+        if hasattr(obj, attr):
+            obj = getattr(obj, attr)
+        elif hasattr(obj, '__getitem__'):
+            try:
+                obj = obj.__getitem__(attr)
+            except TypeError as exc:
+                obj = obj.__getitem__(int(attr))
+    return obj
+
 @register.simple_tag
 def env(key, default):
     return os.getenv(key, default)
@@ -86,6 +97,11 @@ def script(path, min=False):
 # Filters ===================================================================
 
 @register.filter
+def attr(obj, dotattr):
+    attrs = dotattr.split('.')
+    return get_attribute(obj, attrs)
+
+@register.filter
 def json(val):
     return mark_safe(jsonlib.dumps(val))
 
@@ -110,8 +126,11 @@ def field_error(bound_field):
     return bound_field
 
 @register.filter
-def money(val):
-    return locale.currency(val, grouping=True)
+def money(val, frac=True):
+    nstr = locale.currency(val, grouping=True)
+    if not frac:
+        nstr = nstr[:-3]
+    return nstr
 
 @register.filter
 def mark(text, keyword):
