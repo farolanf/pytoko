@@ -102,9 +102,25 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         return 'Semua kategori'
 
     def build_query(self, request):
-        query = self.get_query_str()
+        must = []
+
+        # category filter
+
         category_slug = request.query_params.get('category', None)
-        
+
+        if category_slug:
+            category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
+        else:
+            category_path = Taxonomy.objects.get(slug='kategori').path_ids_str()
+
+        must.append({ 
+            'prefix': { 
+                'category_path': category_path
+            },
+        })
+
+        # price filter
+
         try:
             prices = request.query_params.get('price', '0-0')
             prices = [int(s) for s in prices.split('-')]
@@ -114,44 +130,40 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             price_from = 0
             price_to = 0
 
-        if category_slug:
-            category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
-        else:
-            category_path = Taxonomy.objects.get(slug='kategori').path_ids_str()
+        if price_from or price_to:
+            must.append({
+                'range': {
+                    'price': {
+                        'gte': price_from,
+                        'lte': price_to
+                    }
+                }
+            })
 
-        q = Q({
+        # query filter
+
+        query = self.get_query_str()
+
+        must.append({
             'bool': {
-                'must': [
-                    { 
-                        'prefix': { 
-                            'category_path': category_path
-                        },
-                    },
+                'should': [
                     {
-                        'range': {
-                            'price': {
-                                'gte': price_from,
-                                'lte': price_to
-                            }
+                        'match_phrase': {
+                            'title': query,
                         }
                     },
                     {
-                        'bool': {
-                            'should': [
-                                {
-                                    'match_phrase': {
-                                        'title': query,
-                                    }
-                                },
-                                {
-                                    'match_phrase': {
-                                        'desc': query,
-                                    }
-                                }
-                            ]
+                        'match_phrase': {
+                            'desc': query,
                         }
                     }
                 ]
+            }
+        })
+        
+        q = Q({
+            'bool': {
+                'must': must
             }
         })
 

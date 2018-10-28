@@ -58,7 +58,7 @@ once(function searchFilter () {
                 const priceFrom = Math.min(this.priceFrom, this.priceTo)
                 const priceTo = Math.max(this.priceFrom, this.priceTo)
                 utils.setUrl('/search/', {
-                    price: `${priceFrom}-${priceTo}`
+                    price: priceFrom || priceTo ? `${priceFrom}-${priceTo}` : ''
                 }, true)
             }
         }
