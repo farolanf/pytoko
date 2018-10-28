@@ -13,6 +13,17 @@ locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
 register = template.Library()
 
+def get_attribute(obj, attrs):
+    for attr in attrs:
+        if hasattr(obj, attr):
+            obj = getattr(obj, attr)
+        elif hasattr(obj, '__getitem__'):
+            try:
+                obj = obj.__getitem__(attr)
+            except TypeError as exc:
+                obj = obj.__getitem__(int(attr))
+    return obj
+
 @register.simple_tag
 def env(key, default):
     return os.getenv(key, default)
@@ -84,6 +95,11 @@ def script(path, min=False):
     return {'url': ('%s.min.js' if min else '%s.js') % path}
 
 # Filters ===================================================================
+
+@register.filter
+def attr(obj, dotattr):
+    attrs = dotattr.split('.')
+    return get_attribute(obj, attrs)
 
 @register.filter
 def json(val):
