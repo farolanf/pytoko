@@ -1,0 +1,111 @@
+category
+    product_types
+        Shoes 12
+            specs
+                brand
+                model
+                color
+                size
+    ads
+        ad 143
+            product 12 (Shoes)
+                specs
+                    brand: Nike
+                    model: Runner
+                    color: Black
+                    size: 40
+        
+new ad
+    product_type: 12 (Shoes)
+    spec
+        brand: Nike
+        model: Runner
+        color: Black
+        size: 40
+
+db
+    value
+        value
+
+    field
+        label
+        choices (value) 
+
+    field_value
+        field
+        value
+
+    product_type
+        categories (taxonomy)
+        title: Handphone
+        specs (field)
+            Brand
+            Model
+            Color
+            Size
+
+    product
+        product_type: Handphone
+        specs (field_values) - use product_type specs as template
+            Brand
+            Model
+            Color
+            Size
+
+    taxonomy
+        product_types
+
+    ad
+        product
+
+doc
+    product
+        type: Shoes
+        specs: {
+            brand: Nike
+            model: Runner
+            color: Black
+            size: 40
+            ... specs vary between product types
+        }
+
+filters
+    product.type
+    brand
+    model
+    color
+    size
+
+_search
+
+    query
+
+
+    aggs
+        filters
+            spec_filters
+                brand: match: specs.brand: 
+
+ui
+
+    Shoes
+    brand:
+        Nike (22)
+        Adidas (5)
+    model:
+        Runner (11)
+        Speeder (45)
+    color:
+        Black (5)
+    size:
+        41 (45)
+        40 (11)
+
+    Processor
+    brand:
+        Intel (34)
+        AMD (44)
+    model:
+        i7 4850 (33)
+        Ryzen 2700 (11)
+
