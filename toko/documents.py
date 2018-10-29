@@ -1,5 +1,5 @@
 from django_elasticsearch_dsl import DocType, Index, fields
-from .models import Ad
+from .models import Ad, Taxonomy, File, Product 
 
 ads = Index('ads')
 ads.settings(
@@ -14,7 +14,15 @@ class AdDocument(DocType):
     category_path = fields.KeywordField(attr='category.path_ids_str')
     category_slug = fields.KeywordField(attr='category.slug')
 
-    images = fields.ListField(fields.KeywordField('images_url'))
+    images = fields.ListField(fields.KeywordField(attr='images_url'))
+
+    product = fields.ObjectField(properties={
+        'title': fields.KeywordField(attr='product_type.title'),
+        'specs': fields.NestedField(attr='specs.all', properties={
+            'label': fields.KeywordField(attr='field.label'),
+            'value': fields.KeywordField(attr='value.value_json')
+        })
+    })
 
     class Meta:
         model = Ad
@@ -23,3 +31,4 @@ class AdDocument(DocType):
             'desc',
             'price'
         ]
+        related_models = [Taxonomy, File, Product]

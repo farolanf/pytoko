@@ -81,6 +81,9 @@ class Value(models.Model):
     group = models.ForeignKey('self', related_name='group_related', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to=group_value_filter)
     value = models.CharField(max_length=255)
 
+    def value_json(self):
+        return json.loads(self.value)
+
     def __str__(self):
         return self.value
 
