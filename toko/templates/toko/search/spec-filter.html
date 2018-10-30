@@ -1,0 +1,9 @@
+{% for product in product.buckets %}
+<h2>{{ product.key }}</h2>
+{% for spec in product.specs.speclabel.buckets %}
+<h4>{{ spec.key }}</h4>
+{% for value in spec.specvalue.buckets %}
+<h5>{{ value.key }} ({{ value.doc_count }})</h5>
+{% endfor %}
+{% endfor %}
+{% endfor %}

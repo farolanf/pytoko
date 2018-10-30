@@ -32,3 +32,11 @@ class AdDocument(DocType):
             'price'
         ]
         related_models = [Taxonomy, File, Product]
+
+    def get_instances_from_related(self, related_instance):
+        if isinstance(related_instance, Taxonomy):
+            return related_instance.ads.all()
+        elif isinstance(related_instance, File):
+            return related_instance.ad_set.all()
+        elif isinstance(related_instance, Product):
+            return related_instance.ads.all()

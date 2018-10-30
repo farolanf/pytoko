@@ -1,0 +1,58 @@
+# facet counts
+GET ads/_search
+{
+  "aggs": {
+    "product": {
+      "terms": {
+        "field": "product.title"
+      },
+      "aggs": {
+        "specs": {
+          "nested": {
+            "path": "product.specs"
+          },
+          "aggs": {
+            "speclabel": {
+              "terms": { 
+                "field": "product.specs.label"
+              },
+              "aggs": {
+                "specvalue": {
+                  "terms": { 
+                    "field": "product.specs.value"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# filters
+GET ads/_search
+{
+  "query": {
+    "nested": {
+      "path": "product.specs",
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "product.specs.label": "Warna"
+              }
+            },
+            {
+              "match": {
+                "product.specs.value": "Hitam"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

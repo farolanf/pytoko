@@ -51,6 +51,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'paginator': self.paginator,
             'results': response.hits.hits,
             'categories': categories,
+            'product': response.aggregations.product,
             'prices': self.get_prices()
         }, template_name='toko/search/search.html')
 
@@ -88,6 +89,12 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 return categories
                 """
         )
+
+        search.aggs.bucket('product', 'terms', field='product.title') \
+            .bucket('specs', 'nested', path='product.specs') \
+                .bucket('speclabel', 'terms', field='product.specs.label') \
+                    .bucket('specvalue', 'terms', field='product.specs.value')
+
         return search
 
     def get_query_str(self):
@@ -146,18 +153,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
         must.append({
             'bool': {
-                'should': [
-                    {
-                        'match_phrase': {
-                            'title': query,
-                        }
-                    },
-                    {
-                        'match_phrase': {
-                            'desc': query,
-                        }
-                    }
-                ]
+                'should': self.get_should_query(query)
             }
         })
         
@@ -168,6 +164,25 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         })
 
         return q
+
+    def get_should_query(self, query):
+        should = []
+
+        if query:
+            should += [
+                {
+                    'match_phrase': {
+                        'title': query,
+                    }
+                },
+                {
+                    'match_phrase': {
+                        'desc': query,
+                    }
+                }
+            ]
+
+        return should
 
     def get_page_num(self):
         return int(self.request.query_params.get('page', 1))
