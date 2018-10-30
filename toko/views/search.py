@@ -34,7 +34,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         search = AdDocument.search()
         search = self.build_aggregations(search)
 
-        response = self.paginate_search(search, self.build_query(request))
+        response = self.paginate_search(search, self.build_query())
 
         end = min(end, response.hits.total)
 
@@ -51,7 +51,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'paginator': self.paginator,
             'results': response.hits.hits,
             'categories': categories,
-            'product': response.aggregations.product,
+            'product': response.aggregations.all.query_filter.product,
             'prices': self.get_prices()
         }, template_name='toko/search/search.html')
 
@@ -90,10 +90,12 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 """
         )
 
-        search.aggs.bucket('product', 'terms', field='product.title') \
-            .bucket('specs', 'nested', path='product.specs') \
-                .bucket('speclabel', 'terms', field='product.specs.label') \
-                    .bucket('specvalue', 'terms', field='product.specs.value')
+        search.aggs.bucket('all', 'global') \
+            .bucket('query_filter', 'filter', Q('bool', must=self.get_must_filter())) \
+                .bucket('product', 'terms', field='product.title') \
+                    .bucket('specs', 'nested', path='product.specs') \
+                        .bucket('speclabel', 'terms', field='product.specs.label') \
+                            .bucket('specvalue', 'terms', field='product.specs.value')
 
         return search
 
@@ -108,64 +110,30 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
         return 'Semua kategori'
 
-    def build_query(self, request):
+    def build_query(self):
+        return Q('bool', must=self.get_must_filter() + self.get_spec_filter())
+
+    def get_must_filter(self):
         must = []
-
-        # category filter
-
-        category_slug = request.query_params.get('category', None)
-
-        if category_slug:
-            category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
-        else:
-            category_path = Taxonomy.objects.get(slug='kategori').path_ids_str()
-
-        must.append({ 
-            'prefix': { 
-                'category_path': category_path
-            },
-        })
-
-        # price filter
-
-        try:
-            prices = request.query_params.get('price', '0-0')
-            prices = [int(s) for s in prices.split('-')]
-            price_from = prices[0]
-            price_to = prices[1]
-        except:
-            price_from = 0
-            price_to = 0
-
-        if price_from or price_to:
-            must.append({
-                'range': {
-                    'price': {
-                        'gte': price_from,
-                        'lte': price_to
-                    }
-                }
-            })
 
         # query filter
 
         query = self.get_query_str()
+        must.append(self.get_query_filter(query))
 
-        must.append({
-            'bool': {
-                'should': self.get_should_query(query)
-            }
-        })
-        
-        q = Q({
-            'bool': {
-                'must': must
-            }
-        })
+        # category filter
 
-        return q
+        must.append(self.get_category_filter())
 
-    def get_should_query(self, query):
+        # price filter
+
+        price_query = self.get_price_filter()
+        if price_query:
+            must.append(price_query)
+
+        return must
+
+    def get_query_filter(self, query):
         should = []
 
         if query:
@@ -182,7 +150,36 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 }
             ]
 
-        return should
+        return Q('bool', should=should)
+
+    def get_category_filter(self):
+        category_slug = self.request.query_params.get('category', None)
+
+        if category_slug:
+            category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
+        else:
+            category_path = Taxonomy.objects.get(slug='kategori').path_ids_str()
+
+        return Q('prefix', category_path=category_path)
+
+    def get_price_filter(self):
+        try:
+            prices = self.request.query_params.get('price', '0-0')
+            prices = [int(s) for s in prices.split('-')]
+            price_from = prices[0]
+            price_to = prices[1]
+        except:
+            price_from = 0
+            price_to = 0
+
+        if price_from or price_to:
+            return Q('range', price={
+                'gte': price_from,
+                'lte': price_to
+            })
+
+    def get_spec_filter(self):
+        return []
 
     def get_page_num(self):
         return int(self.request.query_params.get('page', 1))

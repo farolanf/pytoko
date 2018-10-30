@@ -76,6 +76,14 @@ filters
     color
     size
 
+filters
+    
+    product
+        Handphone
+            Merek: [LG, ASUS]
+        Laptop
+            Warna: [Hitam, Silver]
+
 _search
 
     query

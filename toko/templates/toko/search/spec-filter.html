@@ -1,9 +1,43 @@
-{% for product in product.buckets %}
-<h2>{{ product.key }}</h2>
-{% for spec in product.specs.speclabel.buckets %}
-<h4>{{ spec.key }}</h4>
-{% for value in spec.specvalue.buckets %}
-<h5>{{ value.key }} ({{ value.doc_count }})</h5>
-{% endfor %}
-{% endfor %}
-{% endfor %}
+{% load utils %}
+
+<div class="specs-filter">
+    <div class="level">
+        <div class="level-left f6">
+            Hasil dalam spek
+        </div>
+        <div class="level-right">
+            <a class="button is-small is-light" :class="{'is-hidden': !hasFilters}" @click="clearFilters">
+                <span class="icon">
+                    <i class="fa fa-close"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+    <ul>
+        {% for product in product.buckets %}
+        <li>
+            <a class="button is-small is-text" data-filter="product" data-filter-value="{{ product.key }}" @click="toggleFilter">
+                {{ product.key }} ({{ product.doc_count }})
+            </a>
+            <ul>
+                {% for spec in product.specs.speclabel.buckets %}
+                <li>
+                    <h5>{{ spec.key }}</h5>
+                    <ul>
+                        {% for value in spec.specvalue.buckets %}
+                        <li>
+                            <a class="button is-small is-text" data-filter="spec" data-filter-product="{{ product.key }}" data-filter-label="{{ spec.key }}" data-filter-value="{{ value.key }}" @click="toggleFilter">
+                                {{ value.key }} ({{ value.doc_count }})
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% js '/static/lib/vue.min.js' %}
+{% js '/static/toko/js/spec-filter.js' %}
