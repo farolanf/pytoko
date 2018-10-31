@@ -190,36 +190,36 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
         })] if products else []
 
         specs = [
-            Q('bool', should=[
-                Q('bool', must=[
-                    Q({
-                        'term': {
-                            'product.title': title
-                        }
-                    }),
-                    Q('nested', path='product.specs', query={
-                        'bool': {
-                            'must': [
-                                {
-                                    'term': {
-                                        'product.specs.label': label
-                                    }
-                                },
-                                {
-                                    'terms': {
-                                        'product.specs.value': values
-                                    }
+            Q('bool', must=[
+                Q({
+                    'term': {
+                        'product.title': title
+                    }
+                }),
+                Q('nested', path='product.specs', query={
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'product.specs.label': label
                                 }
-                            ]
-                        }
-                    })
-                ])
-                for title, labels in specs.items()
-                for label, values in labels.items()
+                            },
+                            {
+                                'terms': {
+                                    'product.specs.value': values
+                                }
+                            }
+                        ]
+                    }
+                })
             ])
+            for title, labels in specs.items()
+            for label, values in labels.items()
         ] if specs else []
 
-        return products + specs
+        must = [Q('bool', should=products + specs)] if products or specs else []
+
+        return must
 
     def get_page_num(self):
         return int(self.request.query_params.get('page', 1))
