@@ -12,7 +12,8 @@ once(function specFilter () {
                         Handphone: true
                         Laptop: true
                     spec
-                        Warna: value
+                        Handphone
+                            Warna: value
             */
             filters: {
                 product: parseProductQuery(),
@@ -78,6 +79,12 @@ once(function specFilter () {
                 if (this.filters.spec[product][label].includes(value)) {
                     const i = this.filters.spec[product][label].indexOf(value)
                     this.filters.spec[product][label].splice(i, 1)
+                    if (this.filters.spec[product][label].length <= 0) {
+                        this.$delete(this.filters.spec[product], label)
+                        if (Object.keys(this.filters.spec[product]).length <= 0) {
+                            this.$delete(this.filters.spec, product)
+                        }
+                    }
                 } else {
                     this.filters.spec[product][label].push(value)
                 }
