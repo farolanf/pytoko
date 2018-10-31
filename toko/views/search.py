@@ -1,3 +1,4 @@
+import json
 from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -179,7 +180,46 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             })
 
     def get_spec_filter(self):
-        return []
+        products = json.loads(self.request.query_params.get('product', '[]'))
+        specs = json.loads(self.request.query_params.get('spec', '{}'))
+
+        products = [Q({
+            'terms': {
+                'product.title': products
+            }
+        })] if products else []
+
+        specs = [
+            Q('bool', should=[
+                Q('bool', must=[
+                    Q({
+                        'term': {
+                            'product.title': title
+                        }
+                    }),
+                    Q('nested', path='product.specs', query={
+                        'bool': {
+                            'must': [
+                                {
+                                    'term': {
+                                        'product.specs.label': label
+                                    }
+                                },
+                                {
+                                    'terms': {
+                                        'product.specs.value': values
+                                    }
+                                }
+                            ]
+                        }
+                    })
+                ])
+                for title, labels in specs.items()
+                for label, values in labels.items()
+            ])
+        ] if specs else []
+
+        return products + specs
 
     def get_page_num(self):
         return int(self.request.query_params.get('page', 1))

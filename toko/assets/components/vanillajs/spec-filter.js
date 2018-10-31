@@ -33,11 +33,10 @@ once(function specFilter () {
             },
             productFilterQueryStr () {
                 // product[0]=product1&product[1]=product2,...
-                return Object.keys(this.filters.product)
+                const arr = Object.keys(this.filters.product)
                     .map(title => this.filters.product[title] ? title : null)
                     .filter(item => item)
-                    .map((title, i) => `product[${i}]=` + title)
-                    .join('&')
+                return JSON.stringify(arr)
             },
             specFilterQueryStr () {
                 return JSON.stringify(this.filters.spec)
@@ -110,7 +109,7 @@ once(function specFilter () {
         const product = {}
         const url = new URLParse(document.URL, true)
         if (url.query.product) {
-            const arr = utils.parseQueryArray(url.query.product)
+            const arr = JSON.parse(url.query.product)
             arr.forEach(key => {
                 product[key] = true
             })
