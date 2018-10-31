@@ -77,8 +77,11 @@ filters
     size
 
 filters
-    
+
     product
+        Handphone: true
+
+    spec
         Handphone
             Merek: [LG, ASUS]
         Laptop

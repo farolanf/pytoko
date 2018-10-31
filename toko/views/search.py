@@ -53,7 +53,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'categories': categories,
             'product': response.aggregations.all.query_filter.product,
             'prices': self.get_prices()
-        }, template_name='toko/search/search.html')
+        }, template_name='toko/search/search.pjax.html')
 
     def get_prices(self):
         return [n for n in range(100000, 500001, 100000)] + \

@@ -14,20 +14,20 @@
     Tidak ditemukan
 </div>
 {% endif %}
-{% pagination paginator %}
 <div class="columns">
-    <div class="column is-narrow">
+    <div class="column is-narrow search-filter__side">
         {% include './search-filter-side.html' %}
     </div>    
-    <div class="column">
+    <div class="column search__results">
+        {% pagination paginator %}
         <div class="columns is-multiline" id="search-results">
             {% for item in results %}
             {% include 'toko/ad/search-item.html' %}
             {% endfor %}
         </div>
+        {% pagination paginator %}
     </div>
 </div>
-{% pagination paginator %}
 {% css '/static/toko/css/ad.css' %}
 {% css '/static/toko/css/search.css' %}
 {% endblock %}

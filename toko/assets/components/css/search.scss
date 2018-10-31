@@ -6,7 +6,14 @@
     padding-right: 0;
 }
 
+.search-filter__side {
+    margin-top: calc(36px + 1.5rem);
+}
+
 .specs-filter {
+    .specs-filter__bar {
+        min-height: 1.8rem;        
+    }
     h4 {
         font-weight: unset !important;
         font-size: .875rem;
