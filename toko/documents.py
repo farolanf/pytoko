@@ -29,7 +29,9 @@ class AdDocument(DocType):
         fields = [
             'title',
             'desc',
-            'price'
+            'price',
+            'created_at',
+            'updated_at'
         ]
         related_models = [Taxonomy, File, Product]
 

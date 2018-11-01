@@ -32,7 +32,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
     def list(self, request):
         start, end, page_size = self.get_page_info()
 
-        search = AdDocument.search()
+        search = AdDocument.search().sort(*self.get_sort_args())
         search = self.build_aggregations(search)
 
         response = self.paginate_search(search, self.build_query())
@@ -113,6 +113,22 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
     def build_query(self):
         return Q('bool', must=self.get_must_filter() + self.get_spec_filter())
+
+    def get_sort_args(self):
+        sort_type = self.request.query_params.get('sort', 'tersesuai').lower()
+
+        sort = []
+
+        if sort_type == 'termurah':
+            sort.append('price')
+        elif sort_type == 'termahal':
+            sort.append('-price')
+        elif sort_type == 'terbaru':
+            sort.append('-created_at')
+        elif sort_type == 'terlama':
+            sort.append('created_at')
+
+        return sort
 
     def get_must_filter(self):
         must = []

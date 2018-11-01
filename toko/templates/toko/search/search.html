@@ -19,7 +19,14 @@
         {% include './search-filter-side.html' %}
     </div>    
     <div class="column search__results">
-        {% pagination paginator %}
+        <div class="level">
+            <div class="level-left">
+                {% include 'toko/search/sort-bar.html' %}
+            </div>
+            <div class="level-right">
+                {{ paginator.to_html }}
+            </div>
+        </div>
         <div class="columns is-multiline" id="search-results">
             {% for item in results %}
             {% include 'toko/ad/search-item.html' %}
