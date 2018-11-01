@@ -1,5 +1,7 @@
 import re
+import json
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
@@ -70,7 +72,50 @@ class Taxonomy(MPTTModel):
         return ' / '.join(names[1:])
 
     def __str__(self):
-        return self.name
+        return self.path_name()
+
+def group_value_filter():
+    return Q(group__value='group') | Q(value='group')
+
+class Value(models.Model):
+    group = models.ForeignKey('self', related_name='group_related', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to=group_value_filter)
+    value = models.CharField(max_length=255)
+
+    def value_json(self):
+        return json.loads(self.value)
+
+    def __str__(self):
+        return self.value
+
+class Field(models.Model):
+    group = models.ForeignKey(Value, related_name='field_group_related', on_delete=models.CASCADE, limit_choices_to=group_value_filter)
+    label = models.CharField(max_length=50)
+    choices = models.ManyToManyField(Value, related_name='choices_parent')
+
+    def __str__(self):
+        return self.label
+
+class FieldValue(models.Model):
+    field = models.ForeignKey(Field, related_name='values', on_delete=models.CASCADE)
+    value = models.ForeignKey(Value, related_name='field_values', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s: %s' % (self.field.label, json.loads(self.value.value))
+
+class ProductType(models.Model):
+    title = models.CharField(max_length=70)
+    specs = models.ManyToManyField(Field, related_name='product_types')
+    categories = models.ManyToManyField(Taxonomy, related_name='product_types')
+
+    def __str__(self):
+        return self.title
+
+class Product(models.Model):
+    product_type = models.ForeignKey(ProductType, related_name='products', on_delete=models.CASCADE)
+    specs = models.ManyToManyField(FieldValue, related_name='products')
+
+    def __str__(self):
+        return self.product_type.title
 
 class Ad(models.Model):
     user = models.ForeignKey(get_user_model(), related_name='ads', on_delete=models.CASCADE)
@@ -84,6 +129,7 @@ class Ad(models.Model):
     images = models.ManyToManyField(File, through='AdImages')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    product = models.ForeignKey(Product, related_name='ads', null=True, on_delete=models.CASCADE)
 
     def images_url(self):
         return [
@@ -106,6 +152,9 @@ class Ad(models.Model):
             if len(words) - i > 1:
                 inputs.append(' '.join(words[i:i+2]))
         return inputs
+
+    def __str__(self):
+        return self.title
 
 class AdImages(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)

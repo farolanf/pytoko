@@ -1,0 +1,23 @@
+{% load utils %}
+
+<div class="dropdown sort-bar">
+    <div class="dropdown-trigger">
+        <a class="button ttc" title="Urut hasil pencarian">
+            {% if request.query_params.sort %}{{ request.query_params.sort }}{% else %}Urut{% endif %}&nbsp;
+            <span class="icon">
+                <i class="fa fa-sort"></i>
+            </span>
+        </a>
+    </div>
+    <div class="dropdown-menu">
+        <div class="dropdown-content">
+            <a class="dropdown-item {% if request.query_params.sort == 'Tersesuai' %}is-active{% endif %}">Tersesuai</a>
+            <a class="dropdown-item {% if request.query_params.sort == 'Termurah' %}is-active{% endif %}">Termurah</a>
+            <a class="dropdown-item {% if request.query_params.sort == 'Termahal' %}is-active{% endif %}">Termahal</a>
+            <a class="dropdown-item {% if request.query_params.sort == 'Terbaru' %}is-active{% endif %}">Terbaru</a>
+            <a class="dropdown-item {% if request.query_params.sort == 'Terlama' %}is-active{% endif %}">Terlama</a>
+        </div>
+    </div>
+</div>
+
+{% js '/static/toko/js/sort-bar.js' %}

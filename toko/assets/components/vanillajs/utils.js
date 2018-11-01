@@ -7,6 +7,18 @@ const utils = {
         window.location.assign(url.toString())
     },
 
+    parseQueryArray (str) {
+        const parts = str.split('&')
+        const arr = []
+        parts.forEach(part => {
+            const m = part.match(/(?:.+)\[(\d+)\]=(.+)/)
+            if (m) {
+                arr[m[1]] = m[2]
+            }
+        })
+        return arr
+    },
+
     scrollToError () {
         const target = $('.field').toArray().find(el => $('.is-danger', el).length)
         if (!target) return

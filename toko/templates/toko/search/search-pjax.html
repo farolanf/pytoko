@@ -1,0 +1,9 @@
+{% load utils %}
+
+{% pagination paginator %}
+<div class="columns is-multiline" id="search-results">
+    {% for item in results %}
+    {% include 'toko/ad/search-item.html' %}
+    {% endfor %}
+</div>
+{% pagination paginator %}

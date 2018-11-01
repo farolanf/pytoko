@@ -64,9 +64,6 @@ once(function search () {
             },
             created () {
                 this.fetchSuggestions = _.debounce(this.fetchSuggestions, 200)
-            },
-            mounted () {
-                this.$refs.input.focus()
             }
         })
     }

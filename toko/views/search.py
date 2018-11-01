@@ -1,3 +1,4 @@
+import json
 from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -31,10 +32,10 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
     def list(self, request):
         start, end, page_size = self.get_page_info()
 
-        search = AdDocument.search()
+        search = AdDocument.search().sort(*self.get_sort_args())
         search = self.build_aggregations(search)
 
-        response = self.paginate_search(search, self.build_query(request))
+        response = self.paginate_search(search, self.build_query())
 
         end = min(end, response.hits.total)
 
@@ -51,8 +52,9 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'paginator': self.paginator,
             'results': response.hits.hits,
             'categories': categories,
+            'product': response.aggregations.all.query_filter.product,
             'prices': self.get_prices()
-        }, template_name='toko/search/search.html')
+        }, template_name='toko/search/search.pjax.html')
 
     def get_prices(self):
         return [n for n in range(100000, 500001, 100000)] + \
@@ -88,6 +90,14 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 return categories
                 """
         )
+
+        search.aggs.bucket('all', 'global') \
+            .bucket('query_filter', 'filter', Q('bool', must=self.get_must_filter())) \
+                .bucket('product', 'terms', field='product.title') \
+                    .bucket('specs', 'nested', path='product.specs') \
+                        .bucket('speclabel', 'terms', field='product.specs.label') \
+                            .bucket('specvalue', 'terms', field='product.specs.value')
+
         return search
 
     def get_query_str(self):
@@ -101,28 +111,80 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
         return 'Semua kategori'
 
-    def build_query(self, request):
+    def build_query(self):
+        return Q('bool', must=self.get_must_filter() + self.get_spec_filter())
+
+    def get_sort_args(self):
+        sort_type = self.request.query_params.get('sort', 'tersesuai').lower()
+
+        sort = []
+
+        if sort_type == 'termurah':
+            sort.append('price')
+        elif sort_type == 'termahal':
+            sort.append('-price')
+        elif sort_type == 'terbaru':
+            sort.append('-created_at')
+        elif sort_type == 'terlama':
+            sort.append('created_at')
+
+        return sort
+
+    def get_must_filter(self):
         must = []
+
+        # query filter
+
+        query = self.get_query_str()
+        must.append(self.get_query_filter(query))
 
         # category filter
 
-        category_slug = request.query_params.get('category', None)
+        must.append(self.get_category_filter())
+
+        # price filter
+
+        price_query = self.get_price_filter()
+        if price_query:
+            must.append(price_query)
+
+        return must
+
+    def get_query_filter(self, query):
+        should = []
+
+        if query:
+            should += [
+                {
+                    'match_phrase': {
+                        'title': {
+                            'query': query,
+                            'boost': 10
+                        }
+                    }
+                },
+                {
+                    'match_phrase': {
+                        'desc': query,
+                    }
+                }
+            ]
+
+        return Q('bool', should=should)
+
+    def get_category_filter(self):
+        category_slug = self.request.query_params.get('category', None)
 
         if category_slug:
             category_path = Taxonomy.objects.get(slug=category_slug).path_ids_str()
         else:
             category_path = Taxonomy.objects.get(slug='kategori').path_ids_str()
 
-        must.append({ 
-            'prefix': { 
-                'category_path': category_path
-            },
-        })
+        return Q('prefix', category_path=category_path)
 
-        # price filter
-
+    def get_price_filter(self):
         try:
-            prices = request.query_params.get('price', '0-0')
+            prices = self.request.query_params.get('price', '0-0')
             prices = [int(s) for s in prices.split('-')]
             price_from = prices[0]
             price_to = prices[1]
@@ -131,43 +193,52 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             price_to = 0
 
         if price_from or price_to:
-            must.append({
-                'range': {
-                    'price': {
-                        'gte': price_from,
-                        'lte': price_to
-                    }
-                }
+            return Q('range', price={
+                'gte': price_from,
+                'lte': price_to
             })
 
-        # query filter
+    def get_spec_filter(self):
+        products = json.loads(self.request.query_params.get('product', '[]'))
+        specs = json.loads(self.request.query_params.get('spec', '{}'))
 
-        query = self.get_query_str()
+        products = [Q({
+            'terms': {
+                'product.title': products
+            }
+        })] if products else []
 
-        must.append({
-            'bool': {
-                'should': [
-                    {
-                        'match_phrase': {
-                            'title': query,
-                        }
-                    },
-                    {
-                        'match_phrase': {
-                            'desc': query,
-                        }
+        specs = [
+            Q('bool', must=[
+                Q({
+                    'term': {
+                        'product.title': title
                     }
-                ]
-            }
-        })
-        
-        q = Q({
-            'bool': {
-                'must': must
-            }
-        })
+                }),
+                Q('nested', path='product.specs', query={
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'product.specs.label': label
+                                }
+                            },
+                            {
+                                'terms': {
+                                    'product.specs.value': values
+                                }
+                            }
+                        ]
+                    }
+                })
+            ])
+            for title, labels in specs.items()
+            for label, values in labels.items()
+        ] if specs else []
 
-        return q
+        must = [Q('bool', should=products + specs)] if products or specs else []
+
+        return must
 
     def get_page_num(self):
         return int(self.request.query_params.get('page', 1))
