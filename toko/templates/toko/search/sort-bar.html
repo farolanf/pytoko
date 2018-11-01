@@ -1,6 +1,7 @@
-<div class="dropdown sort-bar">
+<div class="dropdown sort-bar" :class="{'is-active': visible}">
+    <div class="backdrop" :class="{active: visible}" @click="hide"></div>
     <div class="dropdown-trigger">
-        <a class="button ttc" title="Urut hasil pencarian">
+        <a class="button ttc" title="Urut hasil pencarian" @click="show">
             {% if request.query_params.sort %}{{ request.query_params.sort }}{% else %}Urut{% endif %}&nbsp;
             <span class="icon">
                 <i class="fa fa-sort"></i>
@@ -8,7 +9,7 @@
         </a>
     </div>
     <div class="dropdown-menu">
-        <div class="dropdown-content">
+        <div class="dropdown-content" @click="onSort">
             <a class="dropdown-item {% if request.query_params.sort == 'Tersesuai' %}is-active{% endif %}">Tersesuai</a>
             <a class="dropdown-item {% if request.query_params.sort == 'Termurah' %}is-active{% endif %}">Termurah</a>
             <a class="dropdown-item {% if request.query_params.sort == 'Termahal' %}is-active{% endif %}">Termahal</a>

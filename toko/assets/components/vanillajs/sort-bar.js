@@ -1,19 +1,33 @@
 once(function sortBar() {
-    
-    init()
 
-    $(document).on('pjax:end', init)
+    const el = document.querySelector('.sort-bar')
+    init(el)
 
-    function init (e) {
-        const container = e && e.target || document
+    $(document).on('pjax:end', e => {
+        const el = e.target.querySelector('.sort-bar')
+        init(el)
+    })
 
-        $(".sort-bar", container).on("click", ".button", function(e) {
-            $(e.delegateTarget).toggleClass("is-active");
-        });
-
-        $('.sort-bar .dropdown-menu .dropdown-item', container).on('click', function (e) {
-            const sortType = $(e.target).text()
-            utils.setUrl('/search/', { sort: sortType, page: 1 }, true)
+    function init (el) {
+        new Vue({
+            el,
+            template: el.outerHTML,
+            data: {
+                visible: false,
+            },
+            methods: {
+                show () {
+                    this.visible = true
+                },
+                hide () {
+                    this.visible = false
+                },
+                onSort (e) {
+                    const sortType = e.target.innerText
+                    utils.setUrl('/search/', { sort: sortType, page: 1 }, true)
+                    this.hide()
+                }
+            }
         })
     }
 });
