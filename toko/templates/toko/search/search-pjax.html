@@ -1,16 +1,20 @@
 {% load utils %}
 
-<div class="level">
-    <div class="level-left">
-        {% include 'toko/search/sort-bar.html' %}
+{% include './search-filter.html' %}
+
+<div class="search__main">
+    <div class="level">
+        <div class="level-left">
+            {% include 'toko/search/sort-bar.html' %}
+        </div>
+        <div class="level-right">
+            {{ paginator.to_html }}
+        </div>
     </div>
-    <div class="level-right">
-        {{ paginator.to_html }}
+    <div class="columns is-multiline" id="search-results">
+        {% for item in results %}
+        {% include 'toko/ad/search-item.html' %}
+        {% endfor %}
     </div>
+    {% pagination paginator %}
 </div>
-<div class="columns is-multiline" id="search-results">
-    {% for item in results %}
-    {% include 'toko/ad/search-item.html' %}
-    {% endfor %}
-</div>
-{% pagination paginator %}

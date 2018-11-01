@@ -96,11 +96,12 @@ once(function specFilter () {
                 const url = new URLParse(document.URL, true)
                 url.query.product = this.productFilterQueryStr
                 url.query.spec = this.specFilterQueryStr
-                $.pjax({
+                utils.pjax({
                     url: url.toString(),
                     container: '.search__results',
-                    scrollTo: false
-                })
+                    scrollTo: false,
+                    fragment: '.search__main'
+                }, ['.search-filter'])
             }
         }
     })
