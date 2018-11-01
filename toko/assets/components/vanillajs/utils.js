@@ -1,5 +1,70 @@
 const utils = {
 
+    /**
+     * Pjax with multiple containers support.
+     * 
+     * @param {object} opts Pjax options
+     * @param {array} conSelectors Additional container-selectors
+     */
+    pjax (opts, conSelectors) {
+
+        // emit pjax:reinit with a list of container-elements
+        $(document).one('pjax:end', function (e, response) {
+            const $data = $(response.responseText)
+            conSelectors.unshift(opts.fragment || '')
+            let containers = []
+            conSelectors.map(selector => {
+                const newCon = getElement(selector, $data)
+                if (newCon) {
+                    const cons = $(document).find(selector).toArray()
+                    containers = containers.concat(cons)
+                }
+            })
+            $(document).trigger('pjax:reinit', [containers])
+        })
+
+        // replace additional containers
+        if (conSelectors && conSelectors.length) {
+            $(document).one('pjax:success', function (e, data) {
+                const $data = $(data)
+                const pjaxCon = this
+                conSelectors.forEach(conSelector => {
+                    const newCon = getElement(conSelector, $data)
+                    if (newCon) {
+                        $(conSelector, pjaxCon).replaceWith(newCon.outerHTML)
+                    }
+                })
+            })
+        }
+
+        $.pjax(opts)
+
+        function getElement (selector, $data) {
+            if (!selector) return $data.get(0)
+            let $el = $data.filter(selector)
+            if (!$el.length) {
+                $el = $data.find(selector)
+            }
+            return $el.get(0)
+        }
+    },
+
+    /**
+     * Call the function with container matching or containing the selector.
+     * 
+     * @param {string} selector 
+     * @param {function} fn 
+     */
+    pjaxReinit (selector, fn) {
+        $(document).on('pjax:reinit', (e, containers) => {
+            containers.forEach(con => {
+                if ($(con).is(selector) || $(con).find(selector).length) {
+                    fn(con)
+                }
+            })
+        })
+    },
+
     setUrl (pathname, query, update = false) {
         const url = URLParse(document.URL, true)
         pathname && url.set('pathname', pathname)
