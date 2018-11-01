@@ -157,7 +157,10 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             should += [
                 {
                     'match_phrase': {
-                        'title': query,
+                        'title': {
+                            'query': query,
+                            'boost': 10
+                        }
                     }
                 },
                 {
