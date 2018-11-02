@@ -47,13 +47,46 @@ class AdminTaxonomySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Taxonomy
-        fields = ('id', 'url', 'name', 'slug', 'parent_id', 'children')
+        fields = ('id', 'url', 'name', 'slug', 'product_types', 'parent_id', 'children')
         extra_kwargs = {
             'url': {'view_name': 'toko:admin-taxonomy-detail'},
+            'product_types': {'view_name': 'toko:admin-producttype-detail'},
         }
 
     def get_children(self, instance):
         return [AdminTaxonomySerializer(item, context=self._context).data for item in instance.get_children()]
+
+class AdminValueSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.Value
+        fields = ('id', 'url', 'group', 'value')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-value-detail'},
+            'group': {'view_name': 'toko:admin-value-detail'},
+        }
+
+class AdminFieldSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.Field
+        fields = ('id', 'url', 'group', 'label', 'choices')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-field-detail'},
+            'group': {'view_name': 'toko:admin-value-detail'},
+            'choices': {'view_name': 'toko:admin-value-detail'},
+        }
+
+class AdminProductTypeSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = models.ProductType
+        fields = ('id', 'url', 'title', 'specs', 'categories')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-producttype-detail'},
+            'specs': {'view_name': 'toko:admin-field-detail'},
+            'categories': {'view_name': 'toko:admin-taxonomy-detail'},
+        }
 
 class AdminAdSerializer(serializers.HyperlinkedModelSerializer):
 
