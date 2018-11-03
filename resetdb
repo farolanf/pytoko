@@ -1,0 +1,13 @@
+rm toko/migrations/* -rf
+touch toko/migrations/__init__.py
+pyman makemigrations
+pyman migrate
+
+pyman createsuperuser
+pyman resettaxonomy toko/data/taxonomy
+pyman loaddata toko/data/provinsi.json
+pyman loaddata toko/data/kabupaten.json
+pyman loaddata toko/data/values.json
+pyman loaddata toko/data/fields.json
+pyman loaddata toko/data/producttypes.json
+pyman fillads toko/data/products.csv
