@@ -8,7 +8,7 @@ from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMi
 from toko import models
 from toko.utils.file import inc_filename
 from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField, PathChoicePrimaryKeyRelatedField
-from toko.querysets import KabupatenDynamicQueryset, get_category_queryset
+from toko.querysets import KabupatenDynamicQueryset, get_category_queryset, ProductTypeDynamicQueryset
 
 User = get_user_model()
 
@@ -118,6 +118,8 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathChoicePrimaryKeyRelatedField(queryset=get_category_queryset)
     category_path = PathPrimaryKeyRelatedField(source='category', read_only=True)
 
+    product_type = DynamicQuerysetPrimaryKeyRelatedField(source='product.product_type', queryset=ProductTypeDynamicQueryset(), with_self=True)
+
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
     )
@@ -138,10 +140,11 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Ad
 
-        fields = ('id', 'category', 'category_path', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'category', 'category_path', 'product_type', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
         
         field_labels = {
             'category': 'Kategori',
+            'product_type': 'Jenis produk',
             'title': 'Judul iklan',
             'desc': 'Deskripsi iklan',
             'price': 'Harga',
@@ -158,8 +161,15 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
+        product = validated_data.pop('product')
+
         super().update(instance, validated_data)
+
+        instance.product.product_type = product['product_type']
+        instance.product.save()
+
         self.update_images(images, instance, remove_others=True)
+
         return instance
 
     def update_images(self, images, ad, remove_others=False):
