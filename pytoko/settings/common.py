@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'mptt',
     'compressor',
     'rest_framework',
+    'nested_inline',
     'django_elasticsearch_dsl',
     'django_filters',
     'django_extensions',

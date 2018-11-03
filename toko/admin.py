@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from nested_inline.admin import NestedModelAdmin, NestedTabularInline
 from mptt.admin import DraggableMPTTAdmin
 from .models import User, Taxonomy, ProductType, Product, Value, Field, FieldValue, Ad
 
@@ -22,17 +23,32 @@ class FieldValueForm(forms.ModelForm):
 
 class FieldValueAdmin(admin.ModelAdmin):
     form = FieldValueForm
+    fields = ('field', 'value')
+    list_display = ('field', 'value', 'product')
+
+class FieldValueInline(NestedTabularInline):
+    model = FieldValue
+    extra = 1
+
+class ProductAdmin(admin.ModelAdmin):
+    inlines = (FieldValueInline,)
+    readonly_fields = ('ad',)
+
+class ProductInline(NestedTabularInline):
+    model = Product
+    inlines = (FieldValueInline,)
+
+class AdAdmin(NestedModelAdmin):
+    inlines = (ProductInline,)
 
 admin.site.register(User)
 admin.site.register(Taxonomy, DraggableMPTTAdmin)
 
 admin.site.register(Value)
 admin.site.register(ProductType)
-admin.site.register(Product)
-admin.site.register(Ad)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Ad, AdAdmin)
+
 
 admin.site.register(Field, FieldAdmin)
 admin.site.register(FieldValue, FieldValueAdmin)
-
-
-# TODO: bulk add taxonomies from text, see laravel relevant code
