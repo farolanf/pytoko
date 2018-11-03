@@ -41,10 +41,22 @@ class AdminFieldViewSet(ModelViewSet):
     queryset = models.Field.objects.all()
     serializer_class = serializers.AdminFieldSerializer
 
+class AdminFieldValueViewSet(ModelViewSet):
+    queryset = models.FieldValue.objects.all()
+    serializer_class = serializers.AdminFieldValueSerializer
+
 class AdminProductTypeViewSet(ModelViewSet):
     queryset = models.ProductType.objects.all()
     serializer_class = serializers.AdminProductTypeSerializer
 
+class AdminProductViewSet(ModelViewSet):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.AdminProductSerializer
+
 class AdminAdViewSet(ModelViewSet):
     queryset = models.Ad.objects.order_by('-updated_at').all()
     serializer_class = serializers.AdminAdSerializer
+
+class AdminAdImageViewSet(ModelViewSet):
+    queryset = models.AdImage.objects.all()
+    serializer_class = serializers.AdminAdImageSerializer

@@ -77,6 +77,17 @@ class AdminFieldSerializer(serializers.HyperlinkedModelSerializer):
             'choices': {'view_name': 'toko:admin-value-detail'},
         }
 
+class AdminFieldValueSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.FieldValue
+        fields = ('id', 'url', 'field', 'value')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-fieldvalue-detail'},
+            'field': {'view_name': 'toko:admin-field-detail'},
+            'value': {'view_name': 'toko:admin-value-detail'},
+        }
+
 class AdminProductTypeSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
@@ -86,6 +97,17 @@ class AdminProductTypeSerializer(serializers.HyperlinkedModelSerializer):
             'url': {'view_name': 'toko:admin-producttype-detail'},
             'specs': {'view_name': 'toko:admin-field-detail'},
             'categories': {'view_name': 'toko:admin-taxonomy-detail'},
+        }
+
+class AdminProductSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.Product
+        fields = ('id', 'url', 'product_type', 'specs')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-product-detail'},
+            'product_type': {'view_name': 'toko:admin-producttype-detail'},
+            'specs': {'view_name': 'toko:admin-fieldvalue-detail'},
         }
 
 class AdminAdSerializer(serializers.HyperlinkedModelSerializer):
@@ -98,6 +120,17 @@ class AdminAdSerializer(serializers.HyperlinkedModelSerializer):
             'category': {'view_name': 'toko:admin-taxonomy-detail'},
             'provinsi': {'view_name': 'toko:admin-provinsi-detail'},
             'kabupaten': {'view_name': 'toko:admin-kabupaten-detail'},
-            'images': {'view_name': 'toko:admin-ad-image-detail'},
+            'images': {'view_name': 'toko:admin-adimage-detail'},
             'user': {'view_name': 'toko:admin-user-detail'},
+        }
+    
+class AdminAdImageSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.AdImage
+        fields = ('id', 'url', 'ad', 'file', 'order')
+        extra_kwargs = {
+            'url': {'view_name': 'toko:admin-adimage-detail'},
+            'ad': {'view_name': 'toko:admin-ad-detail'},
+            'file': {'view_name': 'toko:admin-file-detail'},
         }

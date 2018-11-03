@@ -8,7 +8,6 @@ def delete_file(sender, instance, **kwargs):
 
 @receiver(m2m_changed, sender=Product.specs.through, dispatch_uid='unique_product_spec')
 def unique_product_spec(sender, instance, pk_set, action, reverse, model, **kwargs):
-    print(sender, action, reverse)
     if action == 'pre_add':
         if not reverse:
             fields = Field.objects.filter(values__in=pk_set)
