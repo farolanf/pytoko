@@ -52,7 +52,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             'paginator': self.paginator,
             'results': response.hits.hits,
             'categories': categories,
-            'product': response.aggregations.all.query_filter.product,
+            'product': response.aggregations.product,
             'prices': self.get_prices()
         }, template_name='toko/search/search.pjax.html')
 
@@ -91,12 +91,10 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 """
         )
 
-        search.aggs.bucket('all', 'global') \
-            .bucket('query_filter', 'filter', Q('bool', must=self.get_must_filter())) \
-                .bucket('product', 'terms', field='product.title') \
-                    .bucket('specs', 'nested', path='product.specs') \
-                        .bucket('speclabel', 'terms', field='product.specs.label') \
-                            .bucket('specvalue', 'terms', field='product.specs.value')
+        search.aggs.bucket('product', 'terms', field='product.title') \
+            .bucket('specs', 'nested', path='product.specs') \
+                .bucket('speclabel', 'terms', field='product.specs.label') \
+                    .bucket('specvalue', 'terms', field='product.specs.value')
 
         return search
 
@@ -236,7 +234,7 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             for label, values in labels.items()
         ] if specs else []
 
-        must = [Q('bool', should=products + specs)] if products or specs else []
+        must = [Q('bool', must=products + specs)] if products or specs else []
 
         return must
 
