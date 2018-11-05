@@ -107,7 +107,7 @@ once(function specFilter () {
                         url: url.toString(),
                         container: '.search__results',
                         scrollTo: false,
-                        fragment: '.search__main'
+                        fragment: '.search__results'
                     }, ['.search-filter', '.search-filter__side'])
                 }
             }

@@ -2,7 +2,7 @@ once(function sortBar() {
 
     init(document)
 
-    utils.pjaxReinit('.search__main', init)
+    utils.pjaxReinit('.search__results', init)
 
     function init (container) {
         const el = container.querySelector('.sort-bar')
