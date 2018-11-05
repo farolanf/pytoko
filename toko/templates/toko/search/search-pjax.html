@@ -12,9 +12,14 @@
             {% include 'toko/search/sort-bar.html' %}
         </div>
         <div class="level-right">
-            {{ paginator.to_html }}
+            {% if paginator.page %}{{ paginator.to_html }}{% endif %}
         </div>
     </div>
+    {% if not results %}
+    <div class="notification is-danger has-text-centered">
+        Tidak ditemukan
+    </div>
+    {% endif %}
     <div class="columns is-multiline" id="search-results">
         {% for item in results %}
         {% include 'toko/ad/search-item.html' %}

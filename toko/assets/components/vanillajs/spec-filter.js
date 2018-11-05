@@ -6,6 +6,7 @@ once(function specFilter () {
 
     function init (container) {
         const el = container.querySelector('.specs-filter')
+        if (!el) return
 
         new Vue({
             el,
@@ -101,6 +102,7 @@ once(function specFilter () {
                     const url = new URLParse(document.URL, true)
                     url.query.product = this.productFilterQueryStr
                     url.query.spec = this.specFilterQueryStr
+                    url.query.page = 1
                     utils.pjax({
                         url: url.toString(),
                         container: '.search__results',
