@@ -160,3 +160,22 @@ class AdViewSet(mixins.ActionPermissionsMixin, HtmlModelViewSet):
             queryset = self.request.user.ads.order_by('-updated_at').all()
 
         return super().filter_queryset(queryset)
+
+class ValueViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
+    queryset = models.Value.objects.all()
+    serializer_class = serializers.ValueSerializer
+    action_permissions = (
+        {
+            'actions': ['field'],
+            'permission_classes': []
+        },
+    )
+
+    @action(detail=False)
+    def field(self, request):
+        """ Get all values in group """
+        field_id = request.query_params.get('id')
+        field = models.Field.objects.get(pk=field_id)
+        objs = models.Value.objects.filter(group=field.group).only('id', 'value')
+        serializer = self.get_serializer(objs, many=True)
+        return Response(serializer.data)

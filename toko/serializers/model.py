@@ -188,3 +188,9 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         if obj.provinsi.pk != int(provinsi):
             raise serializers.ValidationError('Kabupaten dan provinsi tidak sesuai')
         return obj
+
+class ValueSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Value
+        fields = ('id', 'value')

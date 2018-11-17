@@ -33,6 +33,7 @@ router.register('files', views.FileViewSet)
 
 simple_router = SimpleRouter()
 simple_router.register('search', views.SearchViewSet, base_name='search')
+simple_router.register('values', views.ValueViewSet)
 
 urlpatterns = [
 
