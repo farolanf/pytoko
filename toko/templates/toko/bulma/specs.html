@@ -1,0 +1,18 @@
+<div class="field">
+    {% if field.label %}
+    <label class="label{% if style.hide_label %} sr-only{% endif %}">{{ field.label }}</label>
+    {% endif %}
+    {% for item in field.value %}
+    <div class="field is-horizontal justify-start">
+        <div class="field-label is-normal">
+            <label>{{ item.label }}</label>
+        </div>
+        <div class="control">
+            <input type="hidden" name="{{ field.name }}[{{ forloop.counter0 }}]field" value="{{ item.field }}">
+            <input type="hidden" name="{{ field.name }}[{{ forloop.counter0 }}]label" value="{{ item.label }}">
+            <input type="text" class="input" name="{{ field.name }}[{{ forloop.counter0 }}]value" value="{{ item.value }}">
+        </div>
+    </div>
+    {% endfor %}
+    {% include 'toko/bulma/field-help.html' %}
+</div>

@@ -1,4 +1,5 @@
 import os
+import json
 from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -114,11 +115,35 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     max_length = 8
     order = ['adimage__order']
 
+class SpecSerializer(serializers.ModelSerializer):
+    value = serializers.CharField()
+
+    class Meta:
+        model = models.FieldValue
+        fields = ('id', 'field', 'value')
+
+    def to_representation(self, data):
+        ret = super().to_representation(data)
+        ret['field'] = data.field.id
+        ret['label'] = data.field.label
+        ret['value'] = json.loads(data.value.value)
+        return ret
+
+class SpecListSerializer(ListSerializer):
+    child = SpecSerializer()
+    order = ['field__label']
+
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathChoicePrimaryKeyRelatedField(queryset=get_category_queryset)
     category_path = PathPrimaryKeyRelatedField(source='category', read_only=True)
 
     product_type = DynamicQuerysetPrimaryKeyRelatedField(source='product.product_type', queryset=ProductTypeDynamicQueryset(), with_self=True)
+
+    specs = SpecListSerializer(
+        source='product.specs',
+        style={'base_template': 'specs.html'},
+        help_text='Lengkapi spek agar iklan anda mudah ditemukan'
+    )
 
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
@@ -140,11 +165,12 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Ad
 
-        fields = ('id', 'category', 'category_path', 'product_type', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'category', 'category_path', 'product_type', 'specs', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
         
         field_labels = {
             'category': 'Kategori',
             'product_type': 'Jenis produk',
+            'specs': 'Spek',
             'title': 'Judul iklan',
             'desc': 'Deskripsi iklan',
             'price': 'Harga',
@@ -165,12 +191,40 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
         super().update(instance, validated_data)
 
-        instance.product.product_type = product['product_type']
-        instance.product.save()
-
+        self.update_product(instance.product, product)
         self.update_images(images, instance, remove_others=True)
 
         return instance
+
+    def update_product(self, product, data):
+        product.product_type = data['product_type']
+
+        def get_value(field):
+            for spec in data['specs']:
+                if spec['field'] == field:
+                    return json.dumps(spec['value'])
+            return ''
+
+        for field in product.product_type.specs.all():
+            value_json = get_value(field)
+            
+            value_queryset = models.Value.objects.filter(value=value_json)
+            if value_queryset.exists():
+                value = value_queryset.first()
+            else:
+                value = models.Value.objects.create(
+                    group=field.group, value=value_json
+                )
+
+            fvalue_queryset = product.specs.filter(field=field)
+            if fvalue_queryset.exists():
+                fvalue = fvalue_queryset.first()
+                fvalue.value = value
+                fvalue.save()
+            else:
+                product.specs.create(
+                    product=product, field=field, value=value
+                )
 
     def update_images(self, images, ad, remove_others=False):
         if remove_others:
