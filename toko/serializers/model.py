@@ -126,7 +126,7 @@ class FieldListSerializer(ListSerializer):
     order = ['label']
 
 class SpecSerializer(serializers.ModelSerializer):
-    value = serializers.CharField()
+    value = serializers.CharField(default='')
 
     class Meta:
         model = models.FieldValue
@@ -147,7 +147,11 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathChoicePrimaryKeyRelatedField(queryset=get_category_queryset)
     category_path = PathPrimaryKeyRelatedField(source='category', read_only=True)
 
-    product_type = DynamicQuerysetPrimaryKeyRelatedField(source='product.product_type', queryset=ProductTypeDynamicQueryset(), with_self=True)
+    product_type = DynamicQuerysetPrimaryKeyRelatedField(
+        source='product.product_type', 
+        queryset=ProductTypeDynamicQueryset(),
+        with_self=True
+    )
 
     specs = SpecListSerializer(
         source='product.specs',
@@ -220,7 +224,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
             for spec in data['specs']:
                 if spec['field'] == field:
                     return json.dumps(spec['value'])
-            return ''
+            return json.dumps('')
 
         for field in product.product_type.specs.all():
             value_json = get_value(field)
