@@ -223,7 +223,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         def get_value(field):
             for spec in data['specs']:
                 if spec['field'] == field:
-                    return json.dumps(spec['value'])
+                    return json.dumps(spec['value'].strip())
             return json.dumps('')
 
         for field in product.product_type.specs.all():
