@@ -191,8 +191,15 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop('images')
+        product = validated_data.pop('product')
+
         instance = super().create(validated_data)
+
+        models.Product.objects.create(product_type=product['product_type'], ad=instance)
+
+        self.update_product(instance.product, product)
         self.update_images(images, instance)
+
         return instance
 
     def update(self, instance, validated_data):
