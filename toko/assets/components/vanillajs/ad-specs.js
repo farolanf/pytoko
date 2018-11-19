@@ -42,6 +42,8 @@ once(function adSpecs () {
                 categories: this.value
             }
         }).then(data => {
+            data = data.filter(x => x.title !== 'Lain-lain')
+                .concat(data.filter(x => x.title === 'Lain-lain'))
             $('[name="product_type"]').html(
                 data.map(x => `<option value="${x.id}">${x.title}</option>`).join('')
             ).trigger('change')
