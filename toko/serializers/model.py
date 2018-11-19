@@ -225,7 +225,7 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
         for field in product.product_type.specs.all():
             value_json = get_value(field)
             
-            value_queryset = models.Value.objects.filter(value=value_json)
+            value_queryset = models.Value.objects.filter(value=value_json, group=field.group)
             if value_queryset.exists():
                 value = value_queryset.first()
             else:
@@ -242,6 +242,8 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
                 product.specs.create(
                     product=product, field=field, value=value
                 )
+
+        product.specs.exclude(field__in=product.product_type.specs.all()).delete()
 
     def update_images(self, images, ad, remove_others=False):
         if remove_others:

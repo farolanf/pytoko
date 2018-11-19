@@ -9,7 +9,7 @@ once(function adSpecs () {
         data: {
             productType: '',
             specs: [],
-            values: DATA.specs.map(x => x.value),
+            values: specValueMap(),
         },
         watch: {
             productType () {
@@ -22,6 +22,7 @@ once(function adSpecs () {
                     url: `/producttype/${this.productType}/specs/`,
                 }).then(data => {
                     this.specs = data
+                    this.values = specValueMap()
                 })
             },
         },
@@ -46,4 +47,11 @@ once(function adSpecs () {
             ).trigger('change')
         })
     }).trigger('change')
+
+    function specValueMap () {
+        return DATA.specs.reduce((obj, item) => {
+            obj[item.field] = item.value
+            return obj
+        }, {})
+    }
 })
