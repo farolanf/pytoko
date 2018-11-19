@@ -115,6 +115,16 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     max_length = 8
     order = ['adimage__order']
 
+class FieldSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Field
+        fields = ('id', 'group', 'label', 'choices')
+
+class FieldListSerializer(ListSerializer):
+    child = FieldSerializer()
+    order = ['label']
+
 class SpecSerializer(serializers.ModelSerializer):
     value = serializers.CharField()
 
@@ -248,3 +258,9 @@ class ValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Value
         fields = ('id', 'value')
+
+class ProductTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ProductType
+        fields = ('id', 'title', 'specs', 'categories')

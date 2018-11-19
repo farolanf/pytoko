@@ -53,6 +53,7 @@
 
         <script>
             const DATA = {{ global.js_vars|json }}
+            DATA.delimiters = ['${', '}']
         </script>
 
         {% compress js %}

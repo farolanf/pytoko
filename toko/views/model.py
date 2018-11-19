@@ -118,49 +118,6 @@ class AdViewSet(mixins.ActionPermissionsMixin, HtmlModelViewSet):
     create_success_url = 'toko:ad-list'
     update_success_url = 'toko:ad-list'
 
-    # TODO: move to filter backend
-    # def get_queryset(self):
-    #     queryset = super().get_queryset()
-
-    #     category_id = self.request.query_params.get('category', None)
-    #     if category_id:
-    #         category = Taxonomy.objects.get(pk=category_id)
-    #         categories = category.get_descendants(include_self=True).values_list('id', flat=True)
-    #         queryset = queryset.filter(category__in=list(categories))
-
-    #     order = self.request.query_params.get('order', None)
-    #     if order:
-    #         queryset = queryset.order_by(order)
-        
-    #     return queryset
-
-    @action(detail=False)
-    def premium(self, request):
-        """
-        Get premium ads.
-        """
-        # TODO: decide which ads to show
-        ad = self.get_queryset().order_by('-updated_at').first()
-        serializer = self.get_serializer(ad, context={'request': request})
-        return Response(serializer.data)
-
-    @action(detail=False)
-    def info(self, request):
-
-        categories = self.get_queryset().order_by().values_list('category', flat=True).distinct()
-
-        return Response({
-            'count': self.get_queryset().count(),
-            'categories': categories,
-        })
-
-    def filter_queryset(self, queryset):
-        
-        if self.action == 'list':
-            queryset = self.request.user.ads.order_by('-updated_at').all()
-
-        return super().filter_queryset(queryset)
-
 class ValueViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
     queryset = models.Value.objects.all()
     serializer_class = serializers.ValueSerializer
@@ -178,4 +135,21 @@ class ValueViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
         field = models.Field.objects.get(pk=field_id)
         objs = models.Value.objects.filter(group=field.group).only('id', 'value')
         serializer = self.get_serializer(objs, many=True)
+        return Response(serializer.data)
+
+class ProductTypeViewSet(mixins.ActionPermissionsMixin, viewsets.ModelViewSet):
+    queryset = models.ProductType.objects.all()
+    serializer_class = serializers.ProductTypeSerializer
+    action_permissions = (
+        {
+            'actions': ['list', 'specs'],
+            'permission_classes': []
+        },
+    )
+    filter_fields = ('categories',)
+
+    @action(detail=True)
+    def specs(self, request, pk=None):
+        obj = self.get_object()
+        serializer = serializers.FieldListSerializer(obj.specs.all())
         return Response(serializer.data)
