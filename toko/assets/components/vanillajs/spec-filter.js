@@ -24,7 +24,8 @@ once(function specFilter () {
                 filters: {
                     product: parseProductQuery(),
                     spec: parseSpecQuery()
-                }
+                },
+                expand: {}
             },
             computed: {
                 hasFilters () {
@@ -57,6 +58,25 @@ once(function specFilter () {
                 }
             },
             methods: {
+                expandProduct (key) {
+                    this.$set(this.expand, key, !this.expand[key])
+                    this.$nextTick(() => {
+                        $(`[data-product="${key}"] > ul`, this.$el)
+                        .toggleClass('dn', !this.expand[key])
+                    })
+                },
+                isExpanded (productKey) {
+                    return this.expand[productKey] || this.productHasFilters(productKey)
+                },
+                productHasFilters (product) {
+                    return this.filters.product[product]
+                        || Object.keys(this.filters.spec).find(product => {
+                            return Object.keys(this.filters.spec[product]).find(label => {
+                                return this.filters.spec[product][label] && 
+                                    this.filters.spec[product][label].length
+                            })
+                        })
+                },
                 specFilterActive (product, label, value) {
                     if (!isNaN(value)) {
                         value = +value

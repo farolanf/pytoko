@@ -11,16 +11,17 @@
             </a>
         </div>
     </div>
-    <ul>
+    <ul class="specs-filter__specs">
         {% for product in product.buckets %}
-        <li>
+        <li data-product="{{ product.key }}">
+            <span class="icon pointer dim" :class="{dn: productHasFilters('{{ product.key }}')}" @click="expandProduct('{{ product.key }}')"><i class="fa" :class="{'fa-plus-square-o': !isExpanded('{{ product.key }}'), 'fa-minus-square-o': isExpanded('{{ product.key }}')}"></i></span>
             <a class="button is-small is-text" 
                 :class="{'is-info': filters.product.{{ product.key }}}" 
                 data-filter-title="{{ product.key }}" 
                 @click="toggleProductFilter">
                 {{ product.key }} ({{ product.doc_count }})
             </a>
-            <ul>
+            <ul :class="{dn: !isExpanded('{{ product.key }}')}">
                 {% for spec in product.specs.speclabel.buckets %}
                 <li>
                     <h5>{{ spec.key }}</h5>
