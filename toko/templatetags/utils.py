@@ -8,6 +8,7 @@ from django.urls import resolve
 from django.forms import BoundField
 from django.utils.safestring import mark_safe
 from toko.renderers import FormRenderer
+from toko.models import Taxonomy
 
 locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
 
@@ -93,6 +94,10 @@ def hidden(name, value):
 @register.inclusion_tag('toko/script.html')
 def script(path, min=False):
     return {'url': ('%s.min.js' if min else '%s.js') % path}
+
+@register.inclusion_tag('toko/category-menu.html')
+def category_menu():
+    return {'menu': Taxonomy.objects.get(slug='kategori').get_descendants()}
 
 # Filters ===================================================================
 
