@@ -1,6 +1,8 @@
+@import '~bulma/sass/utilities/all';
+
 .image-uploads__container {
-    display: grid;
-    grid-template-columns: repeat(4, auto);
+    display: flex;
+    flex-flow: row wrap;
 }
 
 .image-upload {
