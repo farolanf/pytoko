@@ -59,7 +59,9 @@ class Command(BaseCommand):
             file_obj = FileModel.objects.create(user=ad.user, file=file)
             AdImage.objects.create(ad=ad, file=file_obj, order=i)
 
-        product_type = category.product_types.order_by('?').first()
+        product_type = ProductType.objects.order_by('?').first()
+        product_type.categories.add(category)
+        
         product = Product.objects.create(ad=ad, product_type=product_type)
         for field in product_type.specs.all():
             value = field.choices.order_by('?').first()
