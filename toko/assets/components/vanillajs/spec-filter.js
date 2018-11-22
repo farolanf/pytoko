@@ -69,13 +69,17 @@ once(function specFilter () {
                     return this.expand[productKey] || this.productHasFilters(productKey)
                 },
                 productHasFilters (product) {
-                    return this.filters.product[product]
-                        || Object.keys(this.filters.spec).find(product => {
-                            return Object.keys(this.filters.spec[product]).find(label => {
-                                return this.filters.spec[product][label] && 
-                                    this.filters.spec[product][label].length
-                            })
+                    return this.filters.product[product] 
+                        || this.productHasSpecFilters(product)
+                },
+                productHasSpecFilters (productTitle) {
+                    return Object.keys(this.filters.spec).find(product => {
+                        if (product !== productTitle) return
+                        return Object.keys(this.filters.spec[product]).find(label => {
+                            return this.filters.spec[product][label] && 
+                                this.filters.spec[product][label].length
                         })
+                    })
                 },
                 specFilterActive (product, label, value) {
                     if (!isNaN(value)) {
