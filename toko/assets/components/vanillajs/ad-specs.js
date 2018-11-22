@@ -45,9 +45,18 @@ once(function adSpecs () {
             const others = ['lainnya', 'lain-lain']
             data = data.filter(x => !others.includes(x.title.toLowerCase()))
                 .concat(data.filter(x => others.includes(x.title.toLowerCase())))
-            $('[name="product_type"]').html(
+            const $sel = $('[name="product_type"]')
+            const val = $sel.val()
+            $sel.html(
                 data.map(x => `<option value="${x.id}">${x.title}</option>`).join('')
-            ).trigger('change')
+            )
+            // restore value
+            if ($(`option[value="${val}"]`, $sel).length) {
+                $sel.val(val)
+            } else {
+                $sel.val($('option:first-child', $sel).val())
+            }
+            $sel.trigger('change')
         })
     }).trigger('change')
 
