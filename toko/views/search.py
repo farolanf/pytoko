@@ -39,6 +39,12 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
 
         end = min(end, response.hits.total)
 
+        response.aggregations.all['key'] = 'Semua'
+
+        response.aggregations.product['buckets'] = [
+            response.aggregations.all
+        ] + list(response.aggregations.product['buckets'])
+
         categories = response.aggregations.categories.value.to_dict().items()
         categories = sorted(categories, key=lambda x: x[0])
 
@@ -90,6 +96,11 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
                 return categories
                 """
         )
+
+        search.aggs.bucket('all', 'filter', type={'value': 'doc'}) \
+            .bucket('specs', 'nested', path='product.specs') \
+                .bucket('speclabel', 'terms', field='product.specs.label') \
+                    .bucket('specvalue', 'terms', field='product.specs.value')
 
         search.aggs.bucket('product', 'terms', field='product.title') \
             .bucket('specs', 'nested', path='product.specs') \
@@ -206,7 +217,29 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             }
         })] if products else []
 
-        specs = [
+        specs_filter = [
+            Q('nested', path='product.specs', query={
+                'bool': {
+                    'must': [
+                        {
+                            'term': {
+                                'product.specs.label': label
+                            }
+                        },
+                        {
+                            'terms': {
+                                'product.specs.value': values
+                            }
+                        }
+                    ]
+                }
+            })
+            for title, labels in specs.items()
+            for label, values in labels.items()
+            if title.lower() == 'semua'
+        ]
+
+        specs_filter = specs_filter + [
             Q('bool', must=[
                 Q({
                     'term': {
@@ -232,9 +265,10 @@ class SearchViewSet(ActionPermissionsMixin, HtmlModelViewSet):
             ])
             for title, labels in specs.items()
             for label, values in labels.items()
+            if title.lower() != 'semua'
         ] if specs else []
 
-        must = [Q('bool', must=products + specs)] if products or specs else []
+        must = [Q('bool', must=products + specs_filter)] if products or specs_filter else []
 
         return must
 

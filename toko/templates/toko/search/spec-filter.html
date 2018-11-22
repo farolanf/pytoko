@@ -15,12 +15,18 @@
         {% for product in product.buckets %}
         <li data-product="{{ product.key }}">
             <span class="icon pointer dim" :class="{dn: productHasFilters('{{ product.key }}')}" @click="expandProduct('{{ product.key }}')"><i class="fa" :class="{'fa-plus-square-o': !isExpanded('{{ product.key }}'), 'fa-minus-square-o': isExpanded('{{ product.key }}')}"></i></span>
+            {% if product.key == 'Semua' %}
+            <span class="button is-small is-text pe-none" style="text-decoration: unset">
+                {{ product.key }} ({{ product.doc_count }})
+            </span>
+            {% else %}
             <a class="button is-small is-text" 
                 :class="{'is-info': filters.product.{{ product.key }}}" 
                 data-filter-title="{{ product.key }}" 
                 @click="toggleProductFilter">
                 {{ product.key }} ({{ product.doc_count }})
             </a>
+            {% endif %}
             <ul :class="{dn: !isExpanded('{{ product.key }}')}">
                 {% for spec in product.specs.speclabel.buckets %}
                 <li>
