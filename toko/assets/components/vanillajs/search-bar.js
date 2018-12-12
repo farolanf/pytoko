@@ -37,10 +37,13 @@ once(function search () {
                     search && this.search(item.text, item.category)
                 },
                 search (query, category) {
-                    url = URLParse(document.URL)
+                    url = URLParse(document.URL, true)
                     q = { 
                         q: query,
                         page: 1
+                    }
+                    if (!url.query.sort) {
+                        q.sort = 'Terbaru'
                     }
                     if (!category && this.fresh) {
                         category = ''

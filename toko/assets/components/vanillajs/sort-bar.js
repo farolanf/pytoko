@@ -1,14 +1,13 @@
 once(function sortBar() {
 
-    const el = document.querySelector('.sort-bar')
-    init(el)
+    init(document)
 
-    $(document).on('pjax:end', e => {
-        const el = e.target.querySelector('.sort-bar')
-        init(el)
-    })
+    utils.pjaxReinit('.search__results', init)
 
-    function init (el) {
+    function init (container) {
+        const el = container.querySelector('.sort-bar')
+        if (!el) return
+
         new Vue({
             el,
             template: el.outerHTML,

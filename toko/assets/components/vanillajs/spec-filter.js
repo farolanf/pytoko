@@ -1,110 +1,142 @@
 once(function specFilter () {
 
-    const el = document.querySelector('.specs-filter')
+    init(document)
 
-    new Vue({
-        el,
-        template: el.outerHTML,
-        data: {
-            /*
-                filters
-                    product
-                        Handphone: true
-                        Laptop: true
-                    spec
-                        Handphone
-                            Warna: value
-            */
-            filters: {
-                product: parseProductQuery(),
-                spec: parseSpecQuery()
-            }
-        },
-        computed: {
-            hasFilters () {
-                return Object.keys(this.filters.product).find(title => {
-                    return this.filters.product[title]
-                }) || Object.keys(this.filters.spec).find(product => {
-                    return Object.keys(this.filters.spec[product]).find(label => {
-                        return this.filters.spec[product][label] && 
-                            this.filters.spec[product][label].length
-                    })
-                })
-            },
-            productFilterQueryStr () {
-                // product[0]=product1&product[1]=product2,...
-                const arr = Object.keys(this.filters.product)
-                    .map(title => this.filters.product[title] ? title : null)
-                    .filter(item => item)
-                return JSON.stringify(arr)
-            },
-            specFilterQueryStr () {
-                return JSON.stringify(this.filters.spec)
-            }
-        },
-        watch: {
-            filters: {
-                handler () {
-                    this.search()
+    utils.pjaxReinit('.search-filter__side', init)
+
+    function init (container) {
+        const el = container.querySelector('.specs-filter')
+        if (!el) return
+
+        new Vue({
+            el,
+            template: el.outerHTML,
+            data: {
+                /*
+                    filters
+                        product
+                            Handphone: true
+                            Laptop: true
+                        spec
+                            Handphone
+                                Warna: value
+                */
+                filters: {
+                    product: parseProductQuery(),
+                    spec: parseSpecQuery()
                 },
-                deep: true
-            }
-        },
-        methods: {
-            specFilterActive (product, label, value) {
-                if (!isNaN(value)) {
-                    value = +value
-                }
-                return this.filters.spec[product] && this.filters.spec[product][label] &&
-                    this.filters.spec[product][label].includes(value)
+                expand: {}
             },
-            toggleProductFilter (e) {
-                const title = $(e.target).data('filter-title')
-                this.$set(this.filters.product, title, !this.filters.product[title])
+            computed: {
+                hasFilters () {
+                    return Object.keys(this.filters.product).find(title => {
+                        return this.filters.product[title]
+                    }) || Object.keys(this.filters.spec).find(product => {
+                        return Object.keys(this.filters.spec[product]).find(label => {
+                            return this.filters.spec[product][label] && 
+                                this.filters.spec[product][label].length
+                        })
+                    })
+                },
+                productFilterQueryStr () {
+                    // product[0]=product1&product[1]=product2,...
+                    const arr = Object.keys(this.filters.product)
+                        .map(title => this.filters.product[title] ? title : null)
+                        .filter(item => item)
+                    return JSON.stringify(arr)
+                },
+                specFilterQueryStr () {
+                    return JSON.stringify(this.filters.spec)
+                }
             },
-            toggleSpecFilter (e) {
-                const product = $(e.target).data('filter-product')
-                const label = $(e.target).data('filter-label')
-                const value = $(e.target).data('filter-value')
-
-                if (!this.filters.spec[product]) {
-                    this.$set(this.filters.spec, product, {})
+            watch: {
+                filters: {
+                    handler () {
+                        this.search()
+                    },
+                    deep: true
                 }
-                
-                if (!this.filters.spec[product][label]) {
-                    this.$set(this.filters.spec[product], label, [])
-                }
-
-                if (this.filters.spec[product][label].includes(value)) {
-                    const i = this.filters.spec[product][label].indexOf(value)
-                    this.filters.spec[product][label].splice(i, 1)
-                    if (this.filters.spec[product][label].length <= 0) {
-                        this.$delete(this.filters.spec[product], label)
-                        if (Object.keys(this.filters.spec[product]).length <= 0) {
-                            this.$delete(this.filters.spec, product)
-                        }
+            },
+            methods: {
+                expandProduct (key) {
+                    this.$set(this.expand, key, !this.expand[key])
+                    this.$nextTick(() => {
+                        $(`[data-product="${key}"] > ul`, this.$el)
+                        .toggleClass('dn', !this.expand[key])
+                    })
+                },
+                isExpanded (productKey) {
+                    return this.expand[productKey] || this.productHasFilters(productKey)
+                },
+                productHasFilters (product) {
+                    return this.filters.product[product] 
+                        || this.productHasSpecFilters(product)
+                },
+                productHasSpecFilters (productTitle) {
+                    return Object.keys(this.filters.spec).find(product => {
+                        if (product !== productTitle) return
+                        return Object.keys(this.filters.spec[product]).find(label => {
+                            return this.filters.spec[product][label] && 
+                                this.filters.spec[product][label].length
+                        })
+                    })
+                },
+                specFilterActive (product, label, value) {
+                    if (!isNaN(value)) {
+                        value = +value
                     }
-                } else {
-                    this.filters.spec[product][label].push(value)
+                    return this.filters.spec[product] && this.filters.spec[product][label] &&
+                        this.filters.spec[product][label].includes(value)
+                },
+                toggleProductFilter (e) {
+                    const title = $(e.target).data('filter-title')
+                    this.$set(this.filters.product, title, !this.filters.product[title])
+                },
+                toggleSpecFilter (e) {
+                    const product = $(e.target).data('filter-product')
+                    const label = $(e.target).data('filter-label')
+                    const value = $(e.target).data('filter-value')
+
+                    if (!this.filters.spec[product]) {
+                        this.$set(this.filters.spec, product, {})
+                    }
+                    
+                    if (!this.filters.spec[product][label]) {
+                        this.$set(this.filters.spec[product], label, [])
+                    }
+
+                    if (this.filters.spec[product][label].includes(value)) {
+                        const i = this.filters.spec[product][label].indexOf(value)
+                        this.filters.spec[product][label].splice(i, 1)
+                        if (this.filters.spec[product][label].length <= 0) {
+                            this.$delete(this.filters.spec[product], label)
+                            if (Object.keys(this.filters.spec[product]).length <= 0) {
+                                this.$delete(this.filters.spec, product)
+                            }
+                        }
+                    } else {
+                        this.filters.spec[product][label].push(value)
+                    }
+                },
+                clearFilters () {
+                    this.filters.product = {}
+                    this.filters.spec = {}
+                },
+                search () {
+                    const url = new URLParse(document.URL, true)
+                    url.query.product = this.productFilterQueryStr
+                    url.query.spec = this.specFilterQueryStr
+                    url.query.page = 1
+                    utils.pjax({
+                        url: url.toString(),
+                        container: '.search__results',
+                        scrollTo: false,
+                        fragment: '.search__results'
+                    }, ['.search-filter', '.search-filter__side'])
                 }
-            },
-            clearFilters () {
-                this.filters.product = {}
-                this.filters.spec = {}
-            },
-            search () {
-                const url = new URLParse(document.URL, true)
-                url.query.product = this.productFilterQueryStr
-                url.query.spec = this.specFilterQueryStr
-                utils.pjax({
-                    url: url.toString(),
-                    container: '.search__results',
-                    scrollTo: false,
-                    fragment: '.search__main'
-                }, ['.search-filter'])
             }
-        }
-    })
+        })
+    }
 
     function parseProductQuery () {
         const product = {}

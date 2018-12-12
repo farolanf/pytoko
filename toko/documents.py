@@ -1,5 +1,5 @@
 from django_elasticsearch_dsl import DocType, Index, fields
-from .models import Ad, Taxonomy, File, Product 
+from .models import Ad, Taxonomy, File, Product
 
 ads = Index('ads')
 ads.settings(
@@ -37,8 +37,11 @@ class AdDocument(DocType):
 
     def get_instances_from_related(self, related_instance):
         if isinstance(related_instance, Taxonomy):
-            return related_instance.ads.all()
+            return related_instance.ad_set.all()
         elif isinstance(related_instance, File):
             return related_instance.ad_set.all()
         elif isinstance(related_instance, Product):
-            return related_instance.ads.all()
+            try:
+                return related_instance.ad
+            except Ad.DoesNotExist as exc:
+                pass

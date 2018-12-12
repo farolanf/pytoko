@@ -18,7 +18,13 @@ api_router.register('files', views.AdminFileViewSet, base_name='admin-file')
 api_router.register('provinsi', views.AdminProvinsiViewSet, base_name='admin-provinsi')
 api_router.register('kabupaten', views.AdminKabupatenViewSet, base_name='admin-kabupaten')
 api_router.register('taxonomy', views.AdminTaxonomyViewSet, base_name='admin-taxonomy')
+api_router.register('value', views.AdminValueViewSet, base_name='admin-value')
+api_router.register('field', views.AdminFieldViewSet, base_name='admin-field')
+api_router.register('fieldvalue', views.AdminFieldValueViewSet, base_name='admin-fieldvalue')
+api_router.register('producttype', views.AdminProductTypeViewSet, base_name='admin-producttype')
+api_router.register('product', views.AdminProductViewSet, base_name='admin-product')
 api_router.register('ads', views.AdminAdViewSet, base_name='admin-ad')
+api_router.register('adimage', views.AdminAdImageViewSet, base_name='admin-adimage')
 
 router = AppRouter()
 router.register('ads', views.AdViewSet)
@@ -27,6 +33,8 @@ router.register('files', views.FileViewSet)
 
 simple_router = SimpleRouter()
 simple_router.register('search', views.SearchViewSet, base_name='search')
+simple_router.register('values', views.ValueViewSet)
+simple_router.register('producttype', views.ProductTypeViewSet)
 
 urlpatterns = [
 

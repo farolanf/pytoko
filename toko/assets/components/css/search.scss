@@ -14,6 +14,10 @@
     .specs-filter__bar {
         min-height: 1.8rem;        
     }
+    .specs-filter__specs {
+        margin-left: 0;
+        list-style: none;
+    }
     h4 {
         font-weight: unset !important;
         font-size: .875rem;

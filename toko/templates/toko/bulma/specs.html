@@ -1,0 +1,21 @@
+{% load utils %}
+
+<div class="field">
+    {% if field.label %}
+    <label class="label{% if style.hide_label %} sr-only{% endif %}">{{ field.label }}</label>
+    {% endif %}
+    <div class="specs-container dn">
+        <div v-for="field, i in specs" class="field is-horizontal justify-start">
+            <div class="field-label is-normal">
+                <label>${ field.label }</label>
+            </div>
+            <div class="control">
+                <input type="hidden" class="input" :name="`specs[${i}]field`" :value="field.id">
+                <input type="text" class="input" :name="`specs[${i}]value`" :value="values[field.id]" @input="values[field.id] = $event.target.value">
+            </div>
+        </div>
+    </div>
+    {% include 'toko/bulma/field-help.html' %}
+</div>
+
+{% js '/static/toko/js/ad-specs.js' %}

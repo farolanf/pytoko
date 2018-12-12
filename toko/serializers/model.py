@@ -1,4 +1,5 @@
 import os
+import json
 from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -8,7 +9,7 @@ from toko.mixins import ValidatePasswordMixin, SetFieldLabelsMixin, ExtraItemsMi
 from toko import models
 from toko.utils.file import inc_filename
 from toko.fields import DynamicQuerysetPrimaryKeyRelatedField, PathPrimaryKeyRelatedField, PathChoicePrimaryKeyRelatedField
-from toko.querysets import KabupatenDynamicQueryset, get_category_queryset
+from toko.querysets import KabupatenDynamicQueryset, get_category_queryset, ProductTypeDynamicQueryset
 
 User = get_user_model()
 
@@ -112,11 +113,51 @@ class AdImageListSerializer(ExtraItemsMixin, ListSerializer):
     extras = 8
     min_length = 0
     max_length = 8
-    order = ['adimages__order']
+    order = ['adimage__order']
+
+class FieldSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Field
+        fields = ('id', 'group', 'label', 'choices')
+
+class FieldListSerializer(ListSerializer):
+    child = FieldSerializer()
+    order = ['label']
+
+class SpecSerializer(serializers.ModelSerializer):
+    value = serializers.CharField(default='')
+
+    class Meta:
+        model = models.FieldValue
+        fields = ('id', 'field', 'value')
+
+    def to_representation(self, data):
+        ret = super().to_representation(data)
+        ret['field'] = data.field.id
+        ret['label'] = data.field.label
+        ret['value'] = json.loads(data.value.value)
+        return ret
+
+class SpecListSerializer(ListSerializer):
+    child = SpecSerializer()
+    order = ['field__label']
 
 class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     category = PathChoicePrimaryKeyRelatedField(queryset=get_category_queryset)
     category_path = PathPrimaryKeyRelatedField(source='category', read_only=True)
+
+    product_type = DynamicQuerysetPrimaryKeyRelatedField(
+        source='product.product_type', 
+        queryset=ProductTypeDynamicQueryset(),
+        with_self=True
+    )
+
+    specs = SpecListSerializer(
+        source='product.specs',
+        style={'base_template': 'specs.html'},
+        help_text='Lengkapi spek agar iklan anda mudah ditemukan'
+    )
 
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
@@ -138,10 +179,12 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Ad
 
-        fields = ('id', 'category', 'category_path', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
+        fields = ('id', 'category', 'category_path', 'product_type', 'specs', 'title', 'desc', 'price', 'nego', 'images', 'provinsi', 'kabupaten', 'user', 'created_at', 'updated_at')
         
         field_labels = {
             'category': 'Kategori',
+            'product_type': 'Jenis produk',
+            'specs': 'Spek',
             'title': 'Judul iklan',
             'desc': 'Deskripsi iklan',
             'price': 'Harga',
@@ -152,29 +195,86 @@ class AdSerializer(SetFieldLabelsMixin, serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop('images')
+        product = validated_data.pop('product')
+
         instance = super().create(validated_data)
+
+        models.Product.objects.create(product_type=product['product_type'], ad=instance)
+
+        self.update_product(instance.product, product)
         self.update_images(images, instance)
+
         return instance
 
     def update(self, instance, validated_data):
         images = validated_data.pop('images')
+        product = validated_data.pop('product')
+
         super().update(instance, validated_data)
+
+        self.update_product(instance.product, product)
         self.update_images(images, instance, remove_others=True)
+
         return instance
+
+    def update_product(self, product, data):
+        product.product_type = data['product_type']
+
+        def get_value(field):
+            for spec in data['specs']:
+                if spec['field'] == field:
+                    return json.dumps(spec['value'].strip())
+            return json.dumps('')
+
+        for field in product.product_type.specs.all():
+            value_json = get_value(field)
+            
+            value_queryset = models.Value.objects.filter(value__iexact=value_json, group=field.group)
+            if value_queryset.exists():
+                value = value_queryset.first()
+            else:
+                value = models.Value.objects.create(
+                    group=field.group, value=value_json
+                )
+
+            fvalue_queryset = product.specs.filter(field=field)
+            if fvalue_queryset.exists():
+                fvalue = fvalue_queryset.first()
+                fvalue.value = value
+                fvalue.save()
+            else:
+                product.specs.create(
+                    product=product, field=field, value=value
+                )
+
+        product.specs.exclude(field__in=product.product_type.specs.all()).delete()
+        product.save()
 
     def update_images(self, images, ad, remove_others=False):
         if remove_others:
             # remove other images
             file_ids = [img['id'] for img in images if img['id']]
-            models.AdImages.objects.filter(ad=ad).exclude(file_id__in=file_ids).delete()
+            models.AdImage.objects.filter(ad=ad).exclude(file_id__in=file_ids).delete()
         
         # update order
         for i, img in enumerate(images):
             if not img['id']: continue
-            models.AdImages.objects.update_or_create(ad=ad, file_id=img['id'], defaults={'order': i})
+            models.AdImage.objects.update_or_create(ad=ad, file_id=img['id'], defaults={'order': i})
 
     def validate_kabupaten(self, obj):
         provinsi = self.get_initial()['provinsi']
         if obj.provinsi.pk != int(provinsi):
             raise serializers.ValidationError('Kabupaten dan provinsi tidak sesuai')
         return obj
+
+class ValueSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Value
+        fields = ('id', 'value')
+
+class ProductTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ProductType
+        fields = ('id', 'title', 'specs', 'categories')

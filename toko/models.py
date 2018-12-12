@@ -96,8 +96,12 @@ class Field(models.Model):
         return self.label
 
 class FieldValue(models.Model):
+    product = models.ForeignKey('Product', related_name='specs', on_delete=models.CASCADE)
     field = models.ForeignKey(Field, related_name='values', on_delete=models.CASCADE)
     value = models.ForeignKey(Value, related_name='field_values', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('product', 'field')
 
     def __str__(self):
         return '%s: %s' % (self.field.label, json.loads(self.value.value))
@@ -112,7 +116,7 @@ class ProductType(models.Model):
 
 class Product(models.Model):
     product_type = models.ForeignKey(ProductType, related_name='products', on_delete=models.CASCADE)
-    specs = models.ManyToManyField(FieldValue, related_name='products')
+    ad = models.OneToOneField('Ad', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.product_type.title
@@ -126,10 +130,9 @@ class Ad(models.Model):
     desc = models.CharField(max_length=4000)
     price = models.IntegerField()
     nego = models.BooleanField()
-    images = models.ManyToManyField(File, through='AdImages')
+    images = models.ManyToManyField(File, through='AdImage')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    product = models.ForeignKey(Product, related_name='ads', null=True, on_delete=models.CASCADE)
 
     def images_url(self):
         return [
@@ -156,7 +159,7 @@ class Ad(models.Model):
     def __str__(self):
         return self.title
 
-class AdImages(models.Model):
+class AdImage(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     order = models.SmallIntegerField()

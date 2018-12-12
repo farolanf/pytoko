@@ -33,7 +33,7 @@
     <body>
         {% include 'toko/topbar.html' %}
         
-        <div class="container ph2 ph0-ns">
+        <div class="container ph2 ph0-l">
             {% block content %}{% endblock %}
         </div>
 
@@ -53,6 +53,7 @@
 
         <script>
             const DATA = {{ global.js_vars|json }}
+            DATA.delimiters = ['${', '}']
         </script>
 
         {% compress js %}

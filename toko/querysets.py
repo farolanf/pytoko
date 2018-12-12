@@ -35,3 +35,15 @@ class KabupatenDynamicQueryset(DynamicQueryset):
     
     def get_initial_queryset(self, field):
         return field.root.fields['provinsi'].get_queryset().first().kabupaten_set.all()
+
+class ProductTypeDynamicQueryset(DynamicQueryset):
+
+    def get_input_queryset(self, field):
+        category_id = field.root.get_initial()['category']
+        return models.Taxonomy.objects.get(pk=category_id).product_types.all()
+
+    def get_output_queryset(self, field):
+        return field.root.instance.category.product_types.all()
+
+    def get_initial_queryset(self, field):
+        return models.ProductType.objects.all()

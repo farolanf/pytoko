@@ -10,10 +10,10 @@
 {% include './search-block.html' %}
 {% include './search-filter.html' %}
 {% if not results %}
-<div class="box has-text-centered">
+<div class="notification is-danger has-text-centered">
     Tidak ditemukan
 </div>
-{% endif %}
+{% else %}
 <div class="columns">
     <div class="column is-narrow search-filter__side">
         {% include './search-filter-side.html' %}
@@ -24,7 +24,7 @@
                 {% include 'toko/search/sort-bar.html' %}
             </div>
             <div class="level-right">
-                {{ paginator.to_html }}
+                {% if paginator.page %}{{ paginator.to_html }}{% endif %}
             </div>
         </div>
         <div class="columns is-multiline" id="search-results">
@@ -35,10 +35,15 @@
         {% pagination paginator %}
     </div>
 </div>
+{% endif %}
+
 {% css '/static/toko/css/ad.css' %}
 {% css '/static/toko/css/search.css' %}
 
 {% js '/static/lib/vue.min.js' %}
+{% js '/static/lib/jquery.pjax.js' %}
+
 {% js '/static/toko/js/search-filter.js' %}
 {% js '/static/toko/js/sort-bar.js' %}
+{% js '/static/toko/js/spec-filter.js' %}
 {% endblock %}

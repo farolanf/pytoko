@@ -1,0 +1,1 @@
+[{"model": "toko.field", "pk": 2, "fields": {"group": 2, "label": "Warna", "choices": [5, 6, 7]}}, {"model": "toko.field", "pk": 3, "fields": {"group": 3, "label": "Ukuran layar", "choices": [8, 9, 10, 11]}}, {"model": "toko.field", "pk": 4, "fields": {"group": 4, "label": "Merek", "choices": [12, 13, 14]}}]

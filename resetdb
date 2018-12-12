@@ -1,0 +1,14 @@
+rm db.sqlite 2> /dev/null
+rm toko/migrations/* -rf
+touch toko/migrations/__init__.py
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py createsuperuser
+python manage.py resettaxonomy toko/data/taxonomy
+python manage.py loaddata toko/data/provinsi.json
+python manage.py loaddata toko/data/kabupaten.json
+python manage.py loaddata toko/data/values.json
+python manage.py loaddata toko/data/fields.json
+python manage.py loaddata toko/data/producttypes.json
+python manage.py fillads toko/data/products.csv
