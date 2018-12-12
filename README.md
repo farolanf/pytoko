@@ -21,3 +21,9 @@ Please ignore the old frontend code in the `/app` folder, it stays there for ref
     - this will take a minute or two
 - python manage.py runserver
 - open http://localhost:8000
+- enter something in the search box
+
+## Issues
+
+- product filters on the sidebar is currently broken
+- many features not implemented yet
