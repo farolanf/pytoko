@@ -12,7 +12,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import datetime
+import locale
 from dotenv import load_dotenv
+
+# locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
+locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -108,7 +112,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
@@ -120,12 +123,6 @@ REST_FRAMEWORK = {
         'search': '60/min',
     },
     'EXCEPTION_HANDLER': 'toko.views.exception_handler',
-}
-
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_ALLOW_REFRESH': True,
 }
 
 STATICFILES_FINDERS = [

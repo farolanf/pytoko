@@ -9,13 +9,9 @@ INTERNAL_IPS = ['127.0.0.1']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'localhost',
-        'NAME': 'pytoko',
-        'USER': 'pytoko',
-        'PASSWORD': 'pytoko',
-        'COLLATION': 'utf8_general_ci',
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite'),
+    }
 }
 
 DEBUG_TOOLBAR = False

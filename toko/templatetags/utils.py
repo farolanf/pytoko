@@ -10,8 +10,6 @@ from django.utils.safestring import mark_safe
 from toko.renderers import FormRenderer
 from toko.models import Taxonomy
 
-locale.setlocale(locale.LC_ALL, 'id_ID.utf8')
-
 register = template.Library()
 
 def get_attribute(obj, attrs):
