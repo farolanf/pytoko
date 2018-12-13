@@ -5,6 +5,8 @@ python manage.py makemigrations
 python manage.py migrate
 
 python manage.py createsuperuser
+
+echo Populating database...
 python manage.py resettaxonomy toko/data/taxonomy
 python manage.py loaddata toko/data/provinsi.json
 python manage.py loaddata toko/data/kabupaten.json
@@ -13,4 +15,5 @@ python manage.py loaddata toko/data/fields.json
 python manage.py loaddata toko/data/producttypes.json
 python manage.py fillads toko/data/products.csv
 
+echo Rebuilding search index...
 python manage.py search_index --rebuild -f
