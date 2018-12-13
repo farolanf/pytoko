@@ -12,3 +12,5 @@ python manage.py loaddata toko/data/values.json
 python manage.py loaddata toko/data/fields.json
 python manage.py loaddata toko/data/producttypes.json
 python manage.py fillads toko/data/products.csv
+
+python manage.py search_index --rebuild
