@@ -25,5 +25,4 @@ Please ignore the old frontend code in the `/app` folder, it stays there for ref
 
 ## Issues
 
-- product filters on the sidebar is currently broken
 - many features not implemented yet
