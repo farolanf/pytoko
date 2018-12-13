@@ -14,6 +14,7 @@ Please ignore the old frontend code in the `/app` folder, it stays there for ref
 ## Setup
 
 - npm install
+- npm run prod
 - pip install -r requirements.txt
 - ./resetdb
     - enter details to create superuser
